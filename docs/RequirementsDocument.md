@@ -79,7 +79,7 @@ EZShop is a software application to:
 | ------------- |:-------------:| 
 |  FR1     |  |
 |  FR2     |   |
-| | | 
+| FRx..  | | 
 
 ## Non Functional Requirements
 
@@ -90,7 +90,7 @@ EZShop is a software application to:
 |  NFR1     |   |  | |
 |  NFR2     | |  | |
 |  NFR3     | | | |
-| | | | | 
+| NFRx .. | | | | 
 
 
 # Use case diagram and use cases

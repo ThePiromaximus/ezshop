@@ -1,10 +1,12 @@
 # Timesheet
 
 Report in this table the effort (in person hours) spent per week, per activity, per team. 
-This means that you have to sum the working hours of each component of the team.
-Count only effort spent on EZShop (so do not count effort spent in virtual labs 1 to 4)
+[One person hour is the effort of one person working one hour.
+Two person hours is the effort of one person working 2 hours, or 2 persons woring one hour. And so on.]
+You have to sum the working hours of each component of the team.
+Count only effort spent on EZShop (so do not count effort spent in virtual labs 1 to 3)
 
-These figures will not be used to evaluate neither the project nor the team
+These figures will not be used to evaluate neither the project nor the team, they are meant as practical application of basic project management.
 
 | Week | requirement engineering | design | coding | unit testing | integration testing | acceptance testing | management | git maven |
 |:-----------:|:--------:|:-----------:|:-----------:|:----------:|:------------:|:---------------:|:-------------:|:--------------:|

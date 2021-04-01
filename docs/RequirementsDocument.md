@@ -30,10 +30,10 @@ Version:
 
 Small shops require a simple application to support the owner or manager. A small shop (ex a food shop) occupies 50-200 square meters, sells 500-2000 different item types, has one or a few cash registers 
 EZShop is a software application to:
-	* manage sales
-	* manage inventory
-	* manage customers
-	* support accounting
+* manage sales
+* manage inventory
+* manage customers
+* support accounting
 
 
 # Stakeholders
@@ -64,7 +64,7 @@ EZShop is a software application to:
 
 \<Persona is-an-instance-of actor>
 
-\<stories will be formalized later as use cases>
+\<stories will be formalized later as scenarios in use cases>
 
 
 # Functional and non functional requirements
@@ -73,7 +73,7 @@ EZShop is a software application to:
 
 \<In the form DO SOMETHING, or VERB NOUN, describe high level capabilities of the system>
 
-\<will match to high level use cases>
+\<they match to high level use cases>
 
 | ID        | Description  |
 | ------------- |:-------------:| 
@@ -128,17 +128,19 @@ EZShop is a software application to:
 
 ##### Scenario 1.2
 
+##### Scenario 1.x
+
 ### Use case 2, UC2
 ..
 
-### Use case
+### Use case x, UCx
 ..
 
 
 
 # Glossary
 
-\<use UML class diagram to define important concepts in the domain of the system, and their relationships> 
+\<use UML class diagram to define important terms, or concepts in the domain of the system, and their relationships> 
 
 \<concepts are used consistently all over the document, ex in use cases, requirements etc>
 

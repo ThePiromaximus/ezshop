@@ -41,7 +41,7 @@ EZShop is a software application to:
 
 | Stakeholder name  | Description | 
 | ----------------- |:-----------:|
-|                   |             | 
+|   Stakeholder x..     |             | 
 
 # Context Diagram and interfaces
 
@@ -57,7 +57,7 @@ EZShop is a software application to:
 
 | Actor | Logical Interface | Physical Interface  |
 | ------------- |:-------------:| -----:|
-|       |  |  |
+|   Actor x..     |  |  |
 
 # Stories and personas
 \<A Persona is a realistic impersonation of an actor. Define here a few personas and describe in plain text how a persona interacts with the system>

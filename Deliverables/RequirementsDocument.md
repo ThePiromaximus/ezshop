@@ -1240,11 +1240,14 @@ System -- VFC
 VFC -- Customer
 @enduml
 ```
+## POS System specifications
+The application is compatible with any POS system able to run on an odoo-derived OS.
+This ensures the communication between the POS system and the EZShop system through odoo's external APIs.
 
 # System Design
-\<describe here system design>
-
-\<must be consistent with Context diagram>
+The system is setup through one or more independent POS systems that communicate with the EZShop backend.
+Each frontend device, a personal computer, fetches information from the backend.
+Refer to the following deployment diagram.
 
 # Deployment Diagram 
 ```plantuml

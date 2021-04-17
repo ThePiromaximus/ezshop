@@ -17,6 +17,7 @@ Version:
 - [Stories and personas](#stories-and-personas)
 - [Functional and non functional requirements](#functional-and-non-functional-requirements)
 	+ [Functional Requirements](#functional-requirements)
+	+ [Access rights](#access-rights)
 	+ [Non functional requirements](#non-functional-requirements)
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
 	+ [Use case diagram](#use-case-diagram)
@@ -88,7 +89,7 @@ POS -down-> EZS
 | Cashier | Desktop GUI | PC |
 | Warehouse worker | Desktop GUI | PC |
 | Accountant | Desktop GUI | PC |
-| POS System | Software API (https://unicenta.com/) | Ethernet Link |
+| POS System | Software API (https://www.odoo.com/documentation/14.0/index.html) | Internet Link |
 
 # Stories and personas
 > The following example set of personas refer to the workers of a mini-market.
@@ -1146,7 +1147,7 @@ UC6 .up.> UC7 : <<includes>>
 ```plantuml
 @startuml
 class "POS System" as POS
-note right of POS : The POS System includes\na cash register,\nbarcode scanner,\nand handles all kind\nof payment methods
+note right of POS : The POS System includes\na cash register,\nbarcode scanner,\nand handles all kind\nof payment methods,\ncommunicates with the system\nthrough API (more details in\nInterfaces section)
 class Worker {
 Name
 Surname
@@ -1203,6 +1204,7 @@ CardID
 Points
 Expire date
 }
+note top of VFC : Fidelity card points\nto be added\nare computed with formula:\npoints += int(total_price*10)
 class Supplier {
 SupplierName
 SupplierID
@@ -1211,7 +1213,7 @@ Email
 PhoneNumber
 }
 class System
-note top of System : EZShop Software
+note left of System : EZShop Software
 
 Product "*" -up- Inventory : < stores
 Product -- ProductDescriptor : < describes
@@ -1225,6 +1227,8 @@ Order -- Supplier : > contains
 Sale -- Product : > contains
 Worker "*" -- Incexi
 System -up- POS : < sends its own sale report
+"Cash Register" -down- POS
+"Barcode Scanner" -down- POS
 System -- Sale : > records
 note bottom of Sale : The systems create its own instance,\nmanaging completed transactions data
 System -- Worker : < uses

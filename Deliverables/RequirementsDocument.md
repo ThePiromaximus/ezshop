@@ -122,6 +122,7 @@ Mark is 45 years old and has been working as an accountant at EzShop for 15 year
 | -1.2 | Modify an existing worker |
 | -1.3 | Delete a worker |
 | -1.4 | Show all the workers |
+| -1.5 | Show personal page |
 | FR2 | Manage sales |
 | -2.1 | Process receipt from POS System |
 | -2.2 | Update inventory |

@@ -1,10 +1,10 @@
 # Requirements Document 
 
-Authors:
+Authors: D'Antonio Angela, Inzerillo Gabriele, Nocera Ruggero, Vallero Marzio
 
-Date:
+Date: 17/04/2021
 
-Version:
+Version: 1.0
 
 # Contents
 
@@ -15,6 +15,11 @@ Version:
 	+ [Interfaces](#interfaces) 
 	
 - [Stories and personas](#stories-and-personas)
+	+ [Manager](#manager)
+	+ [Cashier](#cashier)
+	+ [Warehouse worker](#warehouse-worker)
+	+ [Accountant](#accountant)
+
 - [Functional and non functional requirements](#functional-and-non-functional-requirements)
 	+ [Functional Requirements](#functional-requirements)
 	+ [Access rights](#access-rights)
@@ -22,7 +27,6 @@ Version:
 - [Use case diagram and use cases](#use-case-diagram-and-use-cases)
 	+ [Use case diagram](#use-case-diagram)
 	+ [Use cases](#use-cases)
- 	+ [Relevant scenarios](#relevant-scenarios)
 - [Glossary](#glossary)
 - [System design](#system-design)
 - [Deployment diagram](#deployment-diagram)
@@ -314,6 +318,7 @@ UC5 .up.> UC7 : <<includes>>
 UC6 .up.> UC7 : <<includes>>
 @enduml
 ```
+## Use cases
 
 ### UC1: Manage worker
 | Actors Involved | Manager |
@@ -321,7 +326,7 @@ UC6 .up.> UC7 : <<includes>>
 | Precondition | The system is fully set up and running, actor has an account and logged in |
 | Post condition | The system is fully running and all workers are aware of the modifications (if they can see them) |
 | Includes use cases | UC1.1, UC1.2, UC1.3 |
-| Nominal Scenario | The actor clicks the "Manage worker" tab |
+| Nominal Scenario | The actor clicks the "Workers" tab |
 
 ### UC1.1: Add a new worker in the worker list
 | Actors Involved | Manager |
@@ -442,7 +447,7 @@ UC6 .up.> UC7 : <<includes>>
 | Precondition | The software is fully set up, actor has an account and logged in |
 | Post condition | The software system is fully running and coherent with sales updates|
 | Include uses cases | UC2.1, UC2.2 |
-| Nominal scenario | The actor clicks the "Manage Sale" tab |
+| Nominal scenario | The actor clicks the "Sales" tab |
 
 ### UC2.1: Software data are updated after payment 
 | Actors Involved | Manager, Cashier, POS System |
@@ -552,7 +557,7 @@ UC6 .up.> UC7 : <<includes>>
 | Precondition | The system is running, the actor is logged in and has the correct access rights |
 | Post condition | The system is running and consistent with the changes made in the inventory |
 | Includes use cases | UC3.1, UC3.2, UC3.3, UC3.4 |
-| Nominal scenario | Actor clicks the "Manage Inventory" tab |
+| Nominal scenario | Actor clicks the "Inventory" tab |
 
 ### Use case 3.1, UC3.1 - Add a new product to all product list 
 
@@ -727,7 +732,7 @@ UC6 .up.> UC7 : <<includes>>
 | Precondition | The system is running, the actor is logged in and has the correct access rights |
 | Post condition | The system is running and consistent with the changes made (if any) |
 | Includes use cases | UC4.1, UC4.2, UC4.3 |
-| Nominal scenario | The actor clicks onto the 'Management' tab, all options are shown |
+| Nominal scenario | The actor clicks onto the 'Accounting' tab, all options are shown |
 | Variants | - |
 
 --- 

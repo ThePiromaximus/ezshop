@@ -352,7 +352,7 @@ UC6 .up.> UC7 : <<includes>>
 | 7 | The system inserts the new record and the actor is prompted with a 'Success' message |
 
 #### Scenario 1.1.2
-| Scenario ID: 1.1.2| Variant of UC1.1|
+| Scenario ID: 1.1.2| Variant of scenario 1.1.1|
 | ------------- |:-------------|
 | Description | The actor tries to add a new worker to the system, but then cancels the operation|
 | Precondition | The account of the worker that has to be inserted doesn't exist |
@@ -392,7 +392,7 @@ UC6 .up.> UC7 : <<includes>>
 | 8 | The system modifies the record and the actor is prompted with a 'Success' message |
 
 #### Scenario 1.2.2 
-| Scenario ID: 1.2.2 | Variant of UC1.2 |
+| Scenario ID: 1.2.2 | Variant of scenario 1.2.1 |
 | ------------- |:-------------|
 | Description | The actor tries to modify a worker record already present in the system, but then cancels the operation|
 | Precondition | The worker account that has to be modifed does exists |
@@ -430,7 +430,7 @@ UC6 .up.> UC7 : <<includes>>
 | 5 | The system removes the record and the actor is prompted with a 'Success' message |
 
 #### Scenario 1.3.2
-| Scenario ID: 1.3.2 | Variant of UC1.3 |
+| Scenario ID: 1.3.2 | Variant of scenario 1.3.1 |
 | ------------- |:-------------|
 | Description | The actor tries to remove a worker record already present in the system, but then cancels the operation |
 | Precondition | The account of the worker thas has to be deleted does exists |
@@ -474,7 +474,7 @@ UC6 .up.> UC7 : <<includes>>
 | 8 | All databases have been updates successfully and the actor is prompted with a 'Success' message.|
 
 #### Scenario 2.1.2
-| Scenario ID: 2.1.2 | Variant of UC2.1|
+| Scenario ID: 2.1.2 | Variant of scenario 2.1.1|
 | ------------- |:-------------|
 | Description | The software update also the statistics based on the total number of point earned by the customer |
 | Precondition | The customer is registered and has a fidelity card |
@@ -513,7 +513,7 @@ UC6 .up.> UC7 : <<includes>>
 
 
 #### Scenario 2.2.2
-| Scenario ID: 2.2.2 | Variant of UC2.2 |
+| Scenario ID: 2.2.2 | Variant of scenario 2.2.1 |
 | ------------- |:-------------|
 | Description | The actor successfully cancel a sale because the customer wants to be totally refunded |
 | Precondition | The sale that has to be deleted is stored in the system |
@@ -533,7 +533,7 @@ UC6 .up.> UC7 : <<includes>>
 
 #### Scenario 2.2.3
 
-| Scenario ID: 2.2.3 | Variant of UC2.2 |
+| Scenario ID: 2.2.3 | Variant of scenario 2.2.1 |
 | ------------- |:-------------|
 | Description | The customer only wants to return a specific product, the actor successfully cancel a specific product of a sale|
 | Precondition | The product that has to be deleted is stored in the system |
@@ -583,7 +583,7 @@ UC6 .up.> UC7 : <<includes>>
 
 #### Scenario 3.1.2
 
-| Scenario 3.1.2 | Variant of UC3.1 |
+| Scenario 3.1.2 | Variant of scenario 3.1.1 |
 | :-------------: | :-------------- |
 | Precondition | The product P already exists in the product list |
 | Post condition | The product P is not added to the product list |
@@ -634,7 +634,7 @@ UC6 .up.> UC7 : <<includes>>
 
 #### Scenario 3.2.3
 
-| Scenario 3.2.3 | Variant of UC3.2 |
+| Scenario 3.2.3 | Variant of scenario 3.2.2 |
 | :-------------: | :-------------- |
 | Precondition | Same of UC3.2 |
 | Post condition | The product P is not removed from the product list |
@@ -669,7 +669,7 @@ UC6 .up.> UC7 : <<includes>>
 
 #### Scenario 3.3.2
 
-| Scenario 3.3.2 | Variant of UC3.3 |
+| Scenario 3.3.2 | Variant of scenario 3.3.1 |
 | :-------------: | :---------------|
 | Precondition | Same of UC3.3 |
 | Post condition | The product P is not modified |
@@ -958,7 +958,7 @@ UC6 .up.> UC7 : <<includes>>
 
 #### Scenario 5.2.2
 
-| Scenario ID: 5.2.2 | Variant of scenario 5.2 |
+| Scenario ID: 5.2.2 | Variant of scenario 5.2.1 |
 | ------------- |:-------------|
 | Description | A manager worker tries to modify a supplier record already present in the system, but then cancels the operation. |
 | Precondition | At least a supplier exists. |
@@ -991,7 +991,7 @@ UC6 .up.> UC7 : <<includes>>
 
 #### Scenario 5.3.2
 
-| Scenario ID: 5.3.2 | Variant of scenario 5.3 |
+| Scenario ID: 5.3.2 | Variant of scenario 5.3.1 |
 | ------------- |:-------------|
 | Description | A manager worker tries to remove a supplier record already present in the system, but then cancels the operation. |
 | Precondition | At least a supplier exists. |
@@ -1031,7 +1031,7 @@ UC6 .up.> UC7 : <<includes>>
 
 #### Scenario 6.1.2
 
-| Scenario ID: 6.1.2 | Variant of scenario 6.1 |
+| Scenario ID: 6.1.2 | Variant of scenario 6.1.1 |
 | ------------- |:-------------|
 | Description | An actor tries to add a new customer to the system, but then cancels the operation. |
 | Precondition | See UC6 |
@@ -1101,7 +1101,7 @@ UC6 .up.> UC7 : <<includes>>
 
 #### Scenario 6.3.2
 
-| Scenario ID: 6.3.2 | Variant of scenario 6.3 |
+| Scenario ID: 6.3.2 | Variant of scenario 6.3.1 |
 | ------------- |:-------------|
 | Description | A Manager/Cashier worker tries to remove a customer record already present in the system, but then cancels the operation. |
 | Precondition | At least one customer record exists. |
@@ -1245,9 +1245,9 @@ System -- VFC
 VFC -- Customer
 @enduml
 ```
-## POS System specifications
-The application is compatible with any POS system able to run on an odoo-derived OS.
-This ensures the communication between the POS system and the EZShop system through odoo's external APIs.
+> ### POS System specifications:
+> The application is compatible with any POS system able to run on an odoo-derived OS.
+> This ensures the communication between the POS system and the EZShop system through odoo's external APIs.
 
 # System Design
 The system is setup through one or more independent POS systems that communicate with the EZShop backend.

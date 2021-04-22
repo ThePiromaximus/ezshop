@@ -17,7 +17,7 @@ Version:
 
 # Instructions
 
-The design must satisfy the Official Requirements document 
+The design must satisfy the Official Requirements document, notably functional and non functional requirements
 
 # High level design 
 

@@ -29,7 +29,7 @@ Version:
 | Testing | 135 |
 ###
 
-´´´plantuml
+```plantuml
 @startgantt
 title Gantt's diagram
 project starts the 2021/04/05
@@ -44,4 +44,4 @@ sunday are closed
 [Testing] lasts 5 days
 [Testing] starts at [Implementation]'s end
 @endgantt
-´´´
+```

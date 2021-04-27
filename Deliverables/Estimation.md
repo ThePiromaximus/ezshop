@@ -1,7 +1,7 @@
 # Project Estimation  
-Authors:
-Date:
-Version:
+Authors: Angela D'Antonio, Gabriele Inzerillo, Ruggero Nocera, Marzio Vallero
+Date: 27/04/2021
+Version: 1.1
 # Contents
 - [Estimate by product decomposition]
 - [Estimate by activity decomposition ]

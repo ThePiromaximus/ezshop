@@ -38,8 +38,6 @@ GUI <--> EZS
 ```
 
 
-
-
 # Low level design
 
 <for each package, report class diagram>
@@ -54,29 +52,8 @@ Customer
 Ticket
 BalanceOperation
 
-Exc:
-InvalidCreditCardException
-InvalidCustomerCardException
-InvalidCustomerIdException
-InvalidCustomerNameException
-InvalidDiscountRateException
-InvalidLocationException
-InvalidOrderIdException
-InvalidPasswordException
-InvalidPaymentException
-InvalidPricePerUnitException
-InvalidProductCodeException
-InvalidProductCodeException
-InvalidProductDescriptionException
-InvalidProductIdException
-InvalidQuantityException
-InvalidRoleException
-InvalidTicketNumberException
-InvalidTransactionIdException
-InvalidUserIdException
-InvalidUsernameException
-UnauthorizedException
 
+### Exception Package
 ```plantuml
 @startuml
 class "Exception" as E
@@ -105,6 +82,7 @@ InvalidUsernameException -down--|> E
 UnauthorizedException -down-|> E
 @enduml
 ```
+
 # Verification traceability matrix
 
 \<for each functional requirement from the requirement document, list which classes concur to implement it>

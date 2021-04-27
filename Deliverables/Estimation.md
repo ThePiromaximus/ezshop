@@ -11,22 +11,24 @@ Version:
 ### 
 |             | Estimate                        |             
 | ----------- | ------------------------------- |  
-| NC =  Estimated number of classes to be developed   | 21 |             
-|  A = Estimated average size per class, in LOC       | 48 | 
-| S = Estimated size of project, in LOC (= NC * A) | 1008 |
-| E = Estimated effort, in person hours (productivity as 10 LOC per person hour, considering implementation phase only)  | 101 |   
-| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | €3030 | 
-| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | 3 weeks (including all phases) |     
+| NC =  Estimated number of classes to be developed   | 26 |             
+|  A = Estimated average size per class, in LOC       | 160 | 
+| S = Estimated size of project, in LOC (= NC * A) | 4160 |
+| E = Estimated effort, in person hours (productivity as 10 LOC per person hour, considering implementation phase only)  | 416 |   
+| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | €12480 | 
+| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | 3 weeks (13 days) |     
 
 # Estimate by activity decomposition
 ### 
 |         Activity name    | Estimated effort (person hours)   |             
 | ----------- | ------------------------------- |
-| Planning | 4 |
-| Requirements | 125 |
+| Planning | 8 |
+| Requirements | 55 |
 | Design | 50 |
-| Implementation | 101 |
-| Testing | 135 |
+| Implementation | 85 |
+| Unit testing | 30 |
+| Integration testing | 95 |
+| Acceptance testing | 10 |
 ###
 
 ```plantuml
@@ -35,13 +37,17 @@ title Gantt's diagram
 project starts the 2021/04/05
 saturday are closed
 sunday are closed 
-[Planning] lasts 15 days
-[Requirements] lasts 4 days
+[Planning] lasts 12 days
+[Requirements] lasts 2 days
 [Design] lasts 2 days
 [Design] starts at [Requirements]'s end
-[Implementation] lasts 4 days
+[Implementation] lasts 3 days
 [Implementation] starts at [Design]'s end
-[Testing] lasts 5 days
-[Testing] starts at [Implementation]'s end
+[Unit Testing] lasts 1 day
+[Unit Testing] starts at [Implementation]'s end
+[Integration Testing] lasts 3 days
+[Integration Testing] starts at [Unit Testing]'s end
+[Acceptance Testing] lasts 1 day
+[Acceptance Testing] starts at [Integration Testing]'s end
 @endgantt
 ```

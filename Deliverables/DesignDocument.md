@@ -52,6 +52,72 @@ Customer
 Ticket
 BalanceOperation
 
+```
+@startuml
+interface "EZShopInterface" as API{
+ void reset()
+ -- User Management --
+ Integer createUser(String username, String password, String role) 
+ boolean deleteUser(Integer id) 
+ List<User> getAllUsers() 
+ User getUser(Integer id) 
+ boolean updateUserRights(Integer id, String role)
+ User login(String username, String password) 
+ boolean logout()
+ -- Product Management --
+ Integer createProductType(String description, String productCode, double pricePerUnit, String note)
+ boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote)
+ boolean deleteProductType(Integer id) 
+ List<ProductType> getAllProductTypes() 
+ ProductType getProductTypeByBarCode(String barCode) 
+ List<ProductType> getProductTypesByDescription(String description) 
+ boolean updateQuantity(Integer productId, int toBeAdded) 
+ boolean updatePosition(Integer productId, String newPos) 
+ -- Order Management --
+ Integer issueOrder(String productCode, int quantity, double pricePerUnit)
+ Integer payOrderFor(String productCode, int quantity, double pricePerUnit)
+ boolean payOrder(Integer orderId) 
+ boolean recordOrderArrival(Integer orderId) 
+ List<Order> getAllOrders() 
+ -- Customer Management --
+ Integer defineCustomer(String customerName) 
+ boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) 
+ boolean deleteCustomer(Integer id) 
+ Customer getCustomer(Integer id) 
+ List<Customer> getAllCustomers() 
+ String createCard() 
+ boolean attachCardToCustomer(String customerCard, Integer customerId) 
+ boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) 
+ -- Payment Management --
+ Integer startSaleTransaction() 
+ boolean addProductToSale(Integer transactionId, String productCode, int amount) 
+ boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) 
+ boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) 
+ boolean applyDiscountRateToSale(Integer transactionId, double discountRate) 
+ int computePointsForSale(Integer transactionId) 
+ boolean endSaleTransaction(Integer transactionId) 
+ boolean deleteSaleTransaction(Integer transactionId) 
+ SaleTransaction getSaleTransaction(Integer transactionId) 
+ Integer startReturnTransaction(Integer transactionId) 
+ boolean returnProduct(Integer returnId, String productCode, int amount) 
+ boolean endReturnTransaction(Integer returnId, boolean commit) 
+ boolean deleteReturnTransaction(Integer returnId) 
+ double receiveCashPayment(Integer transactionId, double cash) 
+ boolean receiveCreditCardPayment(Integer transactionId, String creditCard) 
+ double returnCashPayment(Integer returnId) 
+ double returnCreditCardPayment(Integer returnId, String creditCard) 
+ boolean recordBalanceUpdate(double toBeAdded) 
+ List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) 
+ double computeBalance()
+
+}
+class EZShop {
+
+}
+
+API <|-- EZShop
+@enduml
+```
 
 ### Exception Package
 ```plantuml

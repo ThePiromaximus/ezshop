@@ -20,6 +20,8 @@ Version: 1.1
 
 # Estimate by activity decomposition
 ### 
+> The following activity decomposition refers to a team of experts in their field, for this reason the following estimation do not match with stated person hours in TimeSheet.md
+
 |         Activity name    | Estimated effort (person hours)   |             
 | ----------- | ------------------------------- |
 | Planning | 8 |

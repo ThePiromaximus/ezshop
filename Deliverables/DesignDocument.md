@@ -42,17 +42,7 @@ GUI <--> EZS
 
 <for each package, report class diagram>
 
-EZShop:
-
-User
-Role
-ProductType
-Order
-Customer
-Ticket
-BalanceOperation
-
-```
+```plantuml
 @startuml
 interface "EZShopInterface" as API{
  void reset()
@@ -111,11 +101,107 @@ interface "EZShopInterface" as API{
  double computeBalance()
 
 }
-class EZShop {
+
+class Shop {
+ users: List<User>
+ customers: HashMap<Customer>
+}
+
+class User {
 
 }
 
-API <|-- EZShop
+class Role {
+
+}
+
+class ProductType {
+    barCode : String
+    description : String
+    sellPrice : Float
+    quantity : Interge
+    discountRate : Float
+    notes : String
+    position : Position
+    ....
+    Position getPosition()
+    boolean setPosition()
+}
+
+class Position {
+    aisleID : String
+    rackID : String
+    levelID : String
+}
+
+class Product {
+
+}
+
+enum OrderState {
+    CREATED
+    PAYED
+    CLOSED
+}
+
+class Order {
+    supplier : String
+    pricePerUnit : Float
+    quntity : Integer
+    status : OrderState
+}
+
+class Customer {
+    ID : Integer
+    name : String
+    surname : String
+}
+
+class LoyaltyCard {
+    ID : Integer
+    points : Integer
+    {static} customers : HashMap
+    createCard()
+    attachCardToCustomer()
+}
+
+class Ticket {
+
+}
+
+class BalanceOperation {
+
+}
+
+class FinancialTransaction {
+    description
+    amount
+    date
+}
+
+class ReturnTransaction {
+    quantity
+    returnedValue
+}
+
+class SaleTransaction {
+    ID
+    date
+    time
+    cost
+    paymentType
+    discountRate
+}
+
+class Debit {
+
+}
+
+class Credit {
+
+}
+
+API <|-- Shop
 @enduml
 ```
 

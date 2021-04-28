@@ -103,39 +103,36 @@ interface "EZShopInterface" as API{
 }
 
 class Shop {
- users: List<User>
- customers: HashMap<Customer>
+ +users: HashMap<Integer, User>
+ +cards: HashMap<LoyaltyCard, Customer>
+ +products: HashMap<Integer, ProductType>
+ +saleTransactions: HashMap<Integer, SaleTransaction>
+ +orders: HashMap<Integer, Order>
+ +returnTransactions: HashMap<Integer, ReturnTransaction>
 }
 
 class User {
-
+ +userId: Integer
+ +username: String
+ +password: String
+ +Role: String
 }
 
-class Role {
-
-}
 
 class ProductType {
-    barCode : String
-    description : String
-    sellPrice : Float
-    quantity : Interge
-    discountRate : Float
-    notes : String
-    position : Position
-    ....
-    Position getPosition()
-    boolean setPosition()
+    +barCode : String
+    +description : String
+    +sellPrice : Float
+    +quantity : Interge
+    +discountRate : Float
+    +notes : String
+    +position : Position
 }
 
 class Position {
-    aisleID : String
-    rackID : String
-    levelID : String
-}
-
-class Product {
-
+    +aisleID : String
+    +rackID : String
+    +levelID : String
 }
 
 enum OrderState {
@@ -145,62 +142,78 @@ enum OrderState {
 }
 
 class Order {
-    supplier : String
-    pricePerUnit : Float
-    quntity : Integer
-    status : OrderState
+    +supplier : String
+    +pricePerUnit : Float
+    +quntity : Integer
+    +status : OrderState
+    +products : List<Product>
 }
 
 class Customer {
-    ID : Integer
-    name : String
-    surname : String
+    + ID : Integer
+    + name : String
+    + surname : String
+    + card : LoyaltyCard
 }
 
 class LoyaltyCard {
-    ID : Integer
-    points : Integer
-    {static} customers : HashMap
-    createCard()
-    attachCardToCustomer()
-}
-
-class Ticket {
-
+    + ID : Integer
+    + points : Integer
+    
 }
 
 class BalanceOperation {
-
+    + description : String
+    + amount : double
+    + date : LocalDate
+    + type : BOType
 }
 
-class FinancialTransaction {
-    description
-    amount
-    date
+enum BOType {
+ DEBIT
+ CREDIT
 }
 
 class ReturnTransaction {
-    quantity
-    returnedValue
+    + ID : Integer
+    + quantity : Integer
+    + returnedValue : double
+    + product : Product
+    + committed : boolean
 }
 
 class SaleTransaction {
-    ID
-    date
-    time
-    cost
-    paymentType
-    discountRate
+    +ID: Integer
+    +date: LocalDate
+    +time: LocalTime
+    +cost: double
+    +paymentType: String
+    +discountRate: double
+    +state : TransactionState
+    +card : LoyaltyCard
+    +products : HashMap<Product, Quantity>
 }
 
-class Debit {
-
+enum TransactionState {
+  CLOSED
+  PAID
+  CANCELED
 }
 
-class Credit {
-
-}
-
+LoyaltyCard "0..1" -- "1" Customer
+Shop -- "1..*" User
+Shop --  "*" ReturnTransaction
+Shop -- "*" Order
+Shop -- "*" SaleTransaction
+Shop -- "*" LoyaltyCard
+Shop -- "*" ProductType
+Position "0..1" -- "1" ProductType
+Order "1" --  "1" OrderState
+BalanceOperation "1" -- "1" BOType
+SaleTransaction "1" -- "1" TransactionState
+BalanceOperation <|-- ReturnTransaction
+BalanceOperation <|-- SaleTransaction
+BalanceOperation <|-- Order
 API <|-- Shop
 @enduml
 ```

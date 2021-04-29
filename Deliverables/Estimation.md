@@ -6,7 +6,10 @@ Version: 1.1
 - [Estimate by product decomposition]
 - [Estimate by activity decomposition ]
 # Estimation approach
-<Consider the EZGas  project as described in YOUR requirement document, assume that you are going to develop the project INDEPENDENT of the deadlines of the course>
+
+We have considered our requirements document for EZShop project.
+The applied procedure has been Delphi approach to compute the following estimates.
+
 # Estimate by product decomposition
 ### 
 |             | Estimate                        |             

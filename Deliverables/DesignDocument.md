@@ -253,11 +253,11 @@ UnauthorizedException -down-|> E
 \<for each functional requirement from the requirement document, list which classes concur to implement it>
 | - | Shop | User | ProductType | Position | OrderState | Order | Customer | LoyaltyCard | BalanceOperation | BOType | ReturnTransaction | SaleTransaction | TransactionState |
 | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
-| FR1 | V | | | | | | | | | | | | |
-| FR3 | V | | | | | | | | | | | | |
-| FR4 | V | | | | | | | | | | | | |
-| FR5 | V | | | | | | | | | | | | |
-| FR6 | V | | | | | | | | | | | | |
+| FR1 | V | V | | | | | | | | | | | |
+| FR3 | V | | V | V | | | | | | | | | |
+| FR4 | V | | V | V | V | V | | | | | | | |
+| FR5 | V | | | | | | V | V | | | | | |
+| FR6 | V | | V | | | | | | V | V | V | V | V |
 | FR7 | V | | | | | | | | | | | | |
 | FR8 | V | | | | | | | | | | | | |
 

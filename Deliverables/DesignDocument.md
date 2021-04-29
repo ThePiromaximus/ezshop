@@ -251,15 +251,15 @@ UnauthorizedException -down-|> E
 # Verification traceability matrix
 
 \<for each functional requirement from the requirement document, list which classes concur to implement it>
-| - | User | ProductType | Position | OrderState | Order | Customer | LoyaltyCard | BalanceOperation | BOType | ReturnTransaction | SaleTransaction | TransactionState |
-| - | - | - | - | - | - | - | - | - | - | - | - | - |
-| FR1 | | | | | | | | | | | | |
-| FR3 | | | | | | | | | | | | |
-| FR4 | | | | | | | | | | | | |
-| FR5 | | | | | | | | | | | | |
-| FR6 | | | | | | | | | | | | |
-| FR7 | | | | | | | | | | | | |
-| FR8 | | | | | | | | | | | | |
+| - | Shop | User | ProductType | Position | OrderState | Order | Customer | LoyaltyCard | BalanceOperation | BOType | ReturnTransaction | SaleTransaction | TransactionState |
+| -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- | -- |
+| FR1 | V | | | | | | | | | | | | |
+| FR3 | V | | | | | | | | | | | | |
+| FR4 | V | | | | | | | | | | | | |
+| FR5 | V | | | | | | | | | | | | |
+| FR6 | V | | | | | | | | | | | | |
+| FR7 | V | | | | | | | | | | | | |
+| FR8 | V | | | | | | | | | | | | |
 
 
 

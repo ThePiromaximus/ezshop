@@ -117,7 +117,7 @@
             <artifactId>view</artifactId>
             <version>1.0.0</version>
             <scope>system</scope>
-            <systemPath>${project.basedir}/lib/ezshop-gui.jar</systemPath>
+            <systemPath>${pom.basedir}/lib/ezshop-gui.jar</systemPath>
         </dependency>
 
     </dependencies>

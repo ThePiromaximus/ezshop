@@ -1,77 +1,58 @@
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
 # Project Estimation  
-Authors:
-Date:
-Version:
+Authors: Angela D'Antonio, Gabriele Inzerillo, Ruggero Nocera, Marzio Vallero
+Date: 27/04/2021
+Version: 1.1
 # Contents
 - [Estimate by product decomposition]
 - [Estimate by activity decomposition ]
 # Estimation approach
-<Consider the EZGas  project as described in YOUR requirement document, assume that you are going to develop the project INDEPENDENT of the deadlines of the course>
+
+We have considered our requirements document for EZShop project.
+The applied procedure has been Delphi approach to compute the following estimates.
+
 # Estimate by product decomposition
 ### 
 |             | Estimate                        |             
 | ----------- | ------------------------------- |  
-| NC =  Estimated number of classes to be developed   |                             |             
-|  A = Estimated average size per class, in LOC       |                            | 
-| S = Estimated size of project, in LOC (= NC * A) | |
-| E = Estimated effort, in person hours (here use productivity 10 LOC per person hour)  |                                      |   
-| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | | 
-| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) |                    |               
+| NC =  Estimated number of classes to be developed   | 26 |             
+|  A = Estimated average size per class, in LOC       | 160 | 
+| S = Estimated size of project, in LOC (= NC * A) | 4160 |
+| E = Estimated effort, in person hours (productivity as 10 LOC per person hour, considering implementation phase only)  | 416 |   
+| C = Estimated cost, in euro (here use 1 person hour cost = 30 euro) | €12480 | 
+| Estimated calendar time, in calendar weeks (Assume team of 4 people, 8 hours per day, 5 days per week ) | 3 weeks (13 days) |     
+
 # Estimate by activity decomposition
 ### 
+> The following activity decomposition refers to a team of experts in their field, for this reason the following estimation do not match with stated person hours in TimeSheet.md
+
 |         Activity name    | Estimated effort (person hours)   |             
-| ----------- | ------------------------------- | 
-| | |
+| ----------- | ------------------------------- |
+| Planning | 8 |
+| Requirements | 55 |
+| Design | 50 |
+| Implementation | 85 |
+| Unit testing | 30 |
+| Integration testing | 95 |
+| Acceptance testing | 10 |
 ###
-Insert here Gantt chart with above activities
+
+```plantuml
+@startgantt
+title Gantt's diagram
+project starts the 2021/04/05
+saturday are closed
+sunday are closed 
+[Planning] lasts 12 days
+[Requirements] lasts 2 days
+[Design] lasts 2 days
+[Design] starts at [Requirements]'s end
+[Implementation] lasts 3 days
+[Implementation] starts at [Design]'s end
+[Unit Testing] lasts 1 day
+[Unit Testing] starts at [Implementation]'s end
+[Integration Testing] lasts 3 days
+[Integration Testing] starts at [Unit Testing]'s end
+[Acceptance Testing] lasts 1 day
+[Acceptance Testing] starts at [Integration Testing]'s end
+@endgantt
+```

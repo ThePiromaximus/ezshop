@@ -1,7 +1,7 @@
 package it.polito.ezshop.data;
 
 import it.polito.ezshop.exceptions.*;
-
+import it.polito.ezshop.model.*;
 import java.time.LocalDate;
 import java.util.List;
 

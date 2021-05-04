@@ -73,10 +73,20 @@ public class EZShop implements EZShopInterface {
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
         
+    	//TODO:Gestire eccezione per utente non autorizzato
     	if((barCode == null) || (barCode.length() == 0) || (this.barCodeIsValid(barCode)))
-    	for(int i = 0; i < products.size(); i++)
     	{
-    		
+    		for(ProductType product : products) 
+    		{
+    	        if (product.getBarCode().equals(barCode)) 
+    	        {
+    	            return product;
+    	        }
+    	    }
+    	}
+    	else
+    	{
+    		throw new InvalidProductCodeException();
     	}
     	
     	return null;
@@ -84,17 +94,98 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<ProductType> getProductTypesByDescription(String description) throws UnauthorizedException {
-        return null;
+    	//TODO: gestire eccezione per utente non autorizzato
+    	
+        List<ProductType> searchedProducts = new ArrayList<ProductType>();
+        if (description.length()==0 || description == null) 
+        	description = "";
+        
+        for(ProductType product : products)
+        {
+        	if(product.getProductDescription().contains(description))
+        	{
+        		searchedProducts.add(product);
+        	}
+        }
+        
+        return searchedProducts;
     }
 
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
-        return false;
+        int newQuantity = 0;
+    	//TODO: gestire eccezione per utente non autorizzato
+        if(productId>0 && productId!=null)
+        {
+        	for(ProductType product : products)
+        	{
+        		if(product.getId()==productId)
+        		{
+        			if(product.getLocation().length()!=0 && product.getLocation()!=null)
+        			{
+        				newQuantity = product.getQuantity() + toBeAdded;
+            			if(newQuantity>=0)
+            			{
+            				product.setQuantity(newQuantity);
+            				return true;
+            			}
+            			
+            			return false;
+        			}
+        			else 
+        			{
+        				return false;
+        			}
+        		}
+        	}
+        }
+    	
+    	//Non ho trovato il prodotto
+    	return false;
     }
 
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
-        return false;
+        
+    	//TODO: gestire eccezione per utente non autorizzato
+    	if(productId>0 && productId!=null)
+    	{
+    		if(newPos.matches("[0-9]+[-][a-zA-Z]+[-][0-9]+"))
+    		{
+    			//La location deve essere univoca
+				//Scorro tutti i prodotti per vedere se esiste già la locazione
+				//Se esiste non è univoca e ritorno false
+    			for(ProductType product : products)
+    			{
+    				if(product.getLocation().equals(newPos))
+    				{
+    					return false;
+    				}
+    			}
+    			
+    			//La location è univoca
+    			//Aggiorno il prodotto alla nuova locazione
+    			for(ProductType product : products)
+    			{
+    				if(product.getId()==productId)
+    				{
+    					product.setLocation(newPos);
+    					return true;
+    				}
+    			}
+    			
+    		}
+    		else
+    		{
+    			throw new InvalidLocationException();
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidProductIdException();
+    	}
+    	
+    	return false;
     }
 
     @Override

@@ -3,12 +3,13 @@ package it.polito.ezshop.data;
 import it.polito.ezshop.exceptions.*;
 import it.polito.ezshop.model.*;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
 
 public class EZShop implements EZShopInterface {
-
-
+	
+	List<ProductType> products = new ArrayList<ProductType>();
+	
     @Override
     public void reset() {
 
@@ -71,7 +72,14 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
-        return null;
+        
+    	if((barCode == null) || (barCode.length() == 0) || (this.barCodeIsValid(barCode)))
+    	for(int i = 0; i < products.size(); i++)
+    	{
+    		
+    	}
+    	
+    	return null;
     }
 
     @Override
@@ -252,5 +260,81 @@ public class EZShop implements EZShopInterface {
     @Override
     public double computeBalance() throws UnauthorizedException {
         return 0;
+    }
+    
+    //Metodo per verificare la validità di un barcode
+    // https://www.gs1.org/services/how-calculate-check-digit-manually
+    private boolean barCodeIsValid(String barCode) {
+    	int bcSize = barCode.length();
+    	boolean r = false;
+    	if( (bcSize == 12) || (bcSize == 13) || (bcSize == 14) )
+    	{
+    		int sum = 0;
+    		int mul; //Può essere 1 o 3
+    		int digit; 
+    		switch(bcSize)
+    		{
+	    		case 12:
+	    			for(int i = 0; i < 11; i++)
+	    			{
+	    				mul = (i%2 == 0) ? 3 : 1;
+	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+	    				digit *= mul; //Moltiplico per 1 o 3
+	    				sum += digit; //Sommo
+	    			}
+	    			sum = RoundUp(sum) - sum;
+	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(11)))){
+	    				r = true;
+	    			}else {
+	    				r = false;
+	    			}
+	    			break;
+	    		case 13:
+	    			for(int i = 0; i < 12; i++)
+	    			{
+	    				mul = (i%2 == 0) ? 1 : 3;
+	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+	    				digit *= mul; //Moltiplico per 1 o 3
+	    				sum += digit; //Sommo
+	    			}
+	    			sum = RoundUp(sum) - sum;
+	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(12)))){
+	    				r = true;
+	    			}else {
+	    				r = false;
+	    			}
+	    			break;
+	    		case 14:
+	    			for(int i = 0; i < 13; i++)
+	    			{
+	    				mul = (i%2 == 0) ? 3 : 1;
+	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+	    				digit *= mul; //Moltiplico per 1 o 3
+	    				sum += digit; //Sommo
+	    			}
+	    			sum = RoundUp(sum) - sum;
+	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(13)))){
+	    				r = true;
+	    			}else {
+	    				r = false;
+	    			}
+	    			break;
+    		}
+    		
+    	}
+    	else
+    	{
+    		r = false;
+    	}
+    	
+    	return r;
+    }
+    
+    //Metodo per arrotondare al multiplo di 10 successivo
+    //Necessario per la validazione del barcode
+    static int RoundUp(int toRound)
+    {
+        if (toRound % 10 == 0) return toRound;
+        return (10 - toRound % 10) + toRound;
     }
 }

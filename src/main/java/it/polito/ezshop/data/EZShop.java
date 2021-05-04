@@ -8,9 +8,11 @@ import java.util.*;
 
 public class EZShop implements EZShopInterface {
 	
-	List<ProductType> products = new ArrayList<ProductType>();
-	
-    @Override
+	private List<ProductType> products = new ArrayList<ProductType>();
+	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
+    private HashMap<Integer, ReturnTransaction> openedReturnTransactions = new HashMap<Integer, ReturnTransaction>();
+    
+	@Override
     public void reset() {
 
     }
@@ -295,7 +297,17 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public SaleTransaction getSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-        return null;
+        //TODO Ruggero
+    	//TODO gestire eccezione per utente non autorizzato
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	SaleTransaction st = null;
+    	
+    	if(closedSaleTransactions.containsKey(transactionId))
+    		st = closedSaleTransactions.get(transactionId);
+
+    	return st;
     }
 
     @Override
@@ -423,7 +435,7 @@ public class EZShop implements EZShopInterface {
     
     //Metodo per arrotondare al multiplo di 10 successivo
     //Necessario per la validazione del barcode
-    static int RoundUp(int toRound)
+    private static int RoundUp(int toRound)
     {
         if (toRound % 10 == 0) return toRound;
         return (10 - toRound % 10) + toRound;

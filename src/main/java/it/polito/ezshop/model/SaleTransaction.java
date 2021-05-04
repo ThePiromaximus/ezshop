@@ -4,7 +4,7 @@ import java.util.List;
 
 import it.polito.ezshop.data.TicketEntry;
 
-public class SaleTransaction implements it.polito.ezshop.data.SaleTransaction {
+public class SaleTransaction extends BalanceOperation implements it.polito.ezshop.data.SaleTransaction {
 	private Integer ticketNumber;
 	private List<TicketEntry> entries;
 	private double discountRate;

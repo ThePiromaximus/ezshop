@@ -1,89 +1,82 @@
 package it.polito.ezshop.model;
 
 public class ProductType implements it.polito.ezshop.data.ProductType {
-
+	private Integer quantity;
+	private String location;
+	private String note;
+	private String productDescription;
+	private String barCode;
+	private Double pricePerUnit;
+	private Integer id;
+	
 	@Override
 	public Integer getQuantity() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.quantity;
 	}
 
 	@Override
 	public void setQuantity(Integer quantity) {
-		// TODO Auto-generated method stub
-
+		this.quantity = quantity;
 	}
 
 	@Override
 	public String getLocation() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.location;
 	}
 
 	@Override
 	public void setLocation(String location) {
-		// TODO Auto-generated method stub
-
+		this.location = location;
 	}
 
 	@Override
 	public String getNote() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.note;
 	}
 
 	@Override
 	public void setNote(String note) {
-		// TODO Auto-generated method stub
-
+		this.note = note;
 	}
 
 	@Override
 	public String getProductDescription() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.productDescription;
 	}
 
 	@Override
 	public void setProductDescription(String productDescription) {
-		// TODO Auto-generated method stub
-
+		this.productDescription = productDescription;
 	}
 
 	@Override
 	public String getBarCode() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.barCode;
 	}
 
 	@Override
 	public void setBarCode(String barCode) {
-		// TODO Auto-generated method stub
-
+		this.barCode = barCode;
 	}
 
 	@Override
 	public Double getPricePerUnit() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.pricePerUnit;
 	}
 
 	@Override
 	public void setPricePerUnit(Double pricePerUnit) {
-		// TODO Auto-generated method stub
-
+		this.pricePerUnit = pricePerUnit;
 	}
 
 	@Override
 	public Integer getId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.id;
 	}
 
 	@Override
 	public void setId(Integer id) {
-		// TODO Auto-generated method stub
-
+		this.id = id;
 	}
 
 }

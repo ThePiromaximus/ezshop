@@ -1,77 +1,71 @@
 package it.polito.ezshop.model;
 
 public class Order implements it.polito.ezshop.data.Order {
-
+	private Integer balanceId;
+	private String productCode;
+	private double pricePerUnit;
+	private int quantity;
+	private String status;
+	private Integer orderId;
+	
 	@Override
 	public Integer getBalanceId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.balanceId;
 	}
 
 	@Override
 	public void setBalanceId(Integer balanceId) {
-		// TODO Auto-generated method stub
-
+		this.balanceId = balanceId;
 	}
 
 	@Override
 	public String getProductCode() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.productCode;
 	}
 
 	@Override
 	public void setProductCode(String productCode) {
-		// TODO Auto-generated method stub
-
+		this.productCode = productCode;
 	}
 
 	@Override
 	public double getPricePerUnit() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.pricePerUnit;
 	}
 
 	@Override
 	public void setPricePerUnit(double pricePerUnit) {
-		// TODO Auto-generated method stub
-
+		this.pricePerUnit = pricePerUnit;
 	}
 
 	@Override
 	public int getQuantity() {
-		// TODO Auto-generated method stub
-		return 0;
+		return this.quantity;
 	}
 
 	@Override
 	public void setQuantity(int quantity) {
-		// TODO Auto-generated method stub
-
+		this.quantity = quantity;
 	}
 
 	@Override
 	public String getStatus() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.status;
 	}
 
 	@Override
 	public void setStatus(String status) {
-		// TODO Auto-generated method stub
-
+		this.status = status;
 	}
 
 	@Override
 	public Integer getOrderId() {
-		// TODO Auto-generated method stub
-		return null;
+		return this.orderId;
 	}
 
 	@Override
 	public void setOrderId(Integer orderId) {
-		// TODO Auto-generated method stub
-
+		this.orderId = orderId;
 	}
 
 }

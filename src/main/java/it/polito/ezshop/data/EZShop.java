@@ -10,7 +10,7 @@ public class EZShop implements EZShopInterface {
 	
 	private List<ProductType> products = new ArrayList<ProductType>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
-    private HashMap<Integer, ReturnTransaction> openedReturnTransactions = new HashMap<Integer, ReturnTransaction>();
+    private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     
 	@Override
     public void reset() {
@@ -312,12 +312,24 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer startReturnTransaction(Integer saleNumber) throws /*InvalidTicketNumberException,*/InvalidTransactionIdException, UnauthorizedException {
-        return null;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(saleNumber <= 0 || saleNumber == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	if(!closedSaleTransactions.containsKey(saleNumber))
+    		return -1;
+    	
+    	ReturnTransactionImpl rt = new ReturnTransactionImpl();
+    	rt.setSaleTransaction(closedSaleTransactions.get(saleNumber));
+    	openedReturnTransactions.put(rt.getId(), rt);
+    	
+    	return rt.getId();
     }
 
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        return false;
+        
+    	return false;
     }
 
     @Override

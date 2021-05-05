@@ -20,6 +20,20 @@ public class EZShop implements EZShopInterface {
      Va inizializzata (=0) dentro il metodo reset() 
      */
     private double balance;
+    
+    /*ipotesi: solo uno alla volta può accedere al sistema, 
+     * non posso aprire due GUI contemporaneamente ed accedervi
+     * verificare che loggedUSer può essere null*/
+    private UserImpl loggedUser=null;
+    
+    /*da qualche parte nel main:
+    *loggedUser è un attributo private quindi quando chiamo l'istruzione dal main ho un errore
+    * quindi implementare una setLoggedUser public che mi restitusce l'utente loggato*/
+    //ezshop.setLoggedUser(ezshop.login(pass,username);
+    
+    //quindi poi per controllare i diritti di utilizzo di un metodo:
+	//if(this.userLogged.getRole() != 'administrator')
+	//((	throw new UnauthorizedException();
 
     
 
@@ -73,24 +87,27 @@ public class EZShop implements EZShopInterface {
     public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
     	//TODO: gestire eccezione per utente non autorizzato
     	
-    	if(id == 0 || id == null) 
+    	if(id == 0 || id == null || id > users.size()) 
     		throw new InvalidUserIdException();
     	
-    	users.remove(id);
+    		users.remove(id);
     	
     	//checking if user has really been removed
-    	if(users.containsKey(id)) {
-    		return false;
-    	}
-    	else {
-    		return true;
-    	}
-
+    		if(users.containsKey(id)) {
+    			return false;
+    		}
+    		else {
+    			return true;
+    		}
+    	
     }
 
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
     	//TODO: gestire eccezione per utente non autorizzato
+    	
+    	//if(this.userLogged.getRole() != 'administrator')
+    	//	throw new UnauthorizedException();
     	return new ArrayList<User>(users.values());
     }
 
@@ -98,10 +115,10 @@ public class EZShop implements EZShopInterface {
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
     	//TODO gestire eccezione per utente non autorizzato
     	
-    	if(id <= 0 || id == null)
+    	if(id <= 0 || id == null || id > users.size())
     		throw new InvalidUserIdException();
     	
-    	User us = null;
+    	User us = new UserImpl();
     	
     	if(users.containsKey(id))
     		us = users.get(id);
@@ -133,12 +150,35 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public User login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
-        return null;
+    	
+    	if(username == null || username.isEmpty())
+    		throw new InvalidUsernameException();
+    	if(password == null || password.isEmpty())
+    		throw new InvalidPasswordException();
+    	
+    	UserImpl us = new UserImpl();
+    	
+    	for(Map.Entry<Integer,UserImpl> entry: users.entrySet())
+		{
+			if(entry.getValue().getUsername().equals(username) && entry.getValue().getPassword().equals(password)) {
+					us = entry.getValue();
+							
+			}else {
+				us = null;
+				return us;
+			}	
+		}
+    	return us;
     }
 
     @Override
     public boolean logout() {
-        return false;
+    	if(this.loggedUser == null)
+    		return false;
+    	else {
+    		this.loggedUser=null;
+    		return true;
+    	}
     }
 
     @Override

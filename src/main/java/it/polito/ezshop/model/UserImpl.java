@@ -1,10 +1,18 @@
 package it.polito.ezshop.model;
 
 public class UserImpl implements it.polito.ezshop.data.User {
+	private static Integer PROGRESSIVE_ID = 1;
 	private Integer id;
 	private String username;
 	private String password;
 	private String role;
+	
+	public UserImpl()
+	{
+		this.id = PROGRESSIVE_ID;
+		PROGRESSIVE_ID++;
+	}
+
 	
 	@Override
 	public Integer getId() {

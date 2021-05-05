@@ -5,15 +5,16 @@ import it.polito.ezshop.model.*;
 import java.time.LocalDate;
 import java.util.*;
 
-
 public class EZShop implements EZShopInterface {
 	
+
 	private HashMap<String,ProductType> products = new HashMap<String,ProductType>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, UserImpl> users = new HashMap<Integer, UserImpl>();
-	
-    @Override
+	private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
+    
+
     public void reset() {
 
     }
@@ -234,7 +235,7 @@ public class EZShop implements EZShopInterface {
     	//TODO:Gestire eccezione per utente non autorizzato
     	if((barCode == null) || (barCode.length() == 0) || (this.barCodeIsValid(barCode)))
     	{
-    		for(ProductType product : products) 
+    		for(ProductType product : products.values()) 
     		{
     	        if (product.getBarCode().equals(barCode)) 
     	        {
@@ -258,7 +259,7 @@ public class EZShop implements EZShopInterface {
         if (description.length()==0 || description == null) 
         	description = "";
         
-        for(ProductType product : products)
+        for(ProductType product : products.values())
         {
         	if(product.getProductDescription().contains(description))
         	{
@@ -275,7 +276,7 @@ public class EZShop implements EZShopInterface {
     	//TODO: gestire eccezione per utente non autorizzato
         if(productId>0 && productId!=null)
         {
-        	for(ProductType product : products)
+        	for(ProductType product : products.values())
         	{
         		if(product.getId()==productId)
         		{
@@ -313,7 +314,7 @@ public class EZShop implements EZShopInterface {
     			//La location deve essere univoca
 				//Scorro tutti i prodotti per vedere se esiste già la locazione
 				//Se esiste non è univoca e ritorno false
-    			for(ProductType product : products)
+    			for(ProductType product : products.values())
     			{
     				if(product.getLocation().equals(newPos))
     				{
@@ -323,7 +324,7 @@ public class EZShop implements EZShopInterface {
     			
     			//La location è univoca
     			//Aggiorno il prodotto alla nuova locazione
-    			for(ProductType product : products)
+    			for(ProductType product : products.values())
     			{
     				if(product.getId()==productId)
     				{
@@ -393,61 +394,105 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Customer> getAllCustomers() throws UnauthorizedException {
-        return null;
+    	// TODO add check for logged user
+        return new ArrayList<Customer>(customers.values());
     }
 
     @Override
     public String createCard() throws UnauthorizedException {
-        return null;
+    	// TODO add check for logged user
+    	List<Customer> customersList = getAllCustomers();
+    	// If the db is not reachable, return an empty string
+    	if(customersList == null)
+    		return "";
+    	// Else loop until you generate a unique CardId and return it
+    	while(true) {
+    	String retCard = UUID.randomUUID().toString();
+    	if(customersList.stream().filter(c -> !retCard.equals(c.getCustomerCard())).count() == 0)
+    		return retCard;
+    	}
     }
 
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// Check for exceptions
+    	if(customerId == null || customerId <= 0)
+    		throw new InvalidCustomerIdException();
+    	if(customerCard == null || customerCard.isEmpty())
+    		throw new InvalidCustomerCardException();
+    	List<Customer> customersList = getAllCustomers();
+    	// If the db is not reachable, return an empty string
+    	if(customersList == null)
+    		return false;
+    	// Check if no other customer is using the same card and if the customer exists. If true, assign the card
+    	if(customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard())).count() == 0 && customers.containsKey(customerId)) {
+			customers.get(customerId).setCustomerCard(customerCard);
+    		return true;
+    	}
+    	return false;
     }
 
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public Integer startSaleTransaction() throws UnauthorizedException {
-        return null;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return null;
     }
 
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
         return 0;
     }
 
     @Override
     public boolean endSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
         return false;
     }
 
     @Override
     public boolean deleteSaleTransaction(Integer saleNumber) throws InvalidTransactionIdException, UnauthorizedException {
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
         return false;
     }
 
@@ -484,8 +529,43 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        
-    	return false;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(returnId <= 0 || returnId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	if(productCode == null || productCode.isEmpty() || !barCodeIsValid(productCode))
+			throw new InvalidProductCodeException();
+    	
+    	if(amount <= 0)
+    		throw new InvalidQuantityException();
+    	
+    	if(!products.containsKey(productCode) || !openedReturnTransactions.containsKey(returnId))
+    		return false;
+    	
+    	ReturnTransactionImpl rt = openedReturnTransactions.get(returnId);
+    	SaleTransaction st = rt.getSaleTransaction();
+    	TicketEntry te;
+    	
+    	try {
+    		 te = st.getEntries().stream().filter((TicketEntry t) -> {return t.getBarCode().equals(productCode);}).findFirst().get();
+    	}catch(NoSuchElementException e) {
+    		return false;
+    	}
+    	
+    	if(te.getAmount() < amount)
+    		return false;
+    	
+    	try {
+    		Optional<TicketEntry> ote = rt.getEntry(productCode);
+    		if(ote.get().getAmount() + amount > te.getAmount()) {
+    			return false;
+    		} else {
+    			ote.get().setAmount(ote.get().getAmount() + amount);
+    		}
+    	}catch(NoSuchElementException e) {
+        	rt.addEntry(new TicketEntryImpl(productCode, amount));
+    	}
+    	return true;
     }
 
     @Override

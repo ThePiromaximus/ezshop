@@ -5,12 +5,12 @@ import it.polito.ezshop.model.*;
 import java.time.LocalDate;
 import java.util.*;
 
-
 public class EZShop implements EZShopInterface {
 	
 	private List<ProductType> products = new ArrayList<ProductType>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
+    private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
     
 	@Override
     public void reset() {
@@ -237,61 +237,105 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<Customer> getAllCustomers() throws UnauthorizedException {
-        return null;
+    	// TODO add check for logged user
+        return new ArrayList<Customer>(customers.values());
     }
 
     @Override
     public String createCard() throws UnauthorizedException {
-        return null;
+    	// TODO add check for logged user
+    	List<Customer> customersList = getAllCustomers();
+    	// If the db is not reachable, return an empty string
+    	if(customersList == null)
+    		return "";
+    	// Else loop until you generate a unique CardId and return it
+    	while(true) {
+    	String retCard = UUID.randomUUID().toString();
+    	if(customersList.stream().filter(c -> !retCard.equals(c.getCustomerCard())).count() == 0)
+    		return retCard;
+    	}
     }
 
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// Check for exceptions
+    	if(customerId == null || customerId <= 0)
+    		throw new InvalidCustomerIdException();
+    	if(customerCard == null || customerCard.isEmpty())
+    		throw new InvalidCustomerCardException();
+    	List<Customer> customersList = getAllCustomers();
+    	// If the db is not reachable, return an empty string
+    	if(customersList == null)
+    		return false;
+    	// Check if no other customer is using the same card and if the customer exists. If true, assign the card
+    	if(customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard())).count() == 0 && customers.containsKey(customerId)) {
+			customers.get(customerId).setCustomerCard(customerCard);
+    		return true;
+    	}
+    	return false;
     }
 
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public Integer startSaleTransaction() throws UnauthorizedException {
-        return null;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return null;
     }
 
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
-        return false;
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
+    	return false;
     }
 
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
         return 0;
     }
 
     @Override
     public boolean endSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
         return false;
     }
 
     @Override
     public boolean deleteSaleTransaction(Integer saleNumber) throws InvalidTransactionIdException, UnauthorizedException {
+    	// TODO add check for logged user
+    	// TODO mars: to be implemented
         return false;
     }
 

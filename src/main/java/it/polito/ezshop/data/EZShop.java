@@ -13,6 +13,12 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
     private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
     
+    /*
+     Questa variabile rappresenta il bilancio corrente del sistema (=/= balanceOperation che invece rappresenta una singola operazione)
+     Va inizializzata (=0) dentro il metodo reset() 
+     */
+    private double balance;
+    
 	@Override
     public void reset() {
 

@@ -4,11 +4,11 @@ import it.polito.ezshop.exceptions.*;
 import it.polito.ezshop.model.*;
 import java.time.LocalDate;
 import java.util.*;
-
+import static java.util.stream.Collectors.toList;
 
 public class EZShop implements EZShopInterface {
 	
-	private List<ProductType> products = new ArrayList<ProductType>();
+	private HashMap<String, ProductType> products = new HashMap<String, ProductType>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     
@@ -78,7 +78,7 @@ public class EZShop implements EZShopInterface {
     	//TODO:Gestire eccezione per utente non autorizzato
     	if((barCode == null) || (barCode.length() == 0) || (this.barCodeIsValid(barCode)))
     	{
-    		for(ProductType product : products) 
+    		for(ProductType product : products.values()) 
     		{
     	        if (product.getBarCode().equals(barCode)) 
     	        {
@@ -102,7 +102,7 @@ public class EZShop implements EZShopInterface {
         if (description.length()==0 || description == null) 
         	description = "";
         
-        for(ProductType product : products)
+        for(ProductType product : products.values())
         {
         	if(product.getProductDescription().contains(description))
         	{
@@ -119,7 +119,7 @@ public class EZShop implements EZShopInterface {
     	//TODO: gestire eccezione per utente non autorizzato
         if(productId>0 && productId!=null)
         {
-        	for(ProductType product : products)
+        	for(ProductType product : products.values())
         	{
         		if(product.getId()==productId)
         		{
@@ -157,7 +157,7 @@ public class EZShop implements EZShopInterface {
     			//La location deve essere univoca
 				//Scorro tutti i prodotti per vedere se esiste già la locazione
 				//Se esiste non è univoca e ritorno false
-    			for(ProductType product : products)
+    			for(ProductType product : products.values())
     			{
     				if(product.getLocation().equals(newPos))
     				{
@@ -167,7 +167,7 @@ public class EZShop implements EZShopInterface {
     			
     			//La location è univoca
     			//Aggiorno il prodotto alla nuova locazione
-    			for(ProductType product : products)
+    			for(ProductType product : products.values())
     			{
     				if(product.getId()==productId)
     				{
@@ -328,8 +328,43 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        
-    	return false;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(returnId <= 0 || returnId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	if(productCode == null || productCode.isEmpty() || !barCodeIsValid(productCode))
+			throw new InvalidProductCodeException();
+    	
+    	if(amount <= 0)
+    		throw new InvalidQuantityException();
+    	
+    	if(!products.containsKey(productCode) || !openedReturnTransactions.containsKey(returnId))
+    		return false;
+    	
+    	ReturnTransactionImpl rt = openedReturnTransactions.get(returnId);
+    	SaleTransaction st = rt.getSaleTransaction();
+    	TicketEntry te;
+    	
+    	try {
+    		 te = st.getEntries().stream().filter((TicketEntry t) -> {return t.getBarCode().equals(productCode);}).findFirst().get();
+    	}catch(NoSuchElementException e) {
+    		return false;
+    	}
+    	
+    	if(te.getAmount() < amount)
+    		return false;
+    	
+    	try {
+    		Optional<TicketEntry> ote = rt.getEntry(productCode);
+    		if(ote.get().getAmount() + amount > te.getAmount()) {
+    			return false;
+    		} else {
+    			ote.get().setAmount(ote.get().getAmount() + amount);
+    		}
+    	}catch(NoSuchElementException e) {
+        	rt.addEntry(new TicketEntryImpl(productCode, amount));
+    	}
+    	return true;
     }
 
     @Override

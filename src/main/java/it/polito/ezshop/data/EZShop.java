@@ -461,60 +461,70 @@ public class EZShop implements EZShopInterface {
     private boolean barCodeIsValid(String barCode) {
     	int bcSize = barCode.length();
     	boolean r = false;
-    	if( (bcSize == 12) || (bcSize == 13) || (bcSize == 14) )
+    	
+    	if(barCode.matches("[0-9]{12,14}"))
     	{
-    		int sum = 0;
-    		int mul; //Può essere 1 o 3
-    		int digit; 
-    		switch(bcSize)
-    		{
-	    		case 12:
-	    			for(int i = 0; i < 11; i++)
-	    			{
-	    				mul = (i%2 == 0) ? 3 : 1;
-	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
-	    				digit *= mul; //Moltiplico per 1 o 3
-	    				sum += digit; //Sommo
-	    			}
-	    			sum = RoundUp(sum) - sum;
-	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(11)))){
-	    				r = true;
-	    			}else {
-	    				r = false;
-	    			}
-	    			break;
-	    		case 13:
-	    			for(int i = 0; i < 12; i++)
-	    			{
-	    				mul = (i%2 == 0) ? 1 : 3;
-	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
-	    				digit *= mul; //Moltiplico per 1 o 3
-	    				sum += digit; //Sommo
-	    			}
-	    			sum = RoundUp(sum) - sum;
-	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(12)))){
-	    				r = true;
-	    			}else {
-	    				r = false;
-	    			}
-	    			break;
-	    		case 14:
-	    			for(int i = 0; i < 13; i++)
-	    			{
-	    				mul = (i%2 == 0) ? 3 : 1;
-	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
-	    				digit *= mul; //Moltiplico per 1 o 3
-	    				sum += digit; //Sommo
-	    			}
-	    			sum = RoundUp(sum) - sum;
-	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(13)))){
-	    				r = true;
-	    			}else {
-	    				r = false;
-	    			}
-	    			break;
-    		}
-    		
+    		//Il bar code deve essere una stringa composta da numeri
+    	
+	    	if( (bcSize == 12) || (bcSize == 13) || (bcSize == 14) )
+	    	{
+	    		int sum = 0;
+	    		int mul; //Può essere 1 o 3
+	    		int digit; 
+	    		switch(bcSize)
+	    		{
+		    		case 12:
+		    			for(int i = 0; i < 11; i++)
+		    			{
+		    				mul = (i%2 == 0) ? 3 : 1;
+		    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+		    				digit *= mul; //Moltiplico per 1 o 3
+		    				sum += digit; //Sommo
+		    			}
+		    			sum = RoundUp(sum) - sum;
+		    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(11)))){
+		    				r = true;
+		    			}else {
+		    				r = false;
+		    			}
+		    			break;
+		    		case 13:
+		    			for(int i = 0; i < 12; i++)
+		    			{
+		    				mul = (i%2 == 0) ? 1 : 3;
+		    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+		    				digit *= mul; //Moltiplico per 1 o 3
+		    				sum += digit; //Sommo
+		    			}
+		    			sum = RoundUp(sum) - sum;
+		    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(12)))){
+		    				r = true;
+		    			}else {
+		    				r = false;
+		    			}
+		    			break;
+		    		case 14:
+		    			for(int i = 0; i < 13; i++)
+		    			{
+		    				mul = (i%2 == 0) ? 3 : 1;
+		    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+		    				digit *= mul; //Moltiplico per 1 o 3
+		    				sum += digit; //Sommo
+		    			}
+		    			sum = RoundUp(sum) - sum;
+		    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(13)))){
+		    				r = true;
+		    			}else {
+		    				r = false;
+		    			}
+		    			break;
+	    		}
+	    		
+	    	}
+	    	else
+	    	{
+	    		r = false;
+	    	}
     	}
     	else
     	{

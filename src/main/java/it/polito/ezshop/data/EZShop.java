@@ -11,6 +11,7 @@ public class EZShop implements EZShopInterface {
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
+    private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
     
 	@Override
     public void reset() {
@@ -76,7 +77,7 @@ public class EZShop implements EZShopInterface {
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
         
     	//TODO:Gestire eccezione per utente non autorizzato
-    	if((barCode == null) || (barCode.length() == 0) || (this.barCodeIsValid(barCode)))
+    	if((barCode != null) && (barCode.length() != 0) && (barCodeIsValid(barCode)))
     	{
     		for(ProductType product : products.values()) 
     		{
@@ -192,7 +193,41 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer issueOrder(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        
+    	if((productCode != null) && (productCode.length() != 0) && (barCodeIsValid(productCode)))
+    	{
+    		if(quantity>0)
+    		{
+    			if(pricePerUnit>0)
+    			{
+    				//Il prodotto deve essere presente in inventario
+    				if(products.containsKey(productCode) && products != null)
+    				{
+    					//Creo nuovo ordine e lo aggiungo alla lista
+    					OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
+    					orders.put(o.getOrderId(), o);
+    					return o.getOrderId();
+    				}
+    				else
+    				{
+    					return -1;
+    				}
+    			}
+    			else
+    			{
+    				throw new InvalidPricePerUnitException();
+    			}
+    		}
+    		else
+    		{
+    			throw new InvalidQuantityException();
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidProductCodeException();
+    	}
+    	
     }
 
     @Override
@@ -458,7 +493,7 @@ public class EZShop implements EZShopInterface {
     
     //Metodo per verificare la validità di un barcode
     // https://www.gs1.org/services/how-calculate-check-digit-manually
-    private boolean barCodeIsValid(String barCode) {
+    private static boolean barCodeIsValid(String barCode) {
     	int bcSize = barCode.length();
     	boolean r = false;
     	

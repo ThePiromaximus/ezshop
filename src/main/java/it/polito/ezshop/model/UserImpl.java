@@ -1,6 +1,6 @@
 package it.polito.ezshop.model;
 
-public class User implements it.polito.ezshop.data.User {
+public class UserImpl implements it.polito.ezshop.data.User {
 	private Integer id;
 	private String username;
 	private String password;

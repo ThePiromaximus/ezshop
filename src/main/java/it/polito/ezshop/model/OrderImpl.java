@@ -1,6 +1,6 @@
 package it.polito.ezshop.model;
 
-public class Order implements it.polito.ezshop.data.Order {
+public class OrderImpl implements it.polito.ezshop.data.Order {
 	private Integer balanceId;
 	private String productCode;
 	private double pricePerUnit;

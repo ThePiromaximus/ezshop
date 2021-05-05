@@ -1,6 +1,6 @@
 package it.polito.ezshop.model;
 
-public class ProductType implements it.polito.ezshop.data.ProductType {
+public class ProductTypeImpl implements it.polito.ezshop.data.ProductType {
 	private Integer quantity;
 	private String location;
 	private String note;

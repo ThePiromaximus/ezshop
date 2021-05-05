@@ -2,7 +2,7 @@ package it.polito.ezshop.model;
 
 import java.time.LocalDate;
 
-public class BalanceOperation implements it.polito.ezshop.data.BalanceOperation {
+public class BalanceOperationImpl implements it.polito.ezshop.data.BalanceOperation {
 	private int balanceId;
 	private LocalDate date;
 	private double money;
@@ -10,7 +10,6 @@ public class BalanceOperation implements it.polito.ezshop.data.BalanceOperation 
 	
 	@Override
 	public int getBalanceId() {
-		// TODO Auto-generated method stub
 		return this.balanceId;
 	}
 

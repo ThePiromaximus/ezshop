@@ -1,6 +1,6 @@
 package it.polito.ezshop.model;
 
-public class TicketEntry implements it.polito.ezshop.data.TicketEntry {
+public class TicketEntryImpl implements it.polito.ezshop.data.TicketEntry {
 	private String barCode;
 	private String productDescription;
 	private Integer amount;

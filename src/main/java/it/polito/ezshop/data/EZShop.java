@@ -13,6 +13,14 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, UserImpl> users = new HashMap<Integer, UserImpl>();
 	private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
+	private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
+    
+    /*
+     Questa variabile rappresenta il bilancio corrente del sistema (=/= balanceOperation che invece rappresenta una singola operazione)
+     Va inizializzata (=0) dentro il metodo reset() 
+     */
+    private double balance;
+
     
 
     public void reset() {
@@ -233,7 +241,7 @@ public class EZShop implements EZShopInterface {
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
         
     	//TODO:Gestire eccezione per utente non autorizzato
-    	if((barCode == null) || (barCode.length() == 0) || (this.barCodeIsValid(barCode)))
+    	if((barCode != null) && (barCode.length() != 0) && (barCodeIsValid(barCode)))
     	{
     		for(ProductType product : products.values()) 
     		{
@@ -349,7 +357,41 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer issueOrder(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        
+    	if((productCode != null) && (productCode.length() != 0) && (barCodeIsValid(productCode)))
+    	{
+    		if(quantity>0)
+    		{
+    			if(pricePerUnit>0)
+    			{
+    				//Il prodotto deve essere presente in inventario
+    				if(products.containsKey(productCode) && products != null)
+    				{
+    					//Creo nuovo ordine e lo aggiungo alla lista
+    					OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
+    					orders.put(o.getOrderId(), o);
+    					return o.getOrderId();
+    				}
+    				else
+    				{
+    					return -1;
+    				}
+    			}
+    			else
+    			{
+    				throw new InvalidPricePerUnitException();
+    			}
+    		}
+    		else
+    		{
+    			throw new InvalidQuantityException();
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidProductCodeException();
+    	}
+    	
     }
 
     @Override
@@ -615,63 +657,73 @@ public class EZShop implements EZShopInterface {
     
     //Metodo per verificare la validità di un barcode
     // https://www.gs1.org/services/how-calculate-check-digit-manually
-    private boolean barCodeIsValid(String barCode) {
+    private static boolean barCodeIsValid(String barCode) {
     	int bcSize = barCode.length();
     	boolean r = false;
-    	if( (bcSize == 12) || (bcSize == 13) || (bcSize == 14) )
+    	
+    	if(barCode.matches("[0-9]{12,14}"))
     	{
-    		int sum = 0;
-    		int mul; //Può essere 1 o 3
-    		int digit; 
-    		switch(bcSize)
-    		{
-	    		case 12:
-	    			for(int i = 0; i < 11; i++)
-	    			{
-	    				mul = (i%2 == 0) ? 3 : 1;
-	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
-	    				digit *= mul; //Moltiplico per 1 o 3
-	    				sum += digit; //Sommo
-	    			}
-	    			sum = RoundUp(sum) - sum;
-	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(11)))){
-	    				r = true;
-	    			}else {
-	    				r = false;
-	    			}
-	    			break;
-	    		case 13:
-	    			for(int i = 0; i < 12; i++)
-	    			{
-	    				mul = (i%2 == 0) ? 1 : 3;
-	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
-	    				digit *= mul; //Moltiplico per 1 o 3
-	    				sum += digit; //Sommo
-	    			}
-	    			sum = RoundUp(sum) - sum;
-	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(12)))){
-	    				r = true;
-	    			}else {
-	    				r = false;
-	    			}
-	    			break;
-	    		case 14:
-	    			for(int i = 0; i < 13; i++)
-	    			{
-	    				mul = (i%2 == 0) ? 3 : 1;
-	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
-	    				digit *= mul; //Moltiplico per 1 o 3
-	    				sum += digit; //Sommo
-	    			}
-	    			sum = RoundUp(sum) - sum;
-	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(13)))){
-	    				r = true;
-	    			}else {
-	    				r = false;
-	    			}
-	    			break;
-    		}
-    		
+    		//Il bar code deve essere una stringa composta da numeri
+    	
+	    	if( (bcSize == 12) || (bcSize == 13) || (bcSize == 14) )
+	    	{
+	    		int sum = 0;
+	    		int mul; //Può essere 1 o 3
+	    		int digit; 
+	    		switch(bcSize)
+	    		{
+		    		case 12:
+		    			for(int i = 0; i < 11; i++)
+		    			{
+		    				mul = (i%2 == 0) ? 3 : 1;
+		    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+		    				digit *= mul; //Moltiplico per 1 o 3
+		    				sum += digit; //Sommo
+		    			}
+		    			sum = RoundUp(sum) - sum;
+		    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(11)))){
+		    				r = true;
+		    			}else {
+		    				r = false;
+		    			}
+		    			break;
+		    		case 13:
+		    			for(int i = 0; i < 12; i++)
+		    			{
+		    				mul = (i%2 == 0) ? 1 : 3;
+		    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+		    				digit *= mul; //Moltiplico per 1 o 3
+		    				sum += digit; //Sommo
+		    			}
+		    			sum = RoundUp(sum) - sum;
+		    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(12)))){
+		    				r = true;
+		    			}else {
+		    				r = false;
+		    			}
+		    			break;
+		    		case 14:
+		    			for(int i = 0; i < 13; i++)
+		    			{
+		    				mul = (i%2 == 0) ? 3 : 1;
+		    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+		    				digit *= mul; //Moltiplico per 1 o 3
+		    				sum += digit; //Sommo
+		    			}
+		    			sum = RoundUp(sum) - sum;
+		    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(13)))){
+		    				r = true;
+		    			}else {
+		    				r = false;
+		    			}
+		    			break;
+	    		}
+	    		
+	    	}
+	    	else
+	    	{
+	    		r = false;
+	    	}
     	}
     	else
     	{

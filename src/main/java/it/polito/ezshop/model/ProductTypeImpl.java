@@ -1,6 +1,9 @@
 package it.polito.ezshop.model;
 
 public class ProductTypeImpl implements it.polito.ezshop.data.ProductType {
+	
+	private static Integer PROGRESSIVE_ID = 1;
+	
 	private Integer quantity;
 	private String location;
 	private String note;
@@ -8,6 +11,13 @@ public class ProductTypeImpl implements it.polito.ezshop.data.ProductType {
 	private String barCode;
 	private Double pricePerUnit;
 	private Integer id;
+	
+	public ProductTypeImpl()
+	{
+		this.id = PROGRESSIVE_ID;
+		PROGRESSIVE_ID++;
+	}
+
 	
 	@Override
 	public Integer getQuantity() {

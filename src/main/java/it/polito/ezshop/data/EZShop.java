@@ -8,38 +8,118 @@ import java.util.*;
 
 public class EZShop implements EZShopInterface {
 	
-	private List<ProductType> products = new ArrayList<ProductType>();
+	private HashMap<String,ProductType> products = new HashMap<String,ProductType>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
-    
-	@Override
+    private HashMap<Integer, UserImpl> users = new HashMap<Integer, UserImpl>();
+	
+    @Override
     public void reset() {
 
     }
 
     @Override
     public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-        return null;
+		
+    	UserImpl us = new UserImpl();
+    	
+        if(!username.isEmpty() || username!=null)
+    	{	
+        	//L'username deve essere univoco
+        	for(Map.Entry<Integer,UserImpl> entry: users.entrySet())
+			{
+				if(entry.getValue().getUsername().equals(username))
+				{
+					return -1;
+				}
+			}
+				
+    		if(!password.isEmpty() || password!=null)
+    		
+    		{
+    			if(!role.isEmpty() || role!=null) {
+
+    				us.setUsername(username);
+    				us.setPassword(password);
+    				us.setRole(role);
+    				users.put(us.getId(),us);
+    			
+    			}
+    			else {
+    					throw new InvalidRoleException();
+    			 	  }
+    		}	
+    		 else {
+    			throw new InvalidPasswordException();
+    				}
+    	}
+        else {
+    		throw new InvalidUsernameException();
+    		  }
+    				
+    			return us.getId();
     }
 
     @Override
     public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-        return false;
+    	//TODO: gestire eccezione per utente non autorizzato
+    	
+    	if(id == 0 || id == null) 
+    		throw new InvalidUserIdException();
+    	
+    	users.remove(id);
+    	
+    	//checking if user has really been removed
+    	if(users.containsKey(id)) {
+    		return false;
+    	}
+    	else {
+    		return true;
+    	}
+
     }
 
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
-        return null;
+    	//TODO: gestire eccezione per utente non autorizzato
+    	return new ArrayList<User>(users.values());
     }
 
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-        return null;
+    	//TODO gestire eccezione per utente non autorizzato
+    	
+    	if(id <= 0 || id == null)
+    		throw new InvalidUserIdException();
+    	
+    	User us = null;
+    	
+    	if(users.containsKey(id))
+    		us = users.get(id);
+
+    	return us;
+
     }
 
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
-        return false;
+    	//TODO gestire eccezione per utente non autorizzato
+    	if( id <= 0 || id==null)
+        	throw new InvalidUserIdException();
+       
+        if (role.isEmpty() || role == null)
+        	throw new InvalidRoleException();
+        
+        for(UserImpl user : users.values())
+        	
+        	if(user.getId() == id) {
+        		user.setRole(role);
+        		}
+        	else {
+        		return false;
+        	}
+        
+        return true;
     }
 
     @Override
@@ -54,22 +134,98 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+    	//TODO gestire eccezione per utente non autorizzate
+    	
+        if (description.isEmpty() || description == null)
+        	throw new InvalidProductDescriptionException();
+        
+        if (productCode.isEmpty() || productCode == null)
+        	throw new InvalidProductCodeException();
+
+        if (pricePerUnit <= 0 || pricePerUnit == 0)
+        	throw new InvalidPricePerUnitException();
+        
+        //BarCode must be unique
+        
+		for(ProductType product : products.values())
+		{
+			if(product.getBarCode().equals(productCode))
+			{
+				return -1;
+			}
+		}
+		
+		ProductType pt = new ProductTypeImpl();
+		pt.setBarCode(productCode);
+		pt.setProductDescription(description);
+		pt.setNote(note);
+		pt.setPricePerUnit(pricePerUnit);
+		products.put(pt.getBarCode(),pt);
+
+        
+        return pt.getId();
     }
 
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-        return false;
+    	//TODO gestire eccezione per utente non autorizzate
+        if (newDescription.isEmpty() || newDescription == null)
+        	throw new InvalidProductDescriptionException();
+        
+        if (newCode.isEmpty() || newCode == null)
+        	throw new InvalidProductCodeException();
+
+        if (newPrice <= 0 || newPrice == 0)
+        	throw new InvalidPricePerUnitException();
+        if (id <= 0 || id == 0)
+        	throw new InvalidPricePerUnitException();
+        
+       for ( ProductType product : products.values())
+       {
+    	   if(product.getBarCode().equals(newCode))
+    	   {
+    		   return false;
+    	   } 
+       }
+    	   
+    	for ( ProductType product : products.values())
+    	{
+    		if(product.getId()==id)
+    		{
+    			product.setBarCode(newCode);
+    			product.setProductDescription(newDescription);
+    			product.setNote(newNote);
+    			product.setPricePerUnit(newPrice);
+    		 }
+    	 }
+
+    	   return true;
     }
 
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
-        return false;
+    	if(id == 0 || id == null) 
+    		throw new InvalidProductIdException();
+    	
+    	for(Map.Entry<String,ProductType> entry: products.entrySet())
+		{
+			if(entry.getValue().getId().equals(id))
+			{
+				products.remove(entry.getKey());
+				}
+			else {
+				return false;
+			}
+			
+		}
+    	return true;
+
     }
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-        return null;
+    	//TODO gestire eccezione per utente non autorizzate
+    	return new ArrayList<ProductType>(products.values());
     }
 
     @Override

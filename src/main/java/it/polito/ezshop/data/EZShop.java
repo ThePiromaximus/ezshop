@@ -24,7 +24,7 @@ public class EZShop implements EZShopInterface {
     /*ipotesi: solo uno alla volta può accedere al sistema, 
      * non posso aprire due GUI contemporaneamente ed accedervi
      * verificare che loggedUSer può essere null*/
-    private UserImpl loggedUser=null;
+    private User loggedUser=null;
     
     /*da qualche parte nel main:
     *loggedUser è un attributo private quindi quando chiamo l'istruzione dal main ho un errore
@@ -44,7 +44,7 @@ public class EZShop implements EZShopInterface {
 @Override
 public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 	
-	UserImpl us = new UserImpl();
+	User us = new UserImpl();
 	
     if(!username.isEmpty() || username!=null)
 	{	

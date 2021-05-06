@@ -7,35 +7,23 @@ import java.util.*;
 
 public class EZShop implements EZShopInterface {
 	
-
-	private HashMap<String,ProductType> products = new HashMap<String,ProductType>();
+	private HashMap<String, ProductType> products = new HashMap<String, ProductType>();
+	private HashMap<Integer, SaleTransaction> openedSaleTransactions = new HashMap<Integer, SaleTransaction>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
+	private HashMap<Integer, SaleTransaction> payedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
+    private HashMap<Integer, ReturnTransactionImpl> closedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, User> users = new HashMap<Integer, User>();
 	private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
 	private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
-    
+    private HashMap<Integer, BalanceOperation> balanceOperations = new HashMap<Integer, BalanceOperation>();
     /*
      Questa variabile rappresenta il bilancio corrente del sistema (=/= balanceOperation che invece rappresenta una singola operazione)
      Va inizializzata (=0) dentro il metodo reset() 
      */
     private double balance;
-    
-    /*ipotesi: solo uno alla volta può accedere al sistema, 
-     * non posso aprire due GUI contemporaneamente ed accedervi
-     * verificare che loggedUSer può essere null*/
     private User loggedUser=null;
-    
-    /*da qualche parte nel main:
-    *loggedUser è un attributo private quindi quando chiamo l'istruzione dal main ho un errore
-    * quindi implementare una setLoggedUser public che mi restitusce l'utente loggato*/
-    //ezshop.setLoggedUser(ezshop.login(pass,username);
-    
-    //quindi poi per controllare i diritti di utilizzo di un metodo:
-	//if(this.userLogged.getRole() != 'administrator')
-	//((	throw new UnauthorizedException();
 
-    
 
     public void reset() {
 
@@ -43,51 +31,45 @@ public class EZShop implements EZShopInterface {
 
 @Override
 public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-	
-	User us = new UserImpl();
-	
-    if(!username.isEmpty() || username!=null)
-	{	
-    	//L'username deve essere univoco
-    	for(User user : users.values())
-		{
-			if(user.getUsername().contains(username))
-			{
-				return -1;
-			}
-		}
-			
-		if(!password.isEmpty() || password!=null)
-		
-		{
-			if(!role.isEmpty() || role!=null) {
 
-				us.setUsername(username);
-				us.setPassword(password);
-				us.setRole(role);
-				users.put(us.getId(),us);
-			
-			}
-			else {
-					throw new InvalidRoleException();
-			 	  }
-		}	
-		 else {
-			throw new InvalidPasswordException();
-				}
-	}
-    else {
+	User us = new UserImpl();
+
+	if(username.isEmpty() || username == null)
 		throw new InvalidUsernameException();
-		  }
-				
-			return us.getId();
+
+
+	if(password.isEmpty() || password == null)
+		throw new InvalidPasswordException();
+
+	if(role.isEmpty() || role == null)
+		throw new InvalidRoleException();
+
+
+	//L'username deve essere univoco
+	for(User user : users.values())
+	{
+		if(user.getUsername().contains(username))
+		{
+			return -1;
+		}
+	}
+	us.setUsername(username);
+	us.setPassword(password);
+	us.setRole(role);
+	users.put(us.getId(),us);
+
+
+
+	return us.getId();
 }
 
 @Override
 public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-	//TODO: gestire eccezione per utente non autorizzato
 	
-	if(id == 0 || id == null || id > users.size()) 
+	if(this.loggedUser.getRole()!="Administrator")
+		throw new UnauthorizedException();
+	
+	if(id == 0 || id == null) 
 		throw new InvalidUserIdException();
 	
 		users.remove(id);
@@ -104,18 +86,20 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
-    	//TODO: gestire eccezione per utente non autorizzato
+
+    	if(this.loggedUser.getRole()!="Administrator")
+    		throw new UnauthorizedException();
     	
-    	//if(this.userLogged.getRole() != 'administrator')
-    	//	throw new UnauthorizedException();
     	return new ArrayList<User>(users.values());
     }
 
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzato
+  
+    	if(this.loggedUser.getRole()!="Administrator")
+    		throw new UnauthorizedException();
     	
-    	if(id <= 0 || id == null || id > users.size())
+    	if(id <= 0 || id == null)
     		throw new InvalidUserIdException();
     	
     	User us = new UserImpl();
@@ -129,7 +113,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzato
+    	
+    	if(this.loggedUser.getRole()!="Administrator")
+    		throw new UnauthorizedException();
+    	
     	if( id <= 0 || id==null)
         	throw new InvalidUserIdException();
        
@@ -155,6 +142,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	
     	if(username == null || username.isEmpty())
     		throw new InvalidUsernameException();
+    	
     	if(password == null || password.isEmpty())
     		throw new InvalidPasswordException();
     	
@@ -162,20 +150,17 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	
     	for(User user : users.values())
 		{
-			if(user.getUsername().contains(username) && user.getPassword().contains(password)) {
-					return user;
-							
+			if(user.getUsername().equals(username) && user.getPassword().equals(password)) {
+				this.loggedUser=user;
+				return loggedUser;
 			}
-
-				
 		}
     	return null;
-    	
-
     }
 
     @Override
     public boolean logout() {
+    	
     	if(this.loggedUser == null)
     		return false;
     	else {
@@ -186,7 +171,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzate
+    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    		throw new UnauthorizedException();
     	
         if (description.isEmpty() || description == null)
         	throw new InvalidProductDescriptionException();
@@ -220,7 +206,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzate
+    	
+    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    		throw new UnauthorizedException();
+    	
         if (newDescription.isEmpty() || newDescription == null)
         	throw new InvalidProductDescriptionException();
         
@@ -256,6 +245,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
+    	
+    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    		throw new UnauthorizedException();
+    	
     	if(id == 0 || id == null) 
     		throw new InvalidProductIdException();
     	
@@ -278,7 +271,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzate
+    	
+    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    		throw new UnauthorizedException();
+    	
     	return new ArrayList<ProductType>(products.values());
     }
 
@@ -302,6 +298,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	{
     		throw new InvalidProductCodeException();
     	}
+    	
+    	return null;
 
     }
 
@@ -459,7 +457,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 					if(this.balance >= (quantity*pricePerUnit))
 		    		{
 						//Creo balance operation relativa al precedente ordine
-		    			BalanceOperation bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+		    			BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+		    			balanceOperations.put(bp.getBalanceId(), bp);
 		    			//Creo nuovo ordine e lo aggiungo alla lista
 						Order o = new OrderImpl(productCode, pricePerUnit, quantity);
 						o.setStatus("PAYED");
@@ -516,9 +515,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     				int quantity = orders.get(orderId).getQuantity();
     				if(this.balance >= (quantity*pricePerUnit))
     				{
-    					BalanceOperation bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
-        				orders.get(orderId).setBalanceId(bp.getBalanceId());
-        				orders.get(orderId).setStatus("PAYED");
+    					BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+        				balanceOperations.put(bp.getBalanceId(), bp);
+    					orders.get(orderId).setBalanceId(bp.getBalanceId());
+    					orders.get(orderId).setStatus("PAYED");
         				this.balance -= quantity*pricePerUnit;
         				return true;
     				}
@@ -782,50 +782,147 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
+    	if(customerCard == null || customerCard.isEmpty())
+    		throw new InvalidCustomerCardException();
+    	List<Customer> customersList = getAllCustomers();
+    	// If the db is not reachable, return an empty string
+    	if(customersList == null)
+    		return false;
+    	if(customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard())).count() == 1) {
+    		Customer tmp = customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard()))
+    							.findFirst().get();
+    		if(tmp.getPoints() + pointsToBeAdded >= 0) {
+    			customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard()))
+					.findFirst().ifPresent(c -> c.setPoints(c.getPoints() + pointsToBeAdded));
+    			return true;
+    		}		
+    	}
     	return false;
     }
 
     @Override
     public Integer startSaleTransaction() throws UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-    	return null;
+    	Integer max;
+    	if(openedSaleTransactions.isEmpty()) {
+    		max = 1;
+    	}    		
+    	else {
+    		max = Collections.max(openedSaleTransactions.keySet());
+    	}	
+    	SaleTransaction sale = new SaleTransactionImpl();
+    	sale.setTicketNumber(max+1);
+    	openedSaleTransactions.put(max+1, sale);
+    	return (max+1);
     }
 
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-    	return false;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
+    		throw new InvalidProductCodeException();
+    	if(amount < 0)
+    		throw new InvalidQuantityException();
+    	
+		ProductType refProd = products.get(productCode);
+		if(refProd == null || refProd.getQuantity() < amount)
+			return false;
+		SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			return false;
+		
+		List<TicketEntry> entries = sale.getEntries();
+		TicketEntry productToInsert = new TicketEntryImpl(productCode, amount);
+		productToInsert.setProductDescription(refProd.getProductDescription());
+		productToInsert.setPricePerUnit(refProd.getPricePerUnit());
+		entries.add(productToInsert);
+		sale.setEntries(entries);
+		sale.setPrice(sale.getPrice() + amount * productToInsert.getPricePerUnit());
+		openedSaleTransactions.replace(sale.getTicketNumber(), sale);
+		
+		return true;
     }
 
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-    	return false;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
+    		throw new InvalidProductCodeException();
+    	if(amount < 0)
+    		throw new InvalidQuantityException();
+    	
+		if(products.get(productCode) == null)
+			return false;
+		SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			return false;
+		
+		List<TicketEntry> entries = sale.getEntries();
+		entries.stream().filter(e -> !productCode.equals(e.getBarCode())).findFirst()
+			.ifPresent(e -> e.setAmount(e.getAmount() - amount));
+		sale.setEntries(entries);
+		openedSaleTransactions.replace(sale.getTicketNumber(), sale);
+		
+    	return true;
     }
 
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-    	return false;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
+    		throw new InvalidProductCodeException();
+    	if(discountRate < 0.0 || discountRate > 1.0)
+    		throw new InvalidDiscountRateException ();
+    	
+		if(products.get(productCode) == null)
+			return false;
+		SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			return false;
+		
+		List<TicketEntry> entries = sale.getEntries();
+		entries.stream().filter(e -> !productCode.equals(e.getBarCode())).findFirst()
+			.ifPresent(e -> e.setDiscountRate(discountRate));
+		sale.setEntries(entries);
+		openedSaleTransactions.replace(sale.getTicketNumber(), sale);
+    	
+    	return true;
     }
 
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-    	return false;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	if(discountRate < 0.0 || discountRate > 1.0)
+    		throw new InvalidDiscountRateException ();
+    	
+    	SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			return false;
+		
+		sale.setDiscountRate(discountRate);
+		openedSaleTransactions.replace(sale.getTicketNumber(), sale);
+    	
+    	return true;
     }
 
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
     	// TODO add check for logged user
     	// TODO mars: to be implemented
-        return 0;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	
+    	
+        return transactionId;
     }
 
     @Override
@@ -885,13 +982,15 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if(amount <= 0)
     		throw new InvalidQuantityException();
     	
+
+    	
     	if(!products.containsKey(productCode) || !openedReturnTransactions.containsKey(returnId))
     		return false;
     	
     	ReturnTransactionImpl rt = openedReturnTransactions.get(returnId);
     	SaleTransaction st = rt.getSaleTransaction();
-    	TicketEntry te;
     	
+    	TicketEntry te;
     	try {
     		 te = st.getEntries().stream().filter((TicketEntry t) -> {return t.getBarCode().equals(productCode);}).findFirst().get();
     	}catch(NoSuchElementException e) {
@@ -906,32 +1005,118 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		if(ote.get().getAmount() + amount > te.getAmount()) {
     			return false;
     		} else {
-    			ote.get().setAmount(ote.get().getAmount() + amount);
+    			Integer newAmount = ote.get().getAmount() + amount;
+    			ote.get().setAmount(newAmount);
     		}
     	}catch(NoSuchElementException e) {
-        	rt.addEntry(new TicketEntryImpl(productCode, amount));
+        	rt.addEntry(new TicketEntryImpl(productCode, amount, te.getPricePerUnit(), te.getDiscountRate()));
     	}
     	return true;
     }
 
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
-        return false;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(returnId <= 0 || returnId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	if(!openedReturnTransactions.containsKey(returnId))
+    		return false;
+    	
+    	if(commit == false) {
+    		openedReturnTransactions.remove(returnId);
+    		return true;
+    	}
+    	ReturnTransactionImpl rt = openedReturnTransactions.get(returnId);
+    	
+    	for(TicketEntry te : rt.getEntries()) {
+    		ProductType p = products.get(te.getBarCode());
+    		p.setQuantity(p.getQuantity() + te.getAmount());
+    		
+    		SaleTransaction st = rt.getSaleTransaction();
+    		TicketEntry tSale = st.getEntries().stream().filter((TicketEntry t) -> t.getBarCode().equals(te.getBarCode())).findFirst().get();
+    		st.setPrice((st.getPrice()*(1-st.getDiscountRate()) - te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate()))/(1-st.getDiscountRate()));
+    		tSale.setAmount(tSale.getAmount() - te.getAmount());
+    		
+    	}
+    	
+    	openedReturnTransactions.remove(returnId);
+    	closedReturnTransactions.put(returnId, rt);
+    	return true;
     }
 
     @Override
     public boolean deleteReturnTransaction(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-        return false;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(returnId <= 0 || returnId == null)
+        	throw new InvalidTransactionIdException();
+        
+        if(!closedReturnTransactions.containsKey(returnId))
+        	return false;
+        ReturnTransactionImpl rt = closedReturnTransactions.get(returnId);
+        
+        if(rt.getPayed())
+        	return false;
+        
+    	for(TicketEntry te : rt.getEntries()) {
+    		ProductType p = products.get(te.getBarCode());
+    		p.setQuantity(p.getQuantity() - te.getAmount());
+    		
+    		SaleTransaction st = rt.getSaleTransaction();
+    		TicketEntry tSale = st.getEntries().stream().filter((TicketEntry t) -> t.getBarCode().equals(te.getBarCode())).findFirst().get();
+    		st.setPrice((st.getPrice()*(1-st.getDiscountRate()) + te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate()))/(1-st.getDiscountRate()));
+    		tSale.setAmount(tSale.getAmount() + te.getAmount());
+    	}
+        closedReturnTransactions.remove(returnId);
+        return true;
     }
 
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
-        return 0;
+    	//TODO gestire eccezione per utente non autorizzato
+    	if(ticketNumber <= 0 || ticketNumber == null)
+    		throw new InvalidTransactionIdException();
+    	if(cash <= 0)
+    		throw new InvalidPaymentException();
+    	
+    	if(!closedSaleTransactions.containsKey(ticketNumber))
+    		return -1;
+    	
+    	SaleTransaction st = closedSaleTransactions.get(ticketNumber);
+    	
+    	if(cash < st.getPrice())
+    		return -1;
+    	
+    	closedSaleTransactions.remove(ticketNumber);
+    	payedSaleTransactions.put(ticketNumber, st);
+    	this.balance += st.getPrice();
+    	return st.getPrice() - cash;
     }
 
     @Override
     public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        return false;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(ticketNumber <= 0 || ticketNumber == null)
+        	throw new InvalidTransactionIdException();
+        if(!creditCardIsValid(creditCard))
+        	throw new InvalidCreditCardException();
+        
+        /* TODO:
+         * if(!creditsCard.contains(creditCard)
+         * 		return false;
+         * 
+         * here something to check credit card balance and check if it is registered
+         *
+         */
+        
+        if(!closedSaleTransactions.containsKey(ticketNumber))
+    		return false;
+        
+        SaleTransaction st = closedSaleTransactions.get(ticketNumber);
+    	closedSaleTransactions.remove(ticketNumber);
+    	payedSaleTransactions.put(ticketNumber, st);
+    	this.balance += st.getPrice();
+    	return true;
     }
 
     @Override
@@ -946,7 +1131,13 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
-        return false;
+    	if(toBeAdded + this.balance < 0)
+    		return false;
+    	BalanceOperation bp = new BalanceOperationImpl();
+    	bp.setMoney(toBeAdded);
+    	
+    	this.balance += toBeAdded;
+        return true;
     }
 
     @Override
@@ -956,7 +1147,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public double computeBalance() throws UnauthorizedException {
-        return 0;
+    	//TODO gestire eccezione per utente non autorizzato
+        return this.balance;
     }
     
     //Metodo per verificare la validità di un barcode
@@ -1043,5 +1235,33 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     {
         if (toRound % 10 == 0) return toRound;
         return (10 - toRound % 10) + toRound;
+    }
+    
+    // https://www.geeksforgeeks.org/luhn-algorithm/
+    private static boolean creditCardIsValid(String creditCard) {
+    	if(creditCard == null || creditCard.isEmpty())
+    		return false;
+    	
+	    int nDigits = creditCard.length();
+	 
+	    int nSum = 0;
+	    boolean isSecond = false;
+	    for (int i = nDigits - 1; i >= 0; i--)
+	    {
+	 
+	        int d = creditCard.charAt(i) - '0';
+	 
+	        if (isSecond == true)
+	            d = d * 2;
+	 
+	        // We add two digits to handle
+	        // cases that make two digits
+	        // after doubling
+	        nSum += d / 10;
+	        nSum += d % 10;
+	 
+	        isSecond = !isSecond;
+	    }
+	    return (nSum % 10 == 0);
     }
 }

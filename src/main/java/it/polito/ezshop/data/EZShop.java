@@ -8,6 +8,7 @@ import java.util.*;
 public class EZShop implements EZShopInterface {
 	
 	private List<ProductType> products = new ArrayList<ProductType>();
+	private HashMap<Integer, SaleTransaction> openedSaleTransactions = new HashMap<Integer, SaleTransaction>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
@@ -279,21 +280,55 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
+    	if(customerCard == null || customerCard.isEmpty())
+    		throw new InvalidCustomerCardException();
+    	List<Customer> customersList = getAllCustomers();
+    	// If the db is not reachable, return an empty string
+    	if(customersList == null)
+    		return false;
+    	if(customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard())).count() == 1) {
+    		Customer tmp = customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard())).findFirst().get();
+    		if(tmp.getPoints() + pointsToBeAdded >= 0) {
+    			tmp.setPoints(tmp.getPoints() + pointsToBeAdded);
+    			return true;
+    		}		
+    	}
     	return false;
     }
 
     @Override
     public Integer startSaleTransaction() throws UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-    	return null;
+    	Integer max;
+    	if(openedSaleTransactions.isEmpty()) {
+    		max = 1;
+    	}    		
+    	else {
+    		max = Collections.max(openedSaleTransactions.keySet());
+    	}	
+    	SaleTransaction sale = new SaleTransactionImpl();
+    	sale.setTicketNumber(max+1);
+    	openedSaleTransactions.put(max+1, sale);
+    	return (max+1);
     }
 
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
     	// TODO add check for logged user
     	// TODO mars: to be implemented
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	if(productCode.isEmpty() || productCode == null)
+    		throw new InvalidProductCodeException();
+    	if(amount < 0)
+    		throw new InvalidQuantityException();
+    	if(openedSaleTransactions.containsKey(transactionId)) {
+    		SaleTransaction sale = openedSaleTransactions.get(transactionId);
+    		List<TicketEntry> entries = sale.getEntries();
+    		TicketEntry productToInsert = new TicketEntryImpl();
+    		
+    		entries.add(null);
+    	}
     	return false;
     }
 

@@ -16,7 +16,7 @@ public class EZShop implements EZShopInterface {
     private HashMap<Integer, User> users = new HashMap<Integer, User>();
 	private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
 	private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
-    
+    private HashMap<Integer, BalanceOperation> balanceOperations = new HashMap<Integer, BalanceOperation>();
     /*
      Questa variabile rappresenta il bilancio corrente del sistema (=/= balanceOperation che invece rappresenta una singola operazione)
      Va inizializzata (=0) dentro il metodo reset() 
@@ -441,6 +441,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 		    		{
 						//Creo balance operation relativa al precedente ordine
 		    			BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+		    			balanceOperations.put(bp.getBalanceId(), bp);
 		    			//Creo nuovo ordine e lo aggiungo alla lista
 						OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
 						o.setStatus("PAYED");
@@ -489,7 +490,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     				if(this.balance >= (quantity*pricePerUnit))
     				{
     					BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
-        				orders.get(orderId).setBalanceId(bp.getBalanceId());
+        				balanceOperations.put(bp.getBalanceId(), bp);
+    					orders.get(orderId).setBalanceId(bp.getBalanceId());
         				this.balance -= quantity*pricePerUnit;
         				return true;
     				}
@@ -846,6 +848,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         	throw new InvalidTransactionIdException();
         if(!creditCardIsValid(creditCard))
         	throw new InvalidCreditCardException();
+        
         /* TODO:
          * if(!creditsCard.contains(creditCard)
          * 		return false;
@@ -876,7 +879,13 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
-        return false;
+    	if(toBeAdded + this.balance < 0)
+    		return false;
+    	BalanceOperation bp = new BalanceOperationImpl();
+    	bp.setMoney(toBeAdded);
+    	
+    	this.balance += toBeAdded;
+        return true;
     }
 
     @Override
@@ -886,7 +895,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public double computeBalance() throws UnauthorizedException {
-        return 0;
+    	//TODO gestire eccezione per utente non autorizzato
+        return this.balance;
     }
     
     //Metodo per verificare la validità di un barcode

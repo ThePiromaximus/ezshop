@@ -835,13 +835,33 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	
     	closedSaleTransactions.remove(ticketNumber);
     	payedSaleTransactions.put(ticketNumber, st);
-    	this.balance += st.getPrice() - cash;
+    	this.balance += st.getPrice();
     	return st.getPrice() - cash;
     }
 
     @Override
     public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        return false;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(ticketNumber <= 0 || ticketNumber == null)
+        	throw new InvalidTransactionIdException();
+        if(!creditCardIsValid(creditCard))
+        	throw new InvalidCreditCardException();
+        /* TODO:
+         * if(!creditsCard.contains(creditCard)
+         * 		return false;
+         * 
+         * here something to check credit card balance and check if it is registered
+         *
+         */
+        
+        if(!closedSaleTransactions.containsKey(ticketNumber))
+    		return false;
+        
+        SaleTransaction st = closedSaleTransactions.get(ticketNumber);
+    	closedSaleTransactions.remove(ticketNumber);
+    	payedSaleTransactions.put(ticketNumber, st);
+    	this.balance += st.getPrice();
+    	return true;
     }
 
     @Override
@@ -953,5 +973,33 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     {
         if (toRound % 10 == 0) return toRound;
         return (10 - toRound % 10) + toRound;
+    }
+    
+    // https://www.geeksforgeeks.org/luhn-algorithm/
+    private static boolean creditCardIsValid(String creditCard) {
+    	if(creditCard == null || creditCard.isEmpty())
+    		return false;
+    	
+	    int nDigits = creditCard.length();
+	 
+	    int nSum = 0;
+	    boolean isSecond = false;
+	    for (int i = nDigits - 1; i >= 0; i--)
+	    {
+	 
+	        int d = creditCard.charAt(i) - '0';
+	 
+	        if (isSecond == true)
+	            d = d * 2;
+	 
+	        // We add two digits to handle
+	        // cases that make two digits
+	        // after doubling
+	        nSum += d / 10;
+	        nSum += d % 10;
+	 
+	        isSecond = !isSecond;
+	    }
+	    return (nSum % 10 == 0);
     }
 }

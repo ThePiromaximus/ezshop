@@ -11,7 +11,7 @@ public class EZShop implements EZShopInterface {
 	private HashMap<String,ProductType> products = new HashMap<String,ProductType>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
-    private HashMap<Integer, UserImpl> users = new HashMap<Integer, UserImpl>();
+    private HashMap<Integer, User> users = new HashMap<Integer, User>();
 	private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
 	private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
     
@@ -41,66 +41,66 @@ public class EZShop implements EZShopInterface {
 
     }
 
-    @Override
-    public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-		
-    	UserImpl us = new UserImpl();
-    	
-        if(!username.isEmpty() || username!=null)
-    	{	
-        	//L'username deve essere univoco
-        	for(Map.Entry<Integer,UserImpl> entry: users.entrySet())
+@Override
+public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
+	
+	UserImpl us = new UserImpl();
+	
+    if(!username.isEmpty() || username!=null)
+	{	
+    	//L'username deve essere univoco
+    	for(User user : users.values())
+		{
+			if(user.getUsername().contains(username))
 			{
-				if(entry.getValue().getUsername().equals(username))
-				{
-					return -1;
-				}
+				return -1;
 			}
+		}
+			
+		if(!password.isEmpty() || password!=null)
+		
+		{
+			if(!role.isEmpty() || role!=null) {
+
+				us.setUsername(username);
+				us.setPassword(password);
+				us.setRole(role);
+				users.put(us.getId(),us);
+			
+			}
+			else {
+					throw new InvalidRoleException();
+			 	  }
+		}	
+		 else {
+			throw new InvalidPasswordException();
+				}
+	}
+    else {
+		throw new InvalidUsernameException();
+		  }
 				
-    		if(!password.isEmpty() || password!=null)
-    		
-    		{
-    			if(!role.isEmpty() || role!=null) {
+			return us.getId();
+}
 
-    				us.setUsername(username);
-    				us.setPassword(password);
-    				us.setRole(role);
-    				users.put(us.getId(),us);
-    			
-    			}
-    			else {
-    					throw new InvalidRoleException();
-    			 	  }
-    		}	
-    		 else {
-    			throw new InvalidPasswordException();
-    				}
-    	}
-        else {
-    		throw new InvalidUsernameException();
-    		  }
-    				
-    			return us.getId();
-    }
-
-    @Override
-    public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-    	//TODO: gestire eccezione per utente non autorizzato
-    	
-    	if(id == 0 || id == null || id > users.size()) 
-    		throw new InvalidUserIdException();
-    	
-    		users.remove(id);
-    	
-    	//checking if user has really been removed
-    		if(users.containsKey(id)) {
-    			return false;
-    		}
-    		else {
-    			return true;
-    		}
-    	
-    }
+@Override
+public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
+	//TODO: gestire eccezione per utente non autorizzato
+	
+	if(id == 0 || id == null || id > users.size()) 
+		throw new InvalidUserIdException();
+	
+		users.remove(id);
+	
+	//checking if user has really been removed
+		if(users.containsKey(id)) {
+			return false;
+		}
+		else {
+			return true;
+		}
+	
+}
 
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
@@ -136,7 +136,7 @@ public class EZShop implements EZShopInterface {
         if (role.isEmpty() || role == null)
         	throw new InvalidRoleException();
         
-        for(UserImpl user : users.values())
+        for(User user : users.values())
         	
         	if(user.getId() == id) {
         		user.setRole(role);
@@ -147,6 +147,8 @@ public class EZShop implements EZShopInterface {
         
         return true;
     }
+    
+
 
     @Override
     public User login(String username, String password) throws InvalidUsernameException, InvalidPasswordException {
@@ -156,19 +158,20 @@ public class EZShop implements EZShopInterface {
     	if(password == null || password.isEmpty())
     		throw new InvalidPasswordException();
     	
-    	UserImpl us = new UserImpl();
     	
-    	for(Map.Entry<Integer,UserImpl> entry: users.entrySet())
+    	
+    	for(User user : users.values())
 		{
-			if(entry.getValue().getUsername().equals(username) && entry.getValue().getPassword().equals(password)) {
-					us = entry.getValue();
+			if(user.getUsername().contains(username) && user.getPassword().contains(password)) {
+					return user;
 							
-			}else {
-				us = null;
-				return us;
-			}	
+			}
+
+				
 		}
-    	return us;
+    	return null;
+    	
+
     }
 
     @Override
@@ -256,11 +259,13 @@ public class EZShop implements EZShopInterface {
     	if(id == 0 || id == null) 
     		throw new InvalidProductIdException();
     	
-    	for(Map.Entry<String,ProductType> entry: products.entrySet())
+    	for(ProductType product : products.values())
 		{
-			if(entry.getValue().getId().equals(id))
-			{
-				products.remove(entry.getKey());
+			if(product.getId().equals(id))
+			{	
+				String BarCodeToRemove;
+				BarCodeToRemove = product.getBarCode();
+				products.remove(BarCodeToRemove);
 				}
 			else {
 				return false;

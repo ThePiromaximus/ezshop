@@ -7,11 +7,18 @@ import java.util.*;
 
 public class EZShop implements EZShopInterface {
 	
-	private List<ProductType> products = new ArrayList<ProductType>();
+	private HashMap<String, ProductType> products = new HashMap<String, ProductType>();
 	private HashMap<Integer, SaleTransaction> openedSaleTransactions = new HashMap<Integer, SaleTransaction>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
+    private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
+    
+    /*
+     Questa variabile rappresenta il bilancio corrente del sistema (=/= balanceOperation che invece rappresenta una singola operazione)
+     Va inizializzata (=0) dentro il metodo reset() 
+     */
+    private double balance;
     
 	@Override
     public void reset() {
@@ -77,9 +84,9 @@ public class EZShop implements EZShopInterface {
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
         
     	//TODO:Gestire eccezione per utente non autorizzato
-    	if((barCode == null) || (barCode.length() == 0) || (this.barCodeIsValid(barCode)))
+    	if((barCode != null) && (barCode.length() != 0) && (barCodeIsValid(barCode)))
     	{
-    		for(ProductType product : products) 
+    		for(ProductType product : products.values()) 
     		{
     	        if (product.getBarCode().equals(barCode)) 
     	        {
@@ -103,7 +110,7 @@ public class EZShop implements EZShopInterface {
         if (description.length()==0 || description == null) 
         	description = "";
         
-        for(ProductType product : products)
+        for(ProductType product : products.values())
         {
         	if(product.getProductDescription().contains(description))
         	{
@@ -120,7 +127,7 @@ public class EZShop implements EZShopInterface {
     	//TODO: gestire eccezione per utente non autorizzato
         if(productId>0 && productId!=null)
         {
-        	for(ProductType product : products)
+        	for(ProductType product : products.values())
         	{
         		if(product.getId()==productId)
         		{
@@ -158,7 +165,7 @@ public class EZShop implements EZShopInterface {
     			//La location deve essere univoca
 				//Scorro tutti i prodotti per vedere se esiste già la locazione
 				//Se esiste non è univoca e ritorno false
-    			for(ProductType product : products)
+    			for(ProductType product : products.values())
     			{
     				if(product.getLocation().equals(newPos))
     				{
@@ -168,7 +175,7 @@ public class EZShop implements EZShopInterface {
     			
     			//La location è univoca
     			//Aggiorno il prodotto alla nuova locazione
-    			for(ProductType product : products)
+    			for(ProductType product : products.values())
     			{
     				if(product.getId()==productId)
     				{
@@ -193,7 +200,41 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer issueOrder(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        
+    	if((productCode != null) && (productCode.length() != 0) && (barCodeIsValid(productCode)))
+    	{
+    		if(quantity>0)
+    		{
+    			if(pricePerUnit>0)
+    			{
+    				//Il prodotto deve essere presente in inventario
+    				if(products.containsKey(productCode) && products != null)
+    				{
+    					//Creo nuovo ordine e lo aggiungo alla lista
+    					OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
+    					orders.put(o.getOrderId(), o);
+    					return o.getOrderId();
+    				}
+    				else
+    				{
+    					return -1;
+    				}
+    			}
+    			else
+    			{
+    				throw new InvalidPricePerUnitException();
+    			}
+    		}
+    		else
+    		{
+    			throw new InvalidQuantityException();
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidProductCodeException();
+    	}
+    	
     }
 
     @Override
@@ -407,8 +448,43 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        
-    	return false;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(returnId <= 0 || returnId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	if(productCode == null || productCode.isEmpty() || !barCodeIsValid(productCode))
+			throw new InvalidProductCodeException();
+    	
+    	if(amount <= 0)
+    		throw new InvalidQuantityException();
+    	
+    	if(!products.containsKey(productCode) || !openedReturnTransactions.containsKey(returnId))
+    		return false;
+    	
+    	ReturnTransactionImpl rt = openedReturnTransactions.get(returnId);
+    	SaleTransaction st = rt.getSaleTransaction();
+    	TicketEntry te;
+    	
+    	try {
+    		 te = st.getEntries().stream().filter((TicketEntry t) -> {return t.getBarCode().equals(productCode);}).findFirst().get();
+    	}catch(NoSuchElementException e) {
+    		return false;
+    	}
+    	
+    	if(te.getAmount() < amount)
+    		return false;
+    	
+    	try {
+    		Optional<TicketEntry> ote = rt.getEntry(productCode);
+    		if(ote.get().getAmount() + amount > te.getAmount()) {
+    			return false;
+    		} else {
+    			ote.get().setAmount(ote.get().getAmount() + amount);
+    		}
+    	}catch(NoSuchElementException e) {
+        	rt.addEntry(new TicketEntryImpl(productCode, amount));
+    	}
+    	return true;
     }
 
     @Override
@@ -458,63 +534,73 @@ public class EZShop implements EZShopInterface {
     
     //Metodo per verificare la validità di un barcode
     // https://www.gs1.org/services/how-calculate-check-digit-manually
-    private boolean barCodeIsValid(String barCode) {
+    private static boolean barCodeIsValid(String barCode) {
     	int bcSize = barCode.length();
     	boolean r = false;
-    	if( (bcSize == 12) || (bcSize == 13) || (bcSize == 14) )
+    	
+    	if(barCode.matches("[0-9]{12,14}"))
     	{
-    		int sum = 0;
-    		int mul; //Può essere 1 o 3
-    		int digit; 
-    		switch(bcSize)
-    		{
-	    		case 12:
-	    			for(int i = 0; i < 11; i++)
-	    			{
-	    				mul = (i%2 == 0) ? 3 : 1;
-	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
-	    				digit *= mul; //Moltiplico per 1 o 3
-	    				sum += digit; //Sommo
-	    			}
-	    			sum = RoundUp(sum) - sum;
-	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(11)))){
-	    				r = true;
-	    			}else {
-	    				r = false;
-	    			}
-	    			break;
-	    		case 13:
-	    			for(int i = 0; i < 12; i++)
-	    			{
-	    				mul = (i%2 == 0) ? 1 : 3;
-	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
-	    				digit *= mul; //Moltiplico per 1 o 3
-	    				sum += digit; //Sommo
-	    			}
-	    			sum = RoundUp(sum) - sum;
-	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(12)))){
-	    				r = true;
-	    			}else {
-	    				r = false;
-	    			}
-	    			break;
-	    		case 14:
-	    			for(int i = 0; i < 13; i++)
-	    			{
-	    				mul = (i%2 == 0) ? 3 : 1;
-	    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
-	    				digit *= mul; //Moltiplico per 1 o 3
-	    				sum += digit; //Sommo
-	    			}
-	    			sum = RoundUp(sum) - sum;
-	    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(13)))){
-	    				r = true;
-	    			}else {
-	    				r = false;
-	    			}
-	    			break;
-    		}
-    		
+    		//Il bar code deve essere una stringa composta da numeri
+    	
+	    	if( (bcSize == 12) || (bcSize == 13) || (bcSize == 14) )
+	    	{
+	    		int sum = 0;
+	    		int mul; //Può essere 1 o 3
+	    		int digit; 
+	    		switch(bcSize)
+	    		{
+		    		case 12:
+		    			for(int i = 0; i < 11; i++)
+		    			{
+		    				mul = (i%2 == 0) ? 3 : 1;
+		    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+		    				digit *= mul; //Moltiplico per 1 o 3
+		    				sum += digit; //Sommo
+		    			}
+		    			sum = RoundUp(sum) - sum;
+		    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(11)))){
+		    				r = true;
+		    			}else {
+		    				r = false;
+		    			}
+		    			break;
+		    		case 13:
+		    			for(int i = 0; i < 12; i++)
+		    			{
+		    				mul = (i%2 == 0) ? 1 : 3;
+		    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+		    				digit *= mul; //Moltiplico per 1 o 3
+		    				sum += digit; //Sommo
+		    			}
+		    			sum = RoundUp(sum) - sum;
+		    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(12)))){
+		    				r = true;
+		    			}else {
+		    				r = false;
+		    			}
+		    			break;
+		    		case 14:
+		    			for(int i = 0; i < 13; i++)
+		    			{
+		    				mul = (i%2 == 0) ? 3 : 1;
+		    				digit = Integer.parseInt(Character.toString(barCode.charAt(i))); //Estraggo i-esima cifra
+		    				digit *= mul; //Moltiplico per 1 o 3
+		    				sum += digit; //Sommo
+		    			}
+		    			sum = RoundUp(sum) - sum;
+		    			if(sum == Integer.parseInt(Character.toString(barCode.charAt(13)))){
+		    				r = true;
+		    			}else {
+		    				r = false;
+		    			}
+		    			break;
+	    		}
+	    		
+	    	}
+	    	else
+	    	{
+	    		r = false;
+	    	}
     	}
     	else
     	{

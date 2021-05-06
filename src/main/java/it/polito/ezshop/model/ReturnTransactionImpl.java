@@ -1,12 +1,16 @@
 package it.polito.ezshop.model;
 
-import it.polito.ezshop.data.SaleTransaction;
+import it.polito.ezshop.data.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 public class ReturnTransactionImpl{
-	private static Integer PROGRESSIVE_ID = 0;
+	private static Integer PROGRESSIVE_ID = 1;
 	
 	private SaleTransaction saleTransaction;
 	private Integer id;
+	private List<TicketEntry> entries = new ArrayList<TicketEntry>();
 	
 	public ReturnTransactionImpl() {
 		this.id = PROGRESSIVE_ID;
@@ -28,5 +32,15 @@ public class ReturnTransactionImpl{
 		this.id = id;
 	}
 
+	public void addEntry(TicketEntry t) {
+		this.entries.add(t);
+	}
 	
+	public List<TicketEntry> getEntries(){
+		return entries;
+	}
+	
+	public Optional<TicketEntry> getEntry(String barCode){
+		return entries.stream().filter((TicketEntry t) -> t.getBarCode().equals(barCode)).findFirst();
+	}
 }

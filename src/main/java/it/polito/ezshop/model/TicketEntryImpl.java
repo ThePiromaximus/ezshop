@@ -1,12 +1,18 @@
 package it.polito.ezshop.model;
 
 public class TicketEntryImpl implements it.polito.ezshop.data.TicketEntry {
+	
 	private String barCode;
 	private String productDescription;
 	private Integer amount;
 	private double pricePerUnit;
 	private double discountRate;
 	
+	public TicketEntryImpl (String barCode, Integer amount) {
+		super();
+		this.barCode = barCode;
+		this.amount = amount;
+	}
 	@Override
 	public String getBarCode() {
 		return this.barCode;

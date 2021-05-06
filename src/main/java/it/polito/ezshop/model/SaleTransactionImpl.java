@@ -9,6 +9,7 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements it.poli
 	private List<TicketEntry> entries;
 	private double discountRate;
 	private double price;
+	private boolean payed = false;
 	
 	@Override
 	public Integer getTicketNumber() {
@@ -56,5 +57,13 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements it.poli
 				return true;
 		}
 		return false;
+	}
+	
+	public void setPayed(boolean payed) {
+		this.payed = payed;
+	}
+	
+	public boolean getPayed() {
+		return this.payed;
 	}
 }

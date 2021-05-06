@@ -10,6 +10,7 @@ public class EZShop implements EZShopInterface {
 	private HashMap<String, ProductType> products = new HashMap<String, ProductType>();
 	private HashMap<Integer, SaleTransaction> openedSaleTransactions = new HashMap<Integer, SaleTransaction>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
+	private HashMap<Integer, SaleTransaction> payedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, ReturnTransactionImpl> closedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, User> users = new HashMap<Integer, User>();
@@ -812,13 +813,30 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		st.setPrice((st.getPrice()*(1-st.getDiscountRate()) + te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate()))/(1-st.getDiscountRate()));
     		tSale.setAmount(tSale.getAmount() + te.getAmount());
     	}
-        
+        closedReturnTransactions.remove(returnId);
         return true;
     }
 
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
-        return 0;
+    	//TODO gestire eccezione per utente non autorizzato
+    	if(ticketNumber <= 0 || ticketNumber == null)
+    		throw new InvalidTransactionIdException();
+    	if(cash <= 0)
+    		throw new InvalidPaymentException();
+    	
+    	if(!closedSaleTransactions.containsKey(ticketNumber))
+    		return -1;
+    	
+    	SaleTransaction st = closedSaleTransactions.get(ticketNumber);
+    	
+    	if(cash < st.getPrice())
+    		return -1;
+    	
+    	closedSaleTransactions.remove(ticketNumber);
+    	payedSaleTransactions.put(ticketNumber, st);
+    	this.balance += st.getPrice() - cash;
+    	return st.getPrice() - cash;
     }
 
     @Override

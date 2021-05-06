@@ -21,22 +21,8 @@ public class EZShop implements EZShopInterface {
      Va inizializzata (=0) dentro il metodo reset() 
      */
     private double balance;
-    
-    /*ipotesi: solo uno alla volta può accedere al sistema, 
-     * non posso aprire due GUI contemporaneamente ed accedervi
-     * verificare che loggedUSer può essere null*/
     private User loggedUser=null;
-    
-    /*da qualche parte nel main:
-    *loggedUser è un attributo private quindi quando chiamo l'istruzione dal main ho un errore
-    * quindi implementare una setLoggedUser public che mi restitusce l'utente loggato*/
-    //ezshop.setLoggedUser(ezshop.login(pass,username);
-    
-    //quindi poi per controllare i diritti di utilizzo di un metodo:
-	//if(this.userLogged.getRole() != 'administrator')
-	//((	throw new UnauthorizedException();
 
-    
 
     public void reset() {
 
@@ -44,51 +30,45 @@ public class EZShop implements EZShopInterface {
 
 @Override
 public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-	
-	User us = new UserImpl();
-	
-    if(!username.isEmpty() || username!=null)
-	{	
-    	//L'username deve essere univoco
-    	for(User user : users.values())
-		{
-			if(user.getUsername().contains(username))
-			{
-				return -1;
-			}
-		}
-			
-		if(!password.isEmpty() || password!=null)
-		
-		{
-			if(!role.isEmpty() || role!=null) {
 
-				us.setUsername(username);
-				us.setPassword(password);
-				us.setRole(role);
-				users.put(us.getId(),us);
-			
-			}
-			else {
-					throw new InvalidRoleException();
-			 	  }
-		}	
-		 else {
-			throw new InvalidPasswordException();
-				}
-	}
-    else {
+	User us = new UserImpl();
+
+	if(username.isEmpty() || username == null)
 		throw new InvalidUsernameException();
-		  }
-				
-			return us.getId();
+
+
+	if(password.isEmpty() || password == null)
+		throw new InvalidPasswordException();
+
+	if(role.isEmpty() || role == null)
+		throw new InvalidRoleException();
+
+
+	//L'username deve essere univoco
+	for(User user : users.values())
+	{
+		if(user.getUsername().contains(username))
+		{
+			return -1;
+		}
+	}
+	us.setUsername(username);
+	us.setPassword(password);
+	us.setRole(role);
+	users.put(us.getId(),us);
+
+
+
+	return us.getId();
 }
 
 @Override
 public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-	//TODO: gestire eccezione per utente non autorizzato
 	
-	if(id == 0 || id == null || id > users.size()) 
+	if(this.loggedUser.getRole()!="Administrator")
+		throw new UnauthorizedException();
+	
+	if(id == 0 || id == null) 
 		throw new InvalidUserIdException();
 	
 		users.remove(id);
@@ -105,18 +85,20 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
-    	//TODO: gestire eccezione per utente non autorizzato
+
+    	if(this.loggedUser.getRole()!="Administrator")
+    		throw new UnauthorizedException();
     	
-    	//if(this.userLogged.getRole() != 'administrator')
-    	//	throw new UnauthorizedException();
     	return new ArrayList<User>(users.values());
     }
 
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzato
+  
+    	if(this.loggedUser.getRole()!="Administrator")
+    		throw new UnauthorizedException();
     	
-    	if(id <= 0 || id == null || id > users.size())
+    	if(id <= 0 || id == null)
     		throw new InvalidUserIdException();
     	
     	User us = new UserImpl();
@@ -130,7 +112,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzato
+    	
+    	if(this.loggedUser.getRole()!="Administrator")
+    		throw new UnauthorizedException();
+    	
     	if( id <= 0 || id==null)
         	throw new InvalidUserIdException();
        
@@ -156,6 +141,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	
     	if(username == null || username.isEmpty())
     		throw new InvalidUsernameException();
+    	
     	if(password == null || password.isEmpty())
     		throw new InvalidPasswordException();
     	
@@ -163,20 +149,17 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	
     	for(User user : users.values())
 		{
-			if(user.getUsername().contains(username) && user.getPassword().contains(password)) {
-					return user;
-							
+			if(user.getUsername().equals(username) && user.getPassword().equals(password)) {
+				this.loggedUser=user;
+				return loggedUser;
 			}
-
-				
 		}
     	return null;
-    	
-
     }
 
     @Override
     public boolean logout() {
+    	
     	if(this.loggedUser == null)
     		return false;
     	else {
@@ -187,7 +170,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzate
+    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    		throw new UnauthorizedException();
     	
         if (description.isEmpty() || description == null)
         	throw new InvalidProductDescriptionException();
@@ -221,7 +205,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzate
+    	
+    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    		throw new UnauthorizedException();
+    	
         if (newDescription.isEmpty() || newDescription == null)
         	throw new InvalidProductDescriptionException();
         
@@ -257,6 +244,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
+    	
+    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    		throw new UnauthorizedException();
+    	
     	if(id == 0 || id == null) 
     		throw new InvalidProductIdException();
     	
@@ -279,7 +270,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzate
+    	
+    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    		throw new UnauthorizedException();
+    	
     	return new ArrayList<ProductType>(products.values());
     }
 
@@ -410,18 +404,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		{
     			if(pricePerUnit>0)
     			{
-    				//Il prodotto deve essere presente in inventario
-    				if(products.containsKey(productCode) && products != null)
-    				{
-    					//Creo nuovo ordine e lo aggiungo alla lista
-    					OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
-    					orders.put(o.getOrderId(), o);
-    					return o.getOrderId();
-    				}
-    				else
-    				{
-    					return -1;
-    				}
+    				//Creo nuovo ordine e lo aggiungo alla lista
+					OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
+					orders.put(o.getOrderId(), o);
+					return o.getOrderId();
     			}
     			else
     			{
@@ -442,12 +428,92 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Integer payOrderFor(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        
+    	if((productCode != null) && (productCode.length() != 0) && (barCodeIsValid(productCode)))
+    	{
+    		if(quantity>0)
+    		{
+    			if(pricePerUnit>0)
+    			{
+					
+					if(this.balance >= (quantity*pricePerUnit))
+		    		{
+						//Creo balance operation relativa al precedente ordine
+		    			BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+		    			//Creo nuovo ordine e lo aggiungo alla lista
+						OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
+						o.setStatus("PAYED");
+						o.setBalanceId(bp.getBalanceId());
+						orders.put(o.getOrderId(), o);
+		    			//Decremento bilancio
+		    			this.balance -= quantity*pricePerUnit;
+		    			return o.getOrderId();
+		    		}
+		    		else
+		    		{
+		    			return -1;
+		    		}
+					
+    			}
+    			else
+    			{
+    				throw new InvalidPricePerUnitException();
+    			}
+    		}
+    		else
+    		{
+    			throw new InvalidQuantityException();
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidProductCodeException();
+    	}
+    	
     }
 
     @Override
     public boolean payOrder(Integer orderId) throws InvalidOrderIdException, UnauthorizedException {
-        return false;
+        
+    	if((orderId!=null) && (orderId>=0))
+    	{
+    		if(orders.containsKey(orderId))
+    		{
+    			//L'ordine è presente
+    			if((orders.get(orderId).getStatus()=="ISSUED") || (orders.get(orderId).getStatus()=="PAYED"))
+    			{
+    				//L'ordine è in stato PAYED o ISSUED
+    				double pricePerUnit = orders.get(orderId).getPricePerUnit();
+    				int quantity = orders.get(orderId).getQuantity();
+    				if(this.balance >= (quantity*pricePerUnit))
+    				{
+    					BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+        				orders.get(orderId).setBalanceId(bp.getBalanceId());
+        				this.balance -= quantity*pricePerUnit;
+        				return true;
+    				}
+    				else
+    				{
+    					return false;
+    				}
+    				
+    			}
+    			else
+    			{
+    				return false;
+    			}
+    			
+    		}
+    		else
+    		{
+    			return false;
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidOrderIdException();
+    	}
+    	
     }
 
     @Override

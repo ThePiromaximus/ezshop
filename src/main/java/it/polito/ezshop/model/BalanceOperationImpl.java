@@ -3,10 +3,29 @@ package it.polito.ezshop.model;
 import java.time.LocalDate;
 
 public class BalanceOperationImpl implements it.polito.ezshop.data.BalanceOperation {
+	
+	private static int PROGRESSIVE_ID = 1;
+	
 	private int balanceId;
 	private LocalDate date;
 	private double money;
 	private String type;
+	
+	public BalanceOperationImpl(double money, String type)
+	{
+		this.balanceId = PROGRESSIVE_ID;
+		this.date = LocalDate.now();
+		this.money = money;
+		this.type = type;
+		
+		PROGRESSIVE_ID++;
+	}
+	
+	public BalanceOperationImpl()
+	{
+		this.balanceId = PROGRESSIVE_ID;
+		PROGRESSIVE_ID++;
+	}
 	
 	@Override
 	public int getBalanceId() {

@@ -49,7 +49,7 @@ public class ReturnTransactionImpl{
 		this.payed = payed;
 	}
 	
-	public boolean payed() {
+	public boolean getPayed() {
 		return this.payed;
 	}
 }

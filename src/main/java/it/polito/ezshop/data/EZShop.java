@@ -777,6 +777,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	for(TicketEntry te : rt.getEntries()) {
     		ProductType p = products.get(te.getBarCode());
     		p.setQuantity(p.getQuantity() + te.getAmount());
+    		
     		SaleTransaction st = rt.getSaleTransaction();
     		TicketEntry tSale = st.getEntries().stream().filter((TicketEntry t) -> t.getBarCode().equals(te.getBarCode())).findFirst().get();
     		st.setPrice((st.getPrice()*(1-st.getDiscountRate()) - te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate()))/(1-st.getDiscountRate()));
@@ -791,7 +792,28 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean deleteReturnTransaction(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-        return false;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(returnId <= 0 || returnId == null)
+        	throw new InvalidTransactionIdException();
+        
+        if(!closedReturnTransactions.containsKey(returnId))
+        	return false;
+        ReturnTransactionImpl rt = closedReturnTransactions.get(returnId);
+        
+        if(rt.getPayed())
+        	return false;
+        
+    	for(TicketEntry te : rt.getEntries()) {
+    		ProductType p = products.get(te.getBarCode());
+    		p.setQuantity(p.getQuantity() - te.getAmount());
+    		
+    		SaleTransaction st = rt.getSaleTransaction();
+    		TicketEntry tSale = st.getEntries().stream().filter((TicketEntry t) -> t.getBarCode().equals(te.getBarCode())).findFirst().get();
+    		st.setPrice((st.getPrice()*(1-st.getDiscountRate()) + te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate()))/(1-st.getDiscountRate()));
+    		tSale.setAmount(tSale.getAmount() + te.getAmount());
+    	}
+        
+        return true;
     }
 
     @Override

@@ -1,10 +1,22 @@
 package it.polito.ezshop.model;
 
 public class CustomerImpl implements it.polito.ezshop.data.Customer {
+	private static int PROGRESSIVE_ID = 1;
+	
 	private String customerName;
 	private String customerCard;
 	private Integer id;
 	private Integer points;
+	
+	public CustomerImpl(String customerName)
+	{
+		this.id = PROGRESSIVE_ID;
+		this.customerName = customerName;
+		this.customerCard = null;
+		this.points = null;
+		
+		PROGRESSIVE_ID++;
+	}
 	
 	@Override
 	public String getCustomerName() {

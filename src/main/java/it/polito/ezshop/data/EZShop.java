@@ -285,7 +285,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public ProductType getProductTypeByBarCode(String barCode) throws InvalidProductCodeException, UnauthorizedException {
         
-    	//TODO:Gestire eccezione per utente non autorizzato
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if((barCode != null) && (barCode.length() != 0) && (barCodeIsValid(barCode)))
     	{
     		for(ProductType product : products.values()) 
@@ -300,13 +302,14 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	{
     		throw new InvalidProductCodeException();
     	}
-    	
-    	return null;
+
     }
 
     @Override
     public List<ProductType> getProductTypesByDescription(String description) throws UnauthorizedException {
-    	//TODO: gestire eccezione per utente non autorizzato
+    	
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
+    		throw new UnauthorizedException();
     	
         List<ProductType> searchedProducts = new ArrayList<ProductType>();
         if (description.length()==0 || description == null) 
@@ -325,8 +328,12 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean updateQuantity(Integer productId, int toBeAdded) throws InvalidProductIdException, UnauthorizedException {
+    	
         int newQuantity = 0;
-    	//TODO: gestire eccezione per utente non autorizzato
+        
+        if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
+    		throw new UnauthorizedException();
+        
         if(productId>0 && productId!=null)
         {
         	for(ProductType product : products.values())
@@ -359,7 +366,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public boolean updatePosition(Integer productId, String newPos) throws InvalidProductIdException, InvalidLocationException, UnauthorizedException {
         
-    	//TODO: gestire eccezione per utente non autorizzato
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if(productId>0 && productId!=null)
     	{
     		if(newPos.matches("[0-9]+[-][a-zA-Z]+[-][0-9]+"))
@@ -403,6 +412,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public Integer issueOrder(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
         
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if((productCode != null) && (productCode.length() != 0) && (barCodeIsValid(productCode)))
     	{
     		if(quantity>0)
@@ -410,7 +422,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     			if(pricePerUnit>0)
     			{
     				//Creo nuovo ordine e lo aggiungo alla lista
-					OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
+					Order o = new OrderImpl(productCode, pricePerUnit, quantity);
 					orders.put(o.getOrderId(), o);
 					return o.getOrderId();
     			}
@@ -434,6 +446,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public Integer payOrderFor(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
         
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if((productCode != null) && (productCode.length() != 0) && (barCodeIsValid(productCode)))
     	{
     		if(quantity>0)
@@ -444,9 +459,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 					if(this.balance >= (quantity*pricePerUnit))
 		    		{
 						//Creo balance operation relativa al precedente ordine
-		    			BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+		    			BalanceOperation bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
 		    			//Creo nuovo ordine e lo aggiungo alla lista
-						OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
+						Order o = new OrderImpl(productCode, pricePerUnit, quantity);
 						o.setStatus("PAYED");
 						o.setBalanceId(bp.getBalanceId());
 						orders.put(o.getOrderId(), o);
@@ -480,6 +495,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public boolean payOrder(Integer orderId) throws InvalidOrderIdException, UnauthorizedException {
         
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if((orderId!=null) && (orderId>=0))
     	{
     		if(orders.containsKey(orderId))
@@ -487,13 +505,20 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     			//L'ordine è presente
     			if((orders.get(orderId).getStatus()=="ISSUED") || (orders.get(orderId).getStatus()=="PAYED"))
     			{
-    				//L'ordine è in stato PAYED o ISSUED
+    				if(orders.get(orderId).getStatus()=="PAYED")
+    				{
+    					//L'ordine è già stato pagato torno senza fare nulla
+    					return true;
+    				}
+    				
+    				//L'ordine è in stato ISSUED quindi va pagato
     				double pricePerUnit = orders.get(orderId).getPricePerUnit();
     				int quantity = orders.get(orderId).getQuantity();
     				if(this.balance >= (quantity*pricePerUnit))
     				{
-    					BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+    					BalanceOperation bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
         				orders.get(orderId).setBalanceId(bp.getBalanceId());
+        				orders.get(orderId).setStatus("PAYED");
         				this.balance -= quantity*pricePerUnit;
         				return true;
     				}
@@ -523,27 +548,189 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean recordOrderArrival(Integer orderId) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException {
-        return false;
+        
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
+    		throw new UnauthorizedException();
+    	
+    	if((orderId!=null) && (orderId>0))
+    	{
+    		if(orders.containsKey(orderId))
+    		{
+	    		ProductType p = products.get(orders.get(orderId).getProductCode());
+	    		Order o = orders.get(orderId);
+	    		if((p.getLocation()!=null) && (!p.getLocation().isEmpty()))
+	    		{
+	    			if(orders.get(orderId).getStatus()=="PAYED")
+	    			{
+	    				//L'ordine è stato pagato ed è arrivato
+	    				//Aumento la quantità del prodotto e imposto lo stato dell'ordine a completato
+	    				String barCode = p.getBarCode();
+	    				int oldQuantity = p.getQuantity();
+	    				int quantityToAdd = o.getQuantity();
+	    				products.get(barCode).setQuantity(oldQuantity + quantityToAdd);
+	    				orders.get(orderId).setStatus("COMPLETED");
+	    				return true;
+	    			}
+	    			else if(orders.get(orderId).getStatus()=="COMPLETED")
+	    			{
+	    				//Se l'ordine è stato già completato il metodo non fa nulla
+	    				return true;
+	    			}
+	    			else
+	    			{
+	    				//L'ordine non è né in stato PAYED né in stato completed
+	    				return false;
+	    			}
+	    		}
+	    		else
+	    		{
+	    			//L'ordine non ha una locazione
+	    			throw new InvalidLocationException();
+	    		}
+    		}
+    		else
+    		{
+    			//L'ordine non esiste
+    			return false;
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidOrderIdException();
+    	}
+    	
     }
 
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
-        return null;
+    	
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
+    		throw new UnauthorizedException();
+    	
+    	List<Order> searchedOrders = new ArrayList<Order>();
+    	for(Order order : orders.values())
+        {
+        		searchedOrders.add(order);
+        }
+    	
+        return searchedOrders;
     }
 
     @Override
     public Integer defineCustomer(String customerName) throws InvalidCustomerNameException, UnauthorizedException {
-        return null;
+
+
+    	if(this.loggedUser==null)
+    		throw new UnauthorizedException();
+    	
+    	for(Customer customer : customers.values())
+    	{
+    		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
+    		//deve essere univoco
+    		if(customer.getCustomerName()==customerName)
+    		{
+    			return -1;
+    		}
+    	}
+    	//Il nome è univoco
+    	
+    	if((customerName!=null) && (!customerName.isEmpty()))
+    	{
+    		Customer customer = new CustomerImpl(customerName);
+    		customers.put(customer.getId(), customer);
+    		return customer.getId();
+    	}
+    	else
+    	{
+    		throw new InvalidCustomerNameException();
+    	}
     }
 
     @Override
     public boolean modifyCustomer(Integer id, String newCustomerName, String newCustomerCard) throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, UnauthorizedException {
-        return false;
+        
+    	if(this.loggedUser==null)
+    		throw new UnauthorizedException();
+    	
+    	//Il nome non deve essere nullo o vuoto
+    	if((newCustomerName==null) || (newCustomerName.isEmpty()))
+    		throw new InvalidCustomerNameException();
+    	//Il nome deve essere unico (dovrebbe, dalla documentazione del metodo non si capisce ma nel precedente metodo era così)
+    	for(Customer customer : customers.values())
+    	{
+    		//Devo scorrere tutti i clienti tranne quello attuale, sennò il nome risulterà sempre duplicato (nel caso in cui non venisse modificato)
+    		if(customer.getId()!=id)
+    		{
+        		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
+        		//deve essere univoco
+    			if(customer.getCustomerName()==newCustomerName)
+        		{
+        			return false;
+        		}
+    			
+    		}
+    	}
+    	//Aggiorno il nome del cliente
+		customers.get(id).setCustomerName(newCustomerName);
+    	
+    	//Se la nuova carta è nulla si conclude qui l'operazione
+    	if(newCustomerCard==null)
+    		return true;
+    	//Se la nuova carta è una stringa vuota si stacca la carta dal cliente
+    	if(newCustomerCard.isEmpty())
+    	{
+    		customers.get(id).setCustomerCard(null);
+    		return true;
+    	}
+    	//Se la nuova carta è del formato corretto (10 digits) possiamo procedere all'aggiornamento
+    	if(newCustomerCard.matches("[0-9]{10}")) 
+    	{
+    		//controllo che il codice della carta non sia già di qualche utente
+    		for(Customer customer : customers.values())
+    		{
+    			//Se la carta è già in possesso di qualcuno ritorno falso
+    			if(customer.getCustomerCard()==newCustomerCard)
+    			{
+    				return false;
+    			}
+    		}
+    		//La carta non è in possesso di nessun cliente
+    		//Aggiorno il cliente
+    		customers.get(id).setCustomerCard(newCustomerCard);
+    		return true;
+        	
+    	}
+    	else
+    	{
+    		throw new InvalidCustomerCardException();
+    	}
+    		
     }
 
     @Override
     public boolean deleteCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-        return false;
+    	
+    	if(this.loggedUser==null)
+    		throw new UnauthorizedException();
+    	
+    	if((id!=null) && (id>0))
+    	{
+    		if(customers.containsKey(id))
+    		{
+    			//Rimuovo il customer
+    			customers.remove(id);
+    			return true;
+    		}
+    		else
+    		{
+    			//Il customer non esiste
+    			return false;
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidCustomerIdException();
+    	}
     }
 
     @Override

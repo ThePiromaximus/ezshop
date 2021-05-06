@@ -600,9 +600,11 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if(customersList == null)
     		return false;
     	if(customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard())).count() == 1) {
-    		Customer tmp = customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard())).findFirst().get();
+    		Customer tmp = customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard()))
+    							.findFirst().get();
     		if(tmp.getPoints() + pointsToBeAdded >= 0) {
-    			tmp.setPoints(tmp.getPoints() + pointsToBeAdded);
+    			customersList.stream().filter(c -> !customerCard.equals(c.getCustomerCard()))
+					.findFirst().ifPresent(c -> c.setPoints(c.getPoints() + pointsToBeAdded));
     			return true;
     		}		
     	}
@@ -628,49 +630,110 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
-    	if(productCode.isEmpty() || productCode == null)
+    	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
     		throw new InvalidProductCodeException();
     	if(amount < 0)
     		throw new InvalidQuantityException();
-    	if(openedSaleTransactions.containsKey(transactionId)) {
-    		SaleTransaction sale = openedSaleTransactions.get(transactionId);
-    		List<TicketEntry> entries = sale.getEntries();
-    		TicketEntry productToInsert = new TicketEntryImpl();
-    		
-    		entries.add(null);
-    	}
-    	return false;
+    	
+		ProductType refProd = products.get(productCode);
+		if(refProd == null || refProd.getQuantity() < amount)
+			return false;
+		SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			return false;
+		
+		List<TicketEntry> entries = sale.getEntries();
+		TicketEntry productToInsert = new TicketEntryImpl(productCode, amount);
+		productToInsert.setProductDescription(refProd.getProductDescription());
+		productToInsert.setPricePerUnit(refProd.getPricePerUnit());
+		entries.add(productToInsert);
+		sale.setEntries(entries);
+		sale.setPrice(sale.getPrice() + amount * productToInsert.getPricePerUnit());
+		openedSaleTransactions.replace(sale.getTicketNumber(), sale);
+		
+		return true;
     }
 
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-    	return false;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
+    		throw new InvalidProductCodeException();
+    	if(amount < 0)
+    		throw new InvalidQuantityException();
+    	
+		if(products.get(productCode) == null)
+			return false;
+		SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			return false;
+		
+		List<TicketEntry> entries = sale.getEntries();
+		entries.stream().filter(e -> !productCode.equals(e.getBarCode())).findFirst()
+			.ifPresent(e -> e.setAmount(e.getAmount() - amount));
+		sale.setEntries(entries);
+		openedSaleTransactions.replace(sale.getTicketNumber(), sale);
+		
+    	return true;
     }
 
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-    	return false;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
+    		throw new InvalidProductCodeException();
+    	if(discountRate < 0.0 || discountRate > 1.0)
+    		throw new InvalidDiscountRateException ();
+    	
+		if(products.get(productCode) == null)
+			return false;
+		SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			return false;
+		
+		List<TicketEntry> entries = sale.getEntries();
+		entries.stream().filter(e -> !productCode.equals(e.getBarCode())).findFirst()
+			.ifPresent(e -> e.setDiscountRate(discountRate));
+		sale.setEntries(entries);
+		openedSaleTransactions.replace(sale.getTicketNumber(), sale);
+    	
+    	return true;
     }
 
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-    	return false;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	if(discountRate < 0.0 || discountRate > 1.0)
+    		throw new InvalidDiscountRateException ();
+    	
+    	SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			return false;
+		
+		sale.setDiscountRate(discountRate);
+		openedSaleTransactions.replace(sale.getTicketNumber(), sale);
+    	
+    	return true;
     }
 
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
     	// TODO add check for logged user
     	// TODO mars: to be implemented
-        return 0;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	
+    	
+        return transactionId;
     }
 
     @Override

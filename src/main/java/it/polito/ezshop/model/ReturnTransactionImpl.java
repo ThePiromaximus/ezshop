@@ -11,6 +11,7 @@ public class ReturnTransactionImpl{
 	private SaleTransaction saleTransaction;
 	private Integer id;
 	private List<TicketEntry> entries = new ArrayList<TicketEntry>();
+	private boolean payed = false;
 	
 	public ReturnTransactionImpl() {
 		this.id = PROGRESSIVE_ID;
@@ -42,5 +43,13 @@ public class ReturnTransactionImpl{
 	
 	public Optional<TicketEntry> getEntry(String barCode){
 		return entries.stream().filter((TicketEntry t) -> t.getBarCode().equals(barCode)).findFirst();
+	}
+	
+	public void setPayed(boolean payed) {
+		this.payed = payed;
+	}
+	
+	public boolean payed() {
+		return this.payed;
 	}
 }

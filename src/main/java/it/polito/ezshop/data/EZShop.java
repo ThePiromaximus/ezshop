@@ -11,6 +11,7 @@ public class EZShop implements EZShopInterface {
 	private HashMap<String,ProductType> products = new HashMap<String,ProductType>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
+    private HashMap<Integer, ReturnTransactionImpl> closedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, User> users = new HashMap<Integer, User>();
 	private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
 	private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
@@ -626,13 +627,15 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if(amount <= 0)
     		throw new InvalidQuantityException();
     	
+
+    	
     	if(!products.containsKey(productCode) || !openedReturnTransactions.containsKey(returnId))
     		return false;
     	
     	ReturnTransactionImpl rt = openedReturnTransactions.get(returnId);
     	SaleTransaction st = rt.getSaleTransaction();
-    	TicketEntry te;
     	
+    	TicketEntry te;
     	try {
     		 te = st.getEntries().stream().filter((TicketEntry t) -> {return t.getBarCode().equals(productCode);}).findFirst().get();
     	}catch(NoSuchElementException e) {
@@ -647,17 +650,43 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		if(ote.get().getAmount() + amount > te.getAmount()) {
     			return false;
     		} else {
-    			ote.get().setAmount(ote.get().getAmount() + amount);
+    			Integer newAmount = ote.get().getAmount() + amount;
+    			ote.get().setAmount(newAmount);
     		}
     	}catch(NoSuchElementException e) {
-        	rt.addEntry(new TicketEntryImpl(productCode, amount));
+        	rt.addEntry(new TicketEntryImpl(productCode, amount, te.getPricePerUnit(), te.getDiscountRate()));
     	}
     	return true;
     }
 
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
-        return false;
+        //TODO gestire eccezione per utente non autorizzato
+    	if(returnId <= 0 || returnId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	if(!openedReturnTransactions.containsKey(returnId))
+    		return false;
+    	
+    	if(commit == false) {
+    		openedReturnTransactions.remove(returnId);
+    		return true;
+    	}
+    	ReturnTransactionImpl rt = openedReturnTransactions.get(returnId);
+    	
+    	for(TicketEntry te : rt.getEntries()) {
+    		ProductType p = products.get(te.getBarCode());
+    		p.setQuantity(p.getQuantity() + te.getAmount());
+    		SaleTransaction st = rt.getSaleTransaction();
+    		TicketEntry tSale = st.getEntries().stream().filter((TicketEntry t) -> t.getBarCode().equals(te.getBarCode())).findFirst().get();
+    		st.setPrice((st.getPrice()*(1-st.getDiscountRate()) - te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate()))/(1-st.getDiscountRate()));
+    		tSale.setAmount(tSale.getAmount() - te.getAmount());
+    		
+    	}
+    	
+    	openedReturnTransactions.remove(returnId);
+    	closedReturnTransactions.put(returnId, rt);
+    	return true;
     }
 
     @Override

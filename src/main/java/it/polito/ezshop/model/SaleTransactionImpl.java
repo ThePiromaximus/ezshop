@@ -50,4 +50,11 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements it.poli
 		this.price = price;
 	}
 
+	public boolean containsProduct(String productCode) {
+		for(TicketEntry t : this.entries) {
+			if(t.getBarCode().equals(productCode))
+				return true;
+		}
+		return false;
+	}
 }

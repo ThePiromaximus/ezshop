@@ -409,18 +409,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		{
     			if(pricePerUnit>0)
     			{
-    				//Il prodotto deve essere presente in inventario
-    				if(products.containsKey(productCode) && products != null)
-    				{
-    					//Creo nuovo ordine e lo aggiungo alla lista
-    					OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
-    					orders.put(o.getOrderId(), o);
-    					return o.getOrderId();
-    				}
-    				else
-    				{
-    					return -1;
-    				}
+    				//Creo nuovo ordine e lo aggiungo alla lista
+					OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
+					orders.put(o.getOrderId(), o);
+					return o.getOrderId();
     			}
     			else
     			{
@@ -441,7 +433,48 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Integer payOrderFor(String productCode, int quantity, double pricePerUnit) throws InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, UnauthorizedException {
-        return null;
+        
+    	if((productCode != null) && (productCode.length() != 0) && (barCodeIsValid(productCode)))
+    	{
+    		if(quantity>0)
+    		{
+    			if(pricePerUnit>0)
+    			{
+					
+					if(this.balance >= (quantity*pricePerUnit))
+		    		{
+						//Creo balance operation relativa al precedente ordine
+		    			BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+		    			//Creo nuovo ordine e lo aggiungo alla lista
+						OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
+						o.setStatus("PAYED");
+						o.setBalanceId(bp.getBalanceId());
+						orders.put(o.getOrderId(), o);
+		    			//Decremento bilancio
+		    			balance -= quantity*pricePerUnit;
+		    			return o.getOrderId();
+		    		}
+		    		else
+		    		{
+		    			return -1;
+		    		}
+					
+    			}
+    			else
+    			{
+    				throw new InvalidPricePerUnitException();
+    			}
+    		}
+    		else
+    		{
+    			throw new InvalidQuantityException();
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidProductCodeException();
+    	}
+    	
     }
 
     @Override

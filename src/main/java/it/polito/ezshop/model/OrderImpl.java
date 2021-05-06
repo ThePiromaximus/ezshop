@@ -1,5 +1,8 @@
 package it.polito.ezshop.model;
 
+import java.time.LocalDate;
+import java.util.function.Function;
+
 public class OrderImpl implements it.polito.ezshop.data.Order {
 	
 	private static Integer PROGRESSIVE_ID = 1;
@@ -10,6 +13,7 @@ public class OrderImpl implements it.polito.ezshop.data.Order {
 	private int quantity;
 	private String status;
 	private Integer orderId;
+	private LocalDate date = LocalDate.now();
 	
 	public OrderImpl(String productCode, double pricePerUnit, Integer quantity)
 	{
@@ -86,6 +90,21 @@ public class OrderImpl implements it.polito.ezshop.data.Order {
 	@Override
 	public void setOrderId(Integer orderId) {
 		this.orderId = orderId;
+	}
+	
+	public LocalDate getDate() {
+		return this.date;
+	}
+	
+	public static Function<? super it.polito.ezshop.data.Order, BalanceOperationImpl> mapToBalanceOperation() {
+		return (T) -> {
+			BalanceOperationImpl retBo = new BalanceOperationImpl();
+			OrderImpl F = (OrderImpl) T;
+			retBo.setDate(F.getDate());
+			retBo.setMoney(F.getQuantity()*F.getPricePerUnit());
+			retBo.setType("PAYED");
+			return retBo;
+		};
 	}
 
 }

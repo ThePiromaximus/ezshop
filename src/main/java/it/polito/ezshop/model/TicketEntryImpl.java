@@ -19,6 +19,13 @@ public class TicketEntryImpl implements it.polito.ezshop.data.TicketEntry {
 		this.pricePerUnit = pricePerUnit;
 		this.discountRate = discountRate;
 	}
+	
+	public TicketEntryImpl (String barCode, Integer amount) {
+		super();
+		this.barCode = barCode;
+		this.amount = amount;
+	}
+	
 	@Override
 	public String getBarCode() {
 		return this.barCode;

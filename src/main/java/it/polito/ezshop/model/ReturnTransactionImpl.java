@@ -1,9 +1,12 @@
 package it.polito.ezshop.model;
 
 import it.polito.ezshop.data.*;
+
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 public class ReturnTransactionImpl{
 	private static Integer PROGRESSIVE_ID = 1;
@@ -11,7 +14,8 @@ public class ReturnTransactionImpl{
 	private SaleTransaction saleTransaction;
 	private Integer id;
 	private List<TicketEntry> entries = new ArrayList<TicketEntry>();
-	private boolean payed = false;
+	private double price = 0;
+	private LocalDate date = LocalDate.now();
 	
 	public ReturnTransactionImpl() {
 		this.id = PROGRESSIVE_ID;
@@ -44,12 +48,26 @@ public class ReturnTransactionImpl{
 	public Optional<TicketEntry> getEntry(String barCode){
 		return entries.stream().filter((TicketEntry t) -> t.getBarCode().equals(barCode)).findFirst();
 	}
-	
-	public void setPayed(boolean payed) {
-		this.payed = payed;
+
+	public void setPrice(double price) {
+		this.price = price;
 	}
 	
-	public boolean getPayed() {
-		return this.payed;
+	public double getPrice() {
+		return this.price;
+	}
+	
+	public LocalDate getDate() {
+		return this.date;
+	}
+	
+	public static Function<? super ReturnTransactionImpl, BalanceOperationImpl> mapToBalanceOperation() {
+		return (T) -> {
+			BalanceOperationImpl retBo = new BalanceOperationImpl();
+			retBo.setDate(T.getDate());
+			retBo.setMoney(T.getPrice());
+			retBo.setType("PAYED");
+			return retBo;
+		};
 	}
 }

@@ -451,7 +451,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 						o.setBalanceId(bp.getBalanceId());
 						orders.put(o.getOrderId(), o);
 		    			//Decremento bilancio
-		    			balance -= quantity*pricePerUnit;
+		    			this.balance -= quantity*pricePerUnit;
 		    			return o.getOrderId();
 		    		}
 		    		else
@@ -479,7 +479,46 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean payOrder(Integer orderId) throws InvalidOrderIdException, UnauthorizedException {
-        return false;
+        
+    	if((orderId!=null) && (orderId>=0))
+    	{
+    		if(orders.containsKey(orderId))
+    		{
+    			//L'ordine è presente
+    			if((orders.get(orderId).getStatus()=="ISSUED") || (orders.get(orderId).getStatus()=="PAYED"))
+    			{
+    				//L'ordine è in stato PAYED o ISSUED
+    				double pricePerUnit = orders.get(orderId).getPricePerUnit();
+    				int quantity = orders.get(orderId).getQuantity();
+    				if(this.balance >= (quantity*pricePerUnit))
+    				{
+    					BalanceOperationImpl bp = new BalanceOperationImpl(quantity*pricePerUnit, "ORDER");
+        				orders.get(orderId).setBalanceId(bp.getBalanceId());
+        				this.balance -= quantity*pricePerUnit;
+        				return true;
+    				}
+    				else
+    				{
+    					return false;
+    				}
+    				
+    			}
+    			else
+    			{
+    				return false;
+    			}
+    			
+    		}
+    		else
+    		{
+    			return false;
+    		}
+    	}
+    	else
+    	{
+    		throw new InvalidOrderIdException();
+    	}
+    	
     }
 
     @Override

@@ -678,7 +678,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         	{
         		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
         		//deve essere univoco
-        		if(customer.getCustomerName()==customerName)
+        		if(customer.getCustomerName().equals(customerName))
         		{
         			return -1;
         		}
@@ -718,7 +718,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         		{
             		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
             		//deve essere univoco
-        			if(customer.getCustomerName()==newCustomerName)
+        			if(customer.getCustomerName().equals(newCustomerName))
             		{
             			return false;
             		}

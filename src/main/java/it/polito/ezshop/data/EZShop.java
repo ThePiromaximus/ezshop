@@ -195,7 +195,6 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		}
         }
 		
-        
 		ProductType pt = new ProductTypeImpl();
 		pt.setBarCode(productCode);
 		pt.setProductDescription(description);

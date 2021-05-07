@@ -171,28 +171,31 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser.getRole()!="ShopManager")
     		throw new UnauthorizedException();
     	
         if (description.isEmpty() || description == null)
         	throw new InvalidProductDescriptionException();
         
-        if (productCode.isEmpty() || productCode == null)
+        if (productCode.isEmpty() || productCode == null || barCodeIsValid(productCode) == false)
         	throw new InvalidProductCodeException();
 
         if (pricePerUnit <= 0 || pricePerUnit == 0)
         	throw new InvalidPricePerUnitException();
         
         //BarCode must be unique
-        
-		for(ProductType product : products.values())
-		{
-			if(product.getBarCode().equals(productCode))
-			{
-				return -1;
-			}
-		}
+        if(products.size()!=0)
+        {
+        	for(ProductType product : products.values())
+    		{
+    			if(product.getBarCode().equals(productCode))
+    			{
+    				return -1;
+    			}
+    		}
+        }
 		
+        
 		ProductType pt = new ProductTypeImpl();
 		pt.setBarCode(productCode);
 		pt.setProductDescription(description);
@@ -200,7 +203,6 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 		pt.setPricePerUnit(pricePerUnit);
 		products.put(pt.getBarCode(),pt);
 
-        
         return pt.getId();
     }
 
@@ -246,7 +248,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
     	
-    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser.getRole()!="ShopManager")
     		throw new UnauthorizedException();
     	
     	if(id == 0 || id == null) 
@@ -272,7 +274,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
     	
-    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser.getRole()!="ShopManager")
     		throw new UnauthorizedException();
     	
     	return new ArrayList<ProductType>(products.values());
@@ -313,14 +315,17 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         if (description.length()==0 || description == null) 
         	description = "";
         
-        for(ProductType product : products.values())
+        if(products.size()!=0)
         {
-        	if(product.getProductDescription().contains(description))
-        	{
-        		searchedProducts.add(product);
-        	}
+        	 for(ProductType product : products.values())
+             {
+             	if(product.getProductDescription().contains(description))
+             	{
+             		searchedProducts.add(product);
+             	}
+             }
         }
-        
+       
         return searchedProducts;
     }
 
@@ -334,26 +339,29 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         
         if(productId>0 && productId!=null)
         {
-        	for(ProductType product : products.values())
+        	if(products.size()!=0)
         	{
-        		if(product.getId()==productId)
-        		{
-        			if(product.getLocation().length()!=0 && product.getLocation()!=null)
-        			{
-        				newQuantity = product.getQuantity() + toBeAdded;
-            			if(newQuantity>=0)
-            			{
-            				product.setQuantity(newQuantity);
-            				return true;
-            			}
-            			
-            			return false;
-        			}
-        			else 
-        			{
-        				return false;
-        			}
-        		}
+	        	for(ProductType product : products.values())
+	        	{
+	        		if(product.getId()==productId)
+	        		{
+	        			if(product.getLocation().length()!=0 && product.getLocation()!=null)
+	        			{
+	        				newQuantity = product.getQuantity() + toBeAdded;
+	            			if(newQuantity>=0)
+	            			{
+	            				product.setQuantity(newQuantity);
+	            				return true;
+	            			}
+	            			
+	            			return false;
+	        			}
+	        			else 
+	        			{
+	        				return false;
+	        			}
+	        		}
+	        	}
         	}
         }
     	
@@ -371,28 +379,30 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	{
     		if(newPos.matches("[0-9]+[-][a-zA-Z]+[-][0-9]+"))
     		{
-    			//La location deve essere univoca
-				//Scorro tutti i prodotti per vedere se esiste già la locazione
-				//Se esiste non è univoca e ritorno false
-    			for(ProductType product : products.values())
+    			if(products.size()!=0)
     			{
-    				if(product.getLocation().equals(newPos))
-    				{
-    					return false;
-    				}
+	    			//La location deve essere univoca
+					//Scorro tutti i prodotti per vedere se esiste già la locazione
+					//Se esiste non è univoca e ritorno false
+	    			for(ProductType product : products.values())
+	    			{
+	    				if(product.getLocation().equals(newPos))
+	    				{
+	    					return false;
+	    				}
+	    			}
+	    			
+	    			//La location è univoca
+	    			//Aggiorno il prodotto alla nuova locazione
+	    			for(ProductType product : products.values())
+	    			{
+	    				if(product.getId()==productId)
+	    				{
+	    					product.setLocation(newPos);
+	    					return true;
+	    				}
+	    			}
     			}
-    			
-    			//La location è univoca
-    			//Aggiorno il prodotto alla nuova locazione
-    			for(ProductType product : products.values())
-    			{
-    				if(product.getId()==productId)
-    				{
-    					product.setLocation(newPos);
-    					return true;
-    				}
-    			}
-    			
     		}
     		else
     		{
@@ -608,10 +618,14 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		throw new UnauthorizedException();
     	
     	List<Order> searchedOrders = new ArrayList<Order>();
-    	for(Order order : orders.values())
-        {
-        		searchedOrders.add(order);
-        }
+    	if(orders.size()!=0)
+    	{
+    		for(Order order : orders.values())
+            {
+            		searchedOrders.add(order);
+            }
+    	}
+    	
     	
         return searchedOrders;
     }
@@ -623,16 +637,20 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if(this.loggedUser==null)
     		throw new UnauthorizedException();
     	
-    	for(Customer customer : customers.values())
+    	if(customers.size()!=0)
     	{
-    		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
-    		//deve essere univoco
-    		if(customer.getCustomerName()==customerName)
-    		{
-    			return -1;
-    		}
+    		for(Customer customer : customers.values())
+        	{
+        		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
+        		//deve essere univoco
+        		if(customer.getCustomerName()==customerName)
+        		{
+        			return -1;
+        		}
+        	}
+        	//Il nome è univoco
     	}
-    	//Il nome è univoco
+    	
     	
     	if((customerName!=null) && (!customerName.isEmpty()))
     	{
@@ -656,54 +674,61 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if((newCustomerName==null) || (newCustomerName.isEmpty()))
     		throw new InvalidCustomerNameException();
     	//Il nome deve essere unico (dovrebbe, dalla documentazione del metodo non si capisce ma nel precedente metodo era così)
-    	for(Customer customer : customers.values())
+    	if(customers.size()!=0)
     	{
-    		//Devo scorrere tutti i clienti tranne quello attuale, sennò il nome risulterà sempre duplicato (nel caso in cui non venisse modificato)
-    		if(customer.getId()!=id)
-    		{
-        		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
-        		//deve essere univoco
-    			if(customer.getCustomerName()==newCustomerName)
-        		{
-        			return false;
-        		}
-    			
-    		}
-    	}
-    	//Aggiorno il nome del cliente
-		customers.get(id).setCustomerName(newCustomerName);
-    	
-    	//Se la nuova carta è nulla si conclude qui l'operazione
-    	if(newCustomerCard==null)
-    		return true;
-    	//Se la nuova carta è una stringa vuota si stacca la carta dal cliente
-    	if(newCustomerCard.isEmpty())
-    	{
-    		customers.get(id).setCustomerCard(null);
-    		return true;
-    	}
-    	//Se la nuova carta è del formato corretto (10 digits) possiamo procedere all'aggiornamento
-    	if(newCustomerCard.matches("[0-9]{10}")) 
-    	{
-    		//controllo che il codice della carta non sia già di qualche utente
     		for(Customer customer : customers.values())
-    		{
-    			//Se la carta è già in possesso di qualcuno ritorno falso
-    			if(customer.getCustomerCard()==newCustomerCard)
-    			{
-    				return false;
-    			}
-    		}
-    		//La carta non è in possesso di nessun cliente
-    		//Aggiorno il cliente
-    		customers.get(id).setCustomerCard(newCustomerCard);
-    		return true;
-        	
+        	{
+        		//Devo scorrere tutti i clienti tranne quello attuale, sennò il nome risulterà sempre duplicato (nel caso in cui non venisse modificato)
+        		if(customer.getId()!=id)
+        		{
+            		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
+            		//deve essere univoco
+        			if(customer.getCustomerName()==newCustomerName)
+            		{
+            			return false;
+            		}
+        			
+        		}
+        	}
+    	
+    	
+	    	//Aggiorno il nome del cliente
+			customers.get(id).setCustomerName(newCustomerName);
+	    	
+	    	//Se la nuova carta è nulla si conclude qui l'operazione
+	    	if(newCustomerCard==null)
+	    		return true;
+	    	//Se la nuova carta è una stringa vuota si stacca la carta dal cliente
+	    	if(newCustomerCard.isEmpty())
+	    	{
+	    		customers.get(id).setCustomerCard(null);
+	    		return true;
+	    	}
+	    	//Se la nuova carta è del formato corretto (10 digits) possiamo procedere all'aggiornamento
+	    	if(newCustomerCard.matches("[0-9]{10}")) 
+	    	{
+	    		//controllo che il codice della carta non sia già di qualche utente
+	    		for(Customer customer : customers.values())
+	    		{
+	    			//Se la carta è già in possesso di qualcuno ritorno falso
+	    			if(customer.getCustomerCard()==newCustomerCard)
+	    			{
+	    				return false;
+	    			}
+	    		}
+	    		//La carta non è in possesso di nessun cliente
+	    		//Aggiorno il cliente
+	    		customers.get(id).setCustomerCard(newCustomerCard);
+	    		return true;
+	        	
+	    	}
+	    	else
+	    	{
+	    		throw new InvalidCustomerCardException();
+	    	}
     	}
-    	else
-    	{
-    		throw new InvalidCustomerCardException();
-    	}
+    	
+    	return false;
     		
     }
 

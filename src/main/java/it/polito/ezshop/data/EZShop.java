@@ -620,11 +620,16 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	// TODO add check for logged user
     	Integer max;
     	if(openedSaleTransactions.isEmpty()) {
-    		if(payedSaleTransactions.isEmpty())
-    			max = 1;
-    		else
-    			max = Collections.max(payedSaleTransactions.keySet());
-    	}    		
+    		if(closedSaleTransactions.isEmpty()) {
+    			if(payedSaleTransactions.isEmpty()) {
+    				max = 1;
+    			} else {
+    				max = Collections.max(payedSaleTransactions.keySet());
+    			}
+    		} else {
+    			max = Collections.max(closedSaleTransactions.keySet());
+    		}    			
+    	}		
     	else {
     		max = Collections.max(openedSaleTransactions.keySet());
     	}	
@@ -746,9 +751,11 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	
     	SaleTransaction sale = openedSaleTransactions.get(transactionId);
 		if(sale == null)
-			sale = payedSaleTransactions.get(transactionId);
+			sale = closedSaleTransactions.get(transactionId);
 			if(sale == null)
-				return -1;
+				sale = payedSaleTransactions.get(transactionId);
+					if(sale == null)
+						return -1;
 		
 		Integer retPoints = sale.getEntries().stream().mapToInt(p -> (int)(p.getAmount() * p.getPricePerUnit()) / 10).sum();
     	
@@ -765,7 +772,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 		if(sale == null)
 			return false;
 		
-		if(payedSaleTransactions.putIfAbsent(transactionId, sale) != null)
+		if(closedSaleTransactions.putIfAbsent(transactionId, sale) != null)
 			return false;
 		if(openedSaleTransactions.remove(sale) == null)
 			return false;
@@ -781,15 +788,18 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	
     	SaleTransaction sale = openedSaleTransactions.get(transactionId);
 		if(sale == null) {
-			sale = payedSaleTransactions.get(transactionId);
+			sale = closedSaleTransactions.get(transactionId);
 			if(sale == null) {
-				return false;
-			}
-			else {
-				payedSaleTransactions.remove(transactionId);
+				sale = payedSaleTransactions.get(transactionId);
+				if(sale == null) {
+					return false;
+				} else {
+					payedSaleTransactions.remove(transactionId);
+				}
+			} else {
+				closedSaleTransactions.remove(transactionId);
 			}				
-		}
-		else {
+		} else {
 			openedSaleTransactions.remove(transactionId);
 		}
 		

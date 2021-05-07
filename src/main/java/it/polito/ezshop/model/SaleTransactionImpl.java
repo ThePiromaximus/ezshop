@@ -1,15 +1,17 @@
 package it.polito.ezshop.model;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.function.Function;
 
 import it.polito.ezshop.data.TicketEntry;
 
-public class SaleTransactionImpl extends BalanceOperationImpl implements it.polito.ezshop.data.SaleTransaction {
+public class SaleTransactionImpl implements it.polito.ezshop.data.SaleTransaction {
 	private Integer ticketNumber;
 	private List<TicketEntry> entries;
 	private double discountRate;
 	private double price;
-	private boolean payed = false;
+	private LocalDate date = LocalDate.now();
 	
 	@Override
 	public Integer getTicketNumber() {
@@ -59,11 +61,18 @@ public class SaleTransactionImpl extends BalanceOperationImpl implements it.poli
 		return false;
 	}
 	
-	public void setPayed(boolean payed) {
-		this.payed = payed;
+	public LocalDate getDate() {
+		return this.date;
 	}
 	
-	public boolean getPayed() {
-		return this.payed;
+	public static Function<? super it.polito.ezshop.data.SaleTransaction, BalanceOperationImpl> mapToBalanceOperation() {
+		return (T) -> {
+			BalanceOperationImpl retBo = new BalanceOperationImpl();
+			SaleTransactionImpl F = (SaleTransactionImpl) T;
+			retBo.setDate(F.getDate());
+			retBo.setMoney(F.getPrice());
+			retBo.setType("PAYED");
+			return retBo;
+		};
 	}
 }

@@ -4,20 +4,24 @@ import it.polito.ezshop.exceptions.*;
 import it.polito.ezshop.model.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class EZShop implements EZShopInterface {
 	
-	private HashMap<String, ProductType> products = new HashMap<String, ProductType>();
 	private HashMap<Integer, SaleTransaction> openedSaleTransactions = new HashMap<Integer, SaleTransaction>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
 	private HashMap<Integer, SaleTransaction> payedSaleTransactions = new HashMap<Integer, SaleTransaction>();
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, ReturnTransactionImpl> closedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
+    private HashMap<Integer, ReturnTransactionImpl> payedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
+    private HashMap<Integer, BalanceOperation> balanceOperations = new HashMap<Integer, BalanceOperation>();
     private HashMap<Integer, User> users = new HashMap<Integer, User>();
 	private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
 	private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
-    private HashMap<Integer, BalanceOperation> balanceOperations = new HashMap<Integer, BalanceOperation>();
-    /*
+	private HashMap<String, ProductType> products = new HashMap<String, ProductType>();
+	
+	/*
      Questa variabile rappresenta il bilancio corrente del sistema (=/= balanceOperation che invece rappresenta una singola operazione)
      Va inizializzata (=0) dentro il metodo reset() 
      */
@@ -26,13 +30,24 @@ public class EZShop implements EZShopInterface {
 
 
     public void reset() {
+    	
+    	this.balance = 0;
+    	openedSaleTransactions.clear();
+    	closedSaleTransactions.clear();
+    	payedSaleTransactions.clear();
+    	openedReturnTransactions.clear();
+    	closedReturnTransactions.clear();
+    	payedReturnTransactions.clear();
+    	balanceOperations.clear();
+    	users.clear();
+    	customers.clear();
+    	orders.clear();
+    	products.clear();
 
     }
 
 @Override
 public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-
-	User us = new UserImpl();
 
 	if(username.isEmpty() || username == null)
 		throw new InvalidUsernameException();
@@ -53,12 +68,12 @@ public Integer createUser(String username, String password, String role) throws 
 			return -1;
 		}
 	}
+	
+	User us = new UserImpl();
 	us.setUsername(username);
 	us.setPassword(password);
 	us.setRole(role);
 	users.put(us.getId(),us);
-
-
 
 	return us.getId();
 }
@@ -72,14 +87,12 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 	if(id == 0 || id == null) 
 		throw new InvalidUserIdException();
 	
-		users.remove(id);
-	
-	//checking if user has really been removed
-		if(users.containsKey(id)) {
-			return false;
+	if(users.containsKey(id)) {
+			users.remove(id);
+			return true;
 		}
 		else {
-			return true;
+			return false;
 		}
 	
 }
@@ -102,14 +115,15 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if(id <= 0 || id == null)
     		throw new InvalidUserIdException();
     	
-    	User us = new UserImpl();
+    	for(User user : users.values()) {
+    		
+    		if (user.getId().equals(id)) {
+    	    	return user;
+    		}
+    	}
+    return null;
     	
-    	if(users.containsKey(id))
-    		us = users.get(id);
-
-    	return us;
-
-    }
+    	}
 
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
@@ -123,17 +137,17 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         if (role.isEmpty() || role == null)
         	throw new InvalidRoleException();
         
-        for(User user : users.values())
+        for(User user : users.values()) {
         	
-        	if(user.getId() == id) {
+        	if(user.getId().equals(id)) {
         		user.setRole(role);
+                return true;
         		}
-        	else {
+        }
+
         		return false;
-        	}
-        
-        return true;
-    }
+        	
+        }
     
 
 
@@ -164,7 +178,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if(this.loggedUser == null)
     		return false;
     	else {
-    		this.loggedUser=null;
+    		this.loggedUser = null;
     		return true;
     	}
     }
@@ -232,16 +246,19 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	   
     	for ( ProductType product : products.values())
     	{
-    		if(product.getId()==id)
+    		if(product.getId().equals(id))
     		{
     			product.setBarCode(newCode);
     			product.setProductDescription(newDescription);
     			product.setNote(newNote);
     			product.setPricePerUnit(newPrice);
+    	    	return true;
+    			
     		 }
-    	 }
+    	}
+    		
+    		return false;
 
-    	   return true;
     }
 
     @Override
@@ -257,16 +274,14 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 		{
 			if(product.getId().equals(id))
 			{	
-				String BarCodeToRemove;
-				BarCodeToRemove = product.getBarCode();
-				products.remove(BarCodeToRemove);
-				}
-			else {
-				return false;
+				products.remove(product.getBarCode());
+		    	return true;
+				
 			}
-			
 		}
-    	return true;
+    	
+    	return false;
+
 
     }
 
@@ -511,7 +526,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		if(orders.containsKey(orderId))
     		{
     			//L'ordine è presente
-    			if((orders.get(orderId).getStatus()=="ISSUED") || (orders.get(orderId).getStatus()=="PAYED"))
+    			if((orders.get(orderId).getStatus().equals("ISSUED")) || (orders.get(orderId).getStatus().equals("PAYED")))
     			{
     				if(orders.get(orderId).getStatus()=="PAYED")
     				{
@@ -829,8 +844,16 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	// TODO add check for logged user
     	Integer max;
     	if(openedSaleTransactions.isEmpty()) {
-    		max = 1;
-    	}    		
+    		if(closedSaleTransactions.isEmpty()) {
+    			if(payedSaleTransactions.isEmpty()) {
+    				max = 1;
+    			} else {
+    				max = Collections.max(payedSaleTransactions.keySet());
+    			}
+    		} else {
+    			max = Collections.max(closedSaleTransactions.keySet());
+    		}    			
+    	}		
     	else {
     		max = Collections.max(openedSaleTransactions.keySet());
     	}	
@@ -878,8 +901,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		throw new InvalidProductCodeException();
     	if(amount < 0)
     		throw new InvalidQuantityException();
-    	
-		if(products.get(productCode) == null)
+
+    	ProductType refProd = products.get(productCode);
+		if(refProd == null || refProd.getQuantity() < amount)
 			return false;
 		SaleTransaction sale = openedSaleTransactions.get(transactionId);
 		if(sale == null)
@@ -887,8 +911,14 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 		
 		List<TicketEntry> entries = sale.getEntries();
 		entries.stream().filter(e -> !productCode.equals(e.getBarCode())).findFirst()
-			.ifPresent(e -> e.setAmount(e.getAmount() - amount));
-		sale.setEntries(entries);
+				.ifPresent(e -> { if(e.getAmount() - amount > 0){
+										e.setAmount(e.getAmount() - amount);
+										sale.setPrice(sale.getPrice() - amount * refProd.getPricePerUnit());
+								} else {
+										entries.remove(e);
+										sale.setPrice(sale.getPrice() - e.getAmount() * refProd.getPricePerUnit());
+								}});
+		sale.setEntries(entries);		
 		openedSaleTransactions.replace(sale.getTicketNumber(), sale);
 		
     	return true;
@@ -940,27 +970,64 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
     	
+    	SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			sale = closedSaleTransactions.get(transactionId);
+			if(sale == null)
+				sale = payedSaleTransactions.get(transactionId);
+					if(sale == null)
+						return -1;
+		
+		Integer retPoints = sale.getEntries().stream().mapToInt(p -> (int)(p.getAmount() * p.getPricePerUnit()) / 10).sum();
     	
-    	
-        return transactionId;
+        return retPoints;
     }
 
     @Override
     public boolean endSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-        return false;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null)
+			return false;
+		
+		if(closedSaleTransactions.putIfAbsent(transactionId, sale) != null)
+			return false;
+		if(openedSaleTransactions.remove(sale) == null)
+			return false;
+    	
+        return true;
     }
 
     @Override
-    public boolean deleteSaleTransaction(Integer saleNumber) throws InvalidTransactionIdException, UnauthorizedException {
+    public boolean deleteSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
     	// TODO add check for logged user
-    	// TODO mars: to be implemented
-        return false;
+    	if(transactionId <= 0 || transactionId == null)
+    		throw new InvalidTransactionIdException();
+    	
+    	SaleTransaction sale = openedSaleTransactions.get(transactionId);
+		if(sale == null) {
+			sale = closedSaleTransactions.get(transactionId);
+			if(sale == null) {
+				sale = payedSaleTransactions.get(transactionId);
+				if(sale == null) {
+					return false;
+				} else {
+					payedSaleTransactions.remove(transactionId);
+				}
+			} else {
+				closedSaleTransactions.remove(transactionId);
+			}				
+		} else {
+			openedSaleTransactions.remove(transactionId);
+		}
+		
+        return true;
     }
 
     @Override
@@ -1059,7 +1126,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		
     		SaleTransaction st = rt.getSaleTransaction();
     		TicketEntry tSale = st.getEntries().stream().filter((TicketEntry t) -> t.getBarCode().equals(te.getBarCode())).findFirst().get();
-    		st.setPrice((st.getPrice()*(1-st.getDiscountRate()) - te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate()))/(1-st.getDiscountRate()));
+    		
+    		st.setPrice(st.getPrice() - te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate())*(1-st.getDiscountRate()));
+    		rt.setPrice(rt.getPrice() + te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate())*(1-st.getDiscountRate()));
     		tSale.setAmount(tSale.getAmount() - te.getAmount());
     		
     	}
@@ -1079,7 +1148,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         	return false;
         ReturnTransactionImpl rt = closedReturnTransactions.get(returnId);
         
-        if(rt.getPayed())
+        if(payedReturnTransactions.containsKey(returnId))
         	return false;
         
     	for(TicketEntry te : rt.getEntries()) {
@@ -1088,7 +1157,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		
     		SaleTransaction st = rt.getSaleTransaction();
     		TicketEntry tSale = st.getEntries().stream().filter((TicketEntry t) -> t.getBarCode().equals(te.getBarCode())).findFirst().get();
-    		st.setPrice((st.getPrice()*(1-st.getDiscountRate()) + te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate()))/(1-st.getDiscountRate()));
+    		st.setPrice(st.getPrice() + te.getAmount()*te.getPricePerUnit()*(1-te.getDiscountRate())*(1-st.getDiscountRate()));
     		tSale.setAmount(tSale.getAmount() + te.getAmount());
     	}
         closedReturnTransactions.remove(returnId);
@@ -1145,20 +1214,55 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-        return 0;
+        // TODO gestire eccezione per utente non autorizzato
+    	
+    	if(returnId <= 0)
+        	throw new InvalidTransactionIdException();
+        
+    	if(!closedReturnTransactions.containsKey(returnId))
+    		return -1;
+    	
+    	ReturnTransactionImpl rt = closedReturnTransactions.get(returnId);
+    	closedReturnTransactions.remove(rt.getId());
+    	payedReturnTransactions.put(returnId, rt);
+    	this.balance -= rt.getPrice();
+    	return rt.getPrice();
     }
 
     @Override
     public double returnCreditCardPayment(Integer returnId, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        return 0;
+        // TODO gestire eccezione per utente non autorizzato
+
+    	if(returnId <= 0)
+        	throw new InvalidTransactionIdException();
+    	
+        if(!creditCardIsValid(creditCard))
+        	throw new InvalidCreditCardException();
+        
+        /* TODO:
+         * if(!creditsCard.contains(creditCard)
+         * 		return false;
+         * 
+         * here something to check credit card balance and check if it is registered
+         *
+         */
+        
+        ReturnTransactionImpl rt = closedReturnTransactions.get(returnId);
+    	closedReturnTransactions.remove(rt.getId());
+    	payedReturnTransactions.put(returnId, rt);
+    	this.balance -= rt.getPrice();
+    	return 0;
     }
 
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
+    	// TODO gestire eccezione per utente non autorizzato
     	if(toBeAdded + this.balance < 0)
     		return false;
+    	
     	BalanceOperation bp = new BalanceOperationImpl();
     	bp.setMoney(toBeAdded);
+    	balanceOperations.put(bp.getBalanceId(), bp);
     	
     	this.balance += toBeAdded;
         return true;
@@ -1166,7 +1270,40 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
-        return null;
+        // TODO gestire eccezione per utente non autorizzato
+    	
+    	final LocalDate fromFinal = from;
+    	final LocalDate toFinal = to;
+    	Collection<BalanceOperation> orders = this.orders.values().stream().filter((Order o) -> o.getStatus().equals("PAYED")).map(OrderImpl.mapToBalanceOperation()).collect(Collectors.toSet());
+    	Collection<BalanceOperation> sales = this.payedSaleTransactions.values().stream().map(SaleTransactionImpl.mapToBalanceOperation()).collect(Collectors.toSet());
+    	Collection<BalanceOperation> returns = this.payedReturnTransactions.values().stream().map(ReturnTransactionImpl.mapToBalanceOperation()).collect(Collectors.toSet());
+    	Collection<BalanceOperation> balanceOperations = this.balanceOperations.values();
+    	
+    	Collection<BalanceOperation> creditsAndDebits = Stream.concat(orders.stream(),
+    													Stream.concat(sales.stream(),
+    													Stream.concat(returns.stream(),
+    													balanceOperations.stream()))).collect(Collectors.toSet());
+    	if(from != null && to != null) {
+    		if(from.isAfter(to)) {
+    			LocalDate tmp = to;
+    			to = from;
+    			from = tmp;
+    		}
+    	}
+    	
+    	creditsAndDebits = creditsAndDebits.stream().filter((BalanceOperation bo) -> {
+    		LocalDate date = bo.getDate();
+    		if(fromFinal != null && toFinal != null) {
+    			return (fromFinal.isBefore(date) || fromFinal.equals(date)) && (toFinal.isAfter(date) || toFinal.equals(date));
+    		}
+    		
+    		if(fromFinal == null) {
+    			return toFinal.isAfter(date) || toFinal.equals(date);
+    		}
+    		
+    		return fromFinal.isBefore(date) || toFinal.equals(date);
+    	}).collect(Collectors.toSet());
+    	return null;
     }
 
     @Override

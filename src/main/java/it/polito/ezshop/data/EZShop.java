@@ -30,13 +30,24 @@ public class EZShop implements EZShopInterface {
 
 
     public void reset() {
+    	
+    	this.balance = 0;
+    	openedSaleTransactions.clear();
+    	closedSaleTransactions.clear();
+    	payedSaleTransactions.clear();
+    	openedReturnTransactions.clear();
+    	closedReturnTransactions.clear();
+    	payedReturnTransactions.clear();
+    	balanceOperations.clear();
+    	users.clear();
+    	customers.clear();
+    	orders.clear();
+    	products.clear();
 
     }
 
 @Override
 public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-
-	User us = new UserImpl();
 
 	if(username.isEmpty() || username == null)
 		throw new InvalidUsernameException();
@@ -57,12 +68,12 @@ public Integer createUser(String username, String password, String role) throws 
 			return -1;
 		}
 	}
+	
+	User us = new UserImpl();
 	us.setUsername(username);
 	us.setPassword(password);
 	us.setRole(role);
 	users.put(us.getId(),us);
-
-
 
 	return us.getId();
 }
@@ -76,14 +87,12 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 	if(id == 0 || id == null) 
 		throw new InvalidUserIdException();
 	
-		users.remove(id);
-	
-	//checking if user has really been removed
-		if(users.containsKey(id)) {
-			return false;
+	if(users.containsKey(id)) {
+			users.remove(id);
+			return true;
 		}
 		else {
-			return true;
+			return false;
 		}
 	
 }
@@ -106,14 +115,15 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if(id <= 0 || id == null)
     		throw new InvalidUserIdException();
     	
-    	User us = new UserImpl();
+    	for(User user : users.values()) {
+    		
+    		if (user.getId().equals(id)) {
+    	    	return user;
+    		}
+    	}
+    return null;
     	
-    	if(users.containsKey(id))
-    		us = users.get(id);
-
-    	return us;
-
-    }
+    	}
 
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
@@ -127,17 +137,17 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         if (role.isEmpty() || role == null)
         	throw new InvalidRoleException();
         
-        for(User user : users.values())
+        for(User user : users.values()) {
         	
-        	if(user.getId() == id) {
+        	if(user.getId().equals(id)) {
         		user.setRole(role);
+                return true;
         		}
-        	else {
+        }
+
         		return false;
-        	}
-        
-        return true;
-    }
+        	
+        }
     
 
 
@@ -168,7 +178,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if(this.loggedUser == null)
     		return false;
     	else {
-    		this.loggedUser=null;
+    		this.loggedUser = null;
     		return true;
     	}
     }
@@ -237,16 +247,19 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	   
     	for ( ProductType product : products.values())
     	{
-    		if(product.getId()==id)
+    		if(product.getId().equals(id))
     		{
     			product.setBarCode(newCode);
     			product.setProductDescription(newDescription);
     			product.setNote(newNote);
     			product.setPricePerUnit(newPrice);
+    	    	return true;
+    			
     		 }
-    	 }
+    	}
+    		
+    		return false;
 
-    	   return true;
     }
 
     @Override
@@ -262,16 +275,14 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 		{
 			if(product.getId().equals(id))
 			{	
-				String BarCodeToRemove;
-				BarCodeToRemove = product.getBarCode();
-				products.remove(BarCodeToRemove);
-				}
-			else {
-				return false;
+				products.remove(product.getBarCode());
+		    	return true;
+				
 			}
-			
 		}
-    	return true;
+    	
+    	return false;
+
 
     }
 

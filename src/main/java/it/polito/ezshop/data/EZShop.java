@@ -115,7 +115,13 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	if(id <= 0 || id == null)
     		throw new InvalidUserIdException();
     	
-    	return users.get(id);
+    	for(User user : users.values()) {
+    		
+    		if (user.getId().equals(id)) {
+    	    	return user;
+    		}
+    	}
+    return null;
     	
     	}
 
@@ -131,17 +137,17 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         if (role.isEmpty() || role == null)
         	throw new InvalidRoleException();
         
-        for(User user : users.values())
+        for(User user : users.values()) {
         	
-        	if(user.getId() == id) {
+        	if(user.getId().equals(id)) {
         		user.setRole(role);
+                return true;
         		}
-        	else {
+        }
+
         		return false;
-        	}
-        
-        return true;
-    }
+        	
+        }
     
 
 
@@ -241,16 +247,19 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	   
     	for ( ProductType product : products.values())
     	{
-    		if(product.getId()==id)
+    		if(product.getId().equals(id))
     		{
     			product.setBarCode(newCode);
     			product.setProductDescription(newDescription);
     			product.setNote(newNote);
     			product.setPricePerUnit(newPrice);
+    	    	return true;
+    			
     		 }
-    	 }
+    	}
+    		
+    		return false;
 
-    	   return true;
     }
 
     @Override
@@ -267,14 +276,13 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 			if(product.getId().equals(id))
 			{	
 				products.remove(product.getBarCode());
+		    	return true;
 				
 			}
-			else {
-				return false;
-			}
-			
 		}
-    	return true;
+    	
+    	return false;
+
 
     }
 

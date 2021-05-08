@@ -25,7 +25,7 @@ public class EZShop implements EZShopInterface {
      Questa variabile rappresenta il bilancio corrente del sistema (=/= balanceOperation che invece rappresenta una singola operazione)
      Va inizializzata (=0) dentro il metodo reset() 
      */
-    private double balance;
+    private double balance = 0;
     private User loggedUser=null;
 
 

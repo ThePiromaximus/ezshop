@@ -55,8 +55,8 @@ public Integer createUser(String username, String password, String role) throws 
 
 	if(password.isEmpty() || password == null)
 		throw new InvalidPasswordException();
-
-	if(role.isEmpty() || role == null)
+ 
+	if((role.isEmpty() || role == null ) && !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
 		throw new InvalidRoleException();
 
 
@@ -81,7 +81,7 @@ public Integer createUser(String username, String password, String role) throws 
 @Override
 public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
 	
-	if(this.loggedUser.getRole()!="Administrator")
+	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser==null)
 		throw new UnauthorizedException();
 	
 	if(id == 0 || id == null) 
@@ -100,7 +100,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
 
-    	if(this.loggedUser.getRole()!="Administrator")
+    	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser==null)
     		throw new UnauthorizedException();
     	
     	return new ArrayList<User>(users.values());
@@ -109,7 +109,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
   
-    	if(this.loggedUser.getRole()!="Administrator")
+    	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser==null)
     		throw new UnauthorizedException();
     	
     	if(id <= 0 || id == null)
@@ -128,7 +128,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
     	
-    	if(this.loggedUser.getRole()!="Administrator")
+    	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser==null)
     		throw new UnauthorizedException();
     	
     	if( id <= 0 || id==null)
@@ -185,7 +185,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
-    	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser.getRole()!="ShopManager")
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
     		throw new UnauthorizedException();
     	
         if (description.isEmpty() || description == null)
@@ -213,8 +213,15 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 		ProductType pt = new ProductTypeImpl();
 		pt.setBarCode(productCode);
 		pt.setProductDescription(description);
-		pt.setNote(note);
 		pt.setPricePerUnit(pricePerUnit);
+		
+		if(note == null) {
+			pt.setNote("");
+		}else {
+			pt.setNote(note);
+		}
+
+
 		products.put(pt.getBarCode(),pt);
 
         return pt.getId();
@@ -223,13 +230,13 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public boolean updateProduct(Integer id, String newDescription, String newCode, double newPrice, String newNote) throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
     	
-    	if(this.loggedUser.getRole()!="Administrator" || this.loggedUser.getRole()!="ShopManager")
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
     		throw new UnauthorizedException();
     	
         if (newDescription.isEmpty() || newDescription == null)
         	throw new InvalidProductDescriptionException();
         
-        if (newCode.isEmpty() || newCode == null)
+        if (newCode.isEmpty() || newCode == null || barCodeIsValid(newCode) == false)
         	throw new InvalidProductCodeException();
 
         if (newPrice <= 0 || newPrice == 0)
@@ -265,7 +272,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public boolean deleteProductType(Integer id) throws InvalidProductIdException, UnauthorizedException {
     	
-    	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser.getRole()!="ShopManager")
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
     		throw new UnauthorizedException();
     	
     	if(id == 0 || id == null) 
@@ -289,7 +296,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public List<ProductType> getAllProductTypes() throws UnauthorizedException {
     	
-    	if(this.loggedUser.getRole()!="Administrator" && this.loggedUser.getRole()!="ShopManager")
+    	if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
     		throw new UnauthorizedException();
     	
     	return new ArrayList<ProductType>(products.values());

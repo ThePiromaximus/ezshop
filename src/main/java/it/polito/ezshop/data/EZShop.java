@@ -209,7 +209,6 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		}
         }
 		
-        
 		ProductType pt = new ProductTypeImpl();
 		pt.setBarCode(productCode);
 		pt.setProductDescription(description);
@@ -358,32 +357,42 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         
         if(this.loggedUser==null || this.loggedUser.getRole().contains("Cashier"))
     		throw new UnauthorizedException();
+        if(toBeAdded<=0)
+        	return false;
         
         if(productId>0 && productId!=null)
         {
-        	if(products.size()!=0)
+        	for(ProductType product : products.values())
         	{
-	        	for(ProductType product : products.values())
-	        	{
-	        		if(product.getId()==productId)
-	        		{
-	        			if(product.getLocation().length()!=0 && product.getLocation()!=null)
-	        			{
-	        				newQuantity = product.getQuantity() + toBeAdded;
-	            			if(newQuantity>=0)
-	            			{
-	            				product.setQuantity(newQuantity);
-	            				return true;
-	            			}
-	            			
-	            			return false;
-	        			}
-	        			else 
-	        			{
-	        				return false;
-	        			}
-	        		}
-	        	}
+        		if(product.getId()==productId)
+        		{
+        			
+        			if(product.getLocation()==null)
+        				return false;
+        			
+        			if(product.getLocation().isEmpty())
+        				return false;
+        			
+        			
+        			if(product.getQuantity()!=null)	
+        				newQuantity = product.getQuantity() + toBeAdded;
+        			else
+        				newQuantity = toBeAdded;
+    				
+        			if(newQuantity>=0)
+        			{
+        				ProductType p = products.get(product.getBarCode());
+        				System.out.println("Product.getQuantity()" + product.getQuantity());
+        				System.out.println("newQuantity" + newQuantity);
+        				p.setQuantity(newQuantity);
+        				return true;
+        			}
+        			else
+        			{
+        				return false;
+        			}
+            			
+        		}
         	}
         }
     	
@@ -408,10 +417,14 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 					//Se esiste non è univoca e ritorno false
 	    			for(ProductType product : products.values())
 	    			{
-	    				if(product.getLocation().equals(newPos))
+	    				if(product.getLocation()!=null)
 	    				{
-	    					return false;
+	    					if(product.getLocation().equals(newPos))
+		    				{
+		    					return false;
+		    				}
 	    				}
+	    				
 	    			}
 	    			
 	    			//La location è univoca
@@ -420,8 +433,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 	    			{
 	    				if(product.getId()==productId)
 	    				{
-	    					product.setLocation(newPos);
-	    					return true;
+	    					ProductType p = products.get(product.getBarCode());
+	        				p.setLocation(newPos);
+	        				return true;
 	    				}
 	    			}
     			}
@@ -597,7 +611,13 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 	    				//L'ordine è stato pagato ed è arrivato
 	    				//Aumento la quantità del prodotto e imposto lo stato dell'ordine a completato
 	    				String barCode = p.getBarCode();
-	    				int oldQuantity = p.getQuantity();
+	    				int oldQuantity;
+	    				
+	    				if(p.getQuantity()==null)
+	    					oldQuantity = 0;
+	    				else 
+	    					oldQuantity = p.getQuantity();
+	    				
 	    				int quantityToAdd = o.getQuantity();
 	    				products.get(barCode).setQuantity(oldQuantity + quantityToAdd);
 	    				orders.get(orderId).setStatus("COMPLETED");
@@ -665,7 +685,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         	{
         		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
         		//deve essere univoco
-        		if(customer.getCustomerName()==customerName)
+        		if(customer.getCustomerName().equals(customerName))
         		{
         			return -1;
         		}
@@ -705,7 +725,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
         		{
             		//Devo controllare che il nome che sto inserendo non sia già di un altro customer
             		//deve essere univoco
-        			if(customer.getCustomerName()==newCustomerName)
+        			if(customer.getCustomerName().equals(newCustomerName))
             		{
             			return false;
             		}
@@ -1326,6 +1346,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		}
     		
     		if(fromFinal == null) {
+    			//TODO: NullPointerException
     			return toFinal.isAfter(date) || toFinal.equals(date);
     		}
     		

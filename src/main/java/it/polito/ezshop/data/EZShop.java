@@ -1280,10 +1280,10 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     	Collection<BalanceOperation> returns = this.payedReturnTransactions.values().stream().map(ReturnTransactionImpl.mapToBalanceOperation()).collect(Collectors.toSet());
     	Collection<BalanceOperation> balanceOperations = this.balanceOperations.values();
     	
-    	Collection<BalanceOperation> creditsAndDebits = Stream.concat(orders.stream(),
+    	List<BalanceOperation> creditsAndDebits = Stream.concat(orders.stream(),
     													Stream.concat(sales.stream(),
     													Stream.concat(returns.stream(),
-    													balanceOperations.stream()))).collect(Collectors.toSet());
+    													balanceOperations.stream()))).collect(Collectors.toList());
     	if(from != null && to != null) {
     		if(from.isAfter(to)) {
     			LocalDate tmp = to;
@@ -1303,8 +1303,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		}
     		
     		return fromFinal.isBefore(date) || toFinal.equals(date);
-    	}).collect(Collectors.toSet());
-    	return null;
+    	}).collect(Collectors.toList());
+    	return creditsAndDebits;
     }
 
     @Override

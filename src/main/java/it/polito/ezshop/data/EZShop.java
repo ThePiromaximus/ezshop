@@ -550,7 +550,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Customer getCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(id == null || id <= 0)
     		throw new InvalidCustomerIdException();
@@ -560,7 +560,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public List<Customer> getAllCustomers() throws UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	
     	return new ArrayList<Customer>(customers.values());
@@ -568,7 +568,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public String createCard() throws UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	
     	List<Customer> customersList = getAllCustomers();
@@ -586,7 +586,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
     	// Check for exceptions
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(customerId == null || customerId <= 0)
     		throw new InvalidCustomerIdException();
@@ -606,7 +606,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(customerCard == null || customerCard.isEmpty())
     		throw new InvalidCustomerCardException();
@@ -628,7 +628,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Integer startSaleTransaction() throws UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	Integer max;
     	if(openedSaleTransactions.isEmpty()) {
@@ -641,10 +641,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		} else {
     			max = Collections.max(closedSaleTransactions.keySet());
     		}    			
-    	}		
-    	else {
+    	} else {
     		max = Collections.max(openedSaleTransactions.keySet());
-    	}	
+    	}
     	SaleTransaction sale = new SaleTransactionImpl();
     	sale.setTicketNumber(max+1);
     	openedSaleTransactions.put(max+1, sale);
@@ -653,7 +652,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
@@ -683,7 +682,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
@@ -716,7 +715,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
@@ -742,7 +741,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
@@ -761,18 +760,20 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
     	
     	SaleTransaction sale = openedSaleTransactions.get(transactionId);
-		if(sale == null)
+		if(sale == null) {
 			sale = closedSaleTransactions.get(transactionId);
-			if(sale == null)
+			if(sale == null) {
 				sale = payedSaleTransactions.get(transactionId);
-					if(sale == null)
-						return -1;
+				if(sale == null)
+					return -1;
+			}
+		}
 		
 		Integer retPoints = sale.getEntries().stream().mapToInt(p -> (int)(p.getAmount() * p.getPricePerUnit()) / 10).sum();
     	
@@ -781,7 +782,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean endSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
@@ -800,7 +801,7 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean deleteSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-    	if(loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
     		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();

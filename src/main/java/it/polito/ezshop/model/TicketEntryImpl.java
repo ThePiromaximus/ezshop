@@ -8,12 +8,8 @@ public class TicketEntryImpl implements it.polito.ezshop.data.TicketEntry {
 	private double pricePerUnit;
 	private double discountRate;
 	
-	public TicketEntryImpl() {
-		super();
-	}
-	
+
 	public TicketEntryImpl (String barCode, Integer amount, double pricePerUnit, double discountRate) {
-		super();
 		this.barCode = barCode;
 		this.amount = amount;
 		this.pricePerUnit = pricePerUnit;
@@ -21,9 +17,9 @@ public class TicketEntryImpl implements it.polito.ezshop.data.TicketEntry {
 	}
 	
 	public TicketEntryImpl (String barCode, Integer amount) {
-		super();
 		this.barCode = barCode;
 		this.amount = amount;
+		this.discountRate = 0;
 	}
 	
 	@Override

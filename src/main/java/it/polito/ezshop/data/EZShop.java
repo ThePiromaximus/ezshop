@@ -782,18 +782,27 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Customer getCustomer(Integer id) throws InvalidCustomerIdException, UnauthorizedException {
-        return null;
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
+    	if(id == null || id <= 0)
+    		throw new InvalidCustomerIdException();
+
+    	return customers.get(id);
     }
 
     @Override
     public List<Customer> getAllCustomers() throws UnauthorizedException {
-    	// TODO add check for logged user
-        return new ArrayList<Customer>(customers.values());
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
+    	
+    	return new ArrayList<Customer>(customers.values());
     }
 
     @Override
     public String createCard() throws UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
+    	
     	List<Customer> customersList = getAllCustomers();
     	// If the db is not reachable, return an empty string
     	if(customersList == null)
@@ -808,8 +817,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean attachCardToCustomer(String customerCard, Integer customerId) throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException {
-    	// TODO add check for logged user
     	// Check for exceptions
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	if(customerId == null || customerId <= 0)
     		throw new InvalidCustomerIdException();
     	if(customerCard == null || customerCard.isEmpty())
@@ -828,7 +838,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) throws InvalidCustomerCardException, UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	if(customerCard == null || customerCard.isEmpty())
     		throw new InvalidCustomerCardException();
     	List<Customer> customersList = getAllCustomers();
@@ -849,7 +860,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public Integer startSaleTransaction() throws UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	Integer max;
     	if(openedSaleTransactions.isEmpty()) {
     		if(closedSaleTransactions.isEmpty()) {
@@ -861,10 +873,9 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
     		} else {
     			max = Collections.max(closedSaleTransactions.keySet());
     		}    			
-    	}		
-    	else {
+    	} else {
     		max = Collections.max(openedSaleTransactions.keySet());
-    	}	
+    	}
     	SaleTransaction sale = new SaleTransactionImpl();
     	sale.setTicketNumber(max+1);
     	openedSaleTransactions.put(max+1, sale);
@@ -873,7 +884,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
     	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
@@ -902,7 +914,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
     	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
@@ -934,7 +947,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidDiscountRateException, UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
     	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
@@ -959,7 +973,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean applyDiscountRateToSale(Integer transactionId, double discountRate) throws InvalidTransactionIdException, InvalidDiscountRateException, UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
     	if(discountRate < 0.0 || discountRate > 1.0)
@@ -977,17 +992,20 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public int computePointsForSale(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
     	
     	SaleTransaction sale = openedSaleTransactions.get(transactionId);
-		if(sale == null)
+		if(sale == null) {
 			sale = closedSaleTransactions.get(transactionId);
-			if(sale == null)
+			if(sale == null) {
 				sale = payedSaleTransactions.get(transactionId);
-					if(sale == null)
-						return -1;
+				if(sale == null)
+					return -1;
+			}
+		}
 		
 		Integer retPoints = sale.getEntries().stream().mapToInt(p -> (int)(p.getAmount() * p.getPricePerUnit()) / 10).sum();
     	
@@ -996,7 +1014,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean endSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
     	
@@ -1014,7 +1033,8 @@ public boolean deleteUser(Integer id) throws InvalidUserIdException, Unauthorize
 
     @Override
     public boolean deleteSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-    	// TODO add check for logged user
+    	if(loggedUser != null && loggedUser.getRole() != "Administrator" && loggedUser.getRole() != "ShopManager" && loggedUser.getRole() != "Cashier")
+    		throw new UnauthorizedException();
     	if(transactionId <= 0 || transactionId == null)
     		throw new InvalidTransactionIdException();
     	

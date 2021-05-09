@@ -1216,7 +1216,7 @@ public class EZShop implements EZShopInterface {
         if(!creditCardIsValid(creditCard))
         	throw new InvalidCreditCardException();
         
-        /* TODO:
+        /* TODO credit card handling
          * if(!creditsCard.contains(creditCard)
          * 		return false;
          * 
@@ -1263,7 +1263,7 @@ public class EZShop implements EZShopInterface {
         if(!creditCardIsValid(creditCard))
         	throw new InvalidCreditCardException();
         
-        /* TODO:
+        /* TODO credit card handling
          * if(!creditsCard.contains(creditCard)
          * 		return false;
          * 
@@ -1271,7 +1271,8 @@ public class EZShop implements EZShopInterface {
          *
          */
         
-        // TODO fix returns
+        if(openedReturnTransactions.containsKey(returnId) || !closedReturnTransactions.containsKey(returnId) || paidReturnTransactions.containsKey(returnId))
+        	return -1;
         
         ReturnTransactionImpl rt = closedReturnTransactions.get(returnId);
     	closedReturnTransactions.remove(rt.getId());
@@ -1327,7 +1328,6 @@ public class EZShop implements EZShopInterface {
     		}
     		
     		if(fromFinal == null) {
-    			//TODO: NullPointerException
     			return toFinal.isAfter(date) || toFinal.equals(date);
     		}
     		

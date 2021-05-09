@@ -14,7 +14,7 @@ These figures will not be used to evaluate neither the project nor the team, the
 | apr 12 - 18| 48 | | | | | | | | 
 | apr 19 - 25| 8 | | | | | | | | 
 | apr 26 - 2 | | 47 | | | | | | | 
-| may 3 - 9  | | | | | | | | | 
+| may 3 - 9  | | | 50 | | | | 6 | 3 | 
 | may 10 - 16| | | | | | | | | 
 | may 17 - 23| | | | | | | | | 
 | may 24 - 30| | | | | | | | | 

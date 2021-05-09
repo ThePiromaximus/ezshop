@@ -1045,8 +1045,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public SaleTransaction getSaleTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException {
-        //TODO Ruggero
-    	//TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if( transactionId == null|| transactionId <= 0 )
     		throw new InvalidTransactionIdException();
 
@@ -1055,7 +1056,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer startReturnTransaction(Integer saleNumber) throws /*InvalidTicketNumberException,*/InvalidTransactionIdException, UnauthorizedException {
-        //TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if(saleNumber == null || saleNumber <= 0)
     		throw new InvalidTransactionIdException();
     	
@@ -1071,7 +1074,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException {
-        //TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if(returnId == null || returnId <= 0)
     		throw new InvalidTransactionIdException();
     	
@@ -1113,7 +1118,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean endReturnTransaction(Integer returnId, boolean commit) throws InvalidTransactionIdException, UnauthorizedException {
-        //TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if(returnId == null || returnId <= 0)
     		throw new InvalidTransactionIdException();
     	
@@ -1147,7 +1154,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean deleteReturnTransaction(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-        //TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if( returnId == null || returnId <= 0)
         	throw new InvalidTransactionIdException();
         
@@ -1174,7 +1183,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public double receiveCashPayment(Integer ticketNumber, double cash) throws InvalidTransactionIdException, InvalidPaymentException, UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if(ticketNumber == null || ticketNumber <= 0)
     		throw new InvalidTransactionIdException();
     	if(cash <= 0)
@@ -1196,7 +1207,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean receiveCreditCardPayment(Integer ticketNumber, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        //TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
+    	
     	if(ticketNumber == null || ticketNumber <= 0)
         	throw new InvalidTransactionIdException();
     	
@@ -1223,7 +1236,8 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public double returnCashPayment(Integer returnId) throws InvalidTransactionIdException, UnauthorizedException {
-        // TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
     	
     	if(returnId == null || returnId <= 0)
         	throw new InvalidTransactionIdException();
@@ -1240,7 +1254,8 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public double returnCreditCardPayment(Integer returnId, String creditCard) throws InvalidTransactionIdException, InvalidCreditCardException, UnauthorizedException {
-        // TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
 
     	if(returnId <= 0)
         	throw new InvalidTransactionIdException();
@@ -1267,7 +1282,9 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public boolean recordBalanceUpdate(double toBeAdded) throws UnauthorizedException {
-    	// TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager"))
+    		throw new UnauthorizedException();
+    	
     	if(toBeAdded + this.balance < 0)
     		return false;
     	
@@ -1281,7 +1298,8 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
-        // TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager"))
+    		throw new UnauthorizedException();
     	
     	final LocalDate fromFinal;
     	final LocalDate toFinal;
@@ -1320,7 +1338,8 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public double computeBalance() throws UnauthorizedException {
-    	//TODO gestire eccezione per utente non autorizzato
+    	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager"))
+    		throw new UnauthorizedException();
         return this.balance;
     }
     

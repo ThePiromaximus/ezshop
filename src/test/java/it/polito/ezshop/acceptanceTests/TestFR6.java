@@ -171,14 +171,14 @@ public class TestFR6 {
 		}
 		
 		try {
-			ret = EzShop.deleteProductFromSale(null, "", 1);
+			ret = EzShop.deleteProductFromSale(id, "", 1);
 			fail();
 		} catch (InvalidProductCodeException e) {
 			
 		}
 		
 		try {
-			ret = EzShop.deleteProductFromSale(null, "notValidBarcode", 1);
+			ret = EzShop.deleteProductFromSale(id, "notValidBarcode", 1);
 			fail();
 		} catch (InvalidProductCodeException e) {
 			
@@ -201,6 +201,107 @@ public class TestFR6 {
 		assertTrue(ret);
 		
 		ret = EzShop.deleteProductFromSale(id, "122474487139", 1);
+		assertTrue(ret);
+		
+		return;
+	}
+	
+	@Test
+	public void testApplyDiscountRateToProduct() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidQuantityException, InvalidDiscountRateException {
+		EZShopInterface EzShop = new EZShop();
+		Integer id = 0;
+		User usr;
+		boolean ret = false;
+		
+		try {
+			ret = EzShop.applyDiscountRateToProduct(id, "122474487139", 0.1);
+			fail();
+		} catch (UnauthorizedException e) {
+			
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "Administrator");
+		assertTrue(id > 0);
+		usr = EzShop.login("Marzio", "password");
+		assertTrue(usr != null);
+		
+		id = EzShop.createProductType("TwentyOnePilots - Blurryface", "122548187895", 10, "Music CD");
+		assertTrue(id != -1);
+		
+		ret = EzShop.updateQuantity(id, 2);
+		assertTrue(ret);
+		
+		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10, "Music CD");
+		assertTrue(id != -1);
+		
+		ret = EzShop.updateQuantity(id, 2);
+		assertTrue(ret);
+		
+		id = EzShop.startSaleTransaction();
+		assertTrue(id > 0);
+		
+		ret = EzShop.addProductToSale(id, "122474487139", 1);
+		assertTrue(ret);
+		
+		try {
+			ret = EzShop.applyDiscountRateToProduct(null, "122474487139", 0.1);
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.applyDiscountRateToProduct(0, "122474487139", 0.1);
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.applyDiscountRateToProduct(id, null, 0.1);
+			fail();
+		} catch (InvalidProductCodeException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.applyDiscountRateToProduct(id, "", 0.1);
+			fail();
+		} catch (InvalidProductCodeException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.applyDiscountRateToProduct(id, "notValidBarcode", 0.1);
+			fail();
+		} catch (InvalidProductCodeException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.applyDiscountRateToProduct(id, "122474487139", -0.1);
+			fail();
+		} catch (InvalidDiscountRateException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.applyDiscountRateToProduct(id, "122474487139", 1.1);
+			fail();
+		} catch (InvalidDiscountRateException e) {
+			
+		}
+		
+		ret = EzShop.applyDiscountRateToProduct(id, "000000000000", 0.1);
+		assertTrue(!ret);
+		
+		ret = EzShop.applyDiscountRateToProduct(id+1, "122474487139", 0.1);
+		assertTrue(!ret);
+		
+		ret = EzShop.applyDiscountRateToProduct(id, "122548187895", 0.1);
+		assertTrue(!ret);
+		
+		ret = EzShop.applyDiscountRateToProduct(id, "122474487139", 0.1);
 		assertTrue(ret);
 		
 		return;

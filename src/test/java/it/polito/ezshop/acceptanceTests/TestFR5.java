@@ -173,30 +173,70 @@ public class TestFR5 {
 			
 		}
 
-		try {
-			ret = EzShop.attachCardToCustomer(card, id-1);
-		} catch (InvalidCustomerIdException | InvalidCustomerCardException | UnauthorizedException e) {
-			e.printStackTrace();
-			fail();
-		}
+		ret = EzShop.attachCardToCustomer(card, id-1);
 		assertTrue(!ret);
 		
-		try {
-			ret = EzShop.attachCardToCustomer(card, 150);
-		} catch (InvalidCustomerIdException | InvalidCustomerCardException | UnauthorizedException e) {
-			e.printStackTrace();
-			fail();
-		}
+		ret = EzShop.attachCardToCustomer(card, 150);
 		assertTrue(!ret);
 		
-		try {
-			ret = EzShop.attachCardToCustomer(card, id);
-		} catch (InvalidCustomerIdException | InvalidCustomerCardException | UnauthorizedException e) {
-			e.printStackTrace();
-			fail();
-		}
+		ret = EzShop.attachCardToCustomer(card, id);
 		assertTrue(ret);
 		
+		return;
+	}
+	
+	@SuppressWarnings("unused")
+	@Test
+	public void testModifyPointsOnCard() throws InvalidCustomerCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidCustomerNameException {
+		EZShopInterface EzShop = new EZShop();
+		Integer id = 0, points = 0;
+		String card = "";
+		User usr;
+		Customer cus1 = null;
+		boolean ret = false;
+		
+		try {
+			EzShop.modifyPointsOnCard(card, id);
+			fail();
+		} catch (UnauthorizedException e) {
+
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		assertTrue(id > 0);
+		usr = EzShop.login("Marzio", "password");
+		assertTrue(usr != null);
+		
+		card = EzShop.createCard();
+		assertTrue(!card.equals(""));
+		id = EzShop.defineCustomer("Keanu Reeves");
+		assertTrue(id > 0);
+		
+		try {
+			ret = EzShop.modifyPointsOnCard(null, 10);
+			fail();
+		} catch (InvalidCustomerCardException e) {
+
+		}
+		
+		try {
+			ret = EzShop.modifyPointsOnCard("", 10);
+			fail();
+		} catch (InvalidCustomerCardException e) {
+
+		}
+		
+		ret = EzShop.modifyPointsOnCard(card + "a", 10);
+		assertTrue(!ret);
+		
+		ret = EzShop.modifyPointsOnCard(card, -10);
+		assertTrue(!ret);
+		
+		ret = EzShop.modifyPointsOnCard(card, 10);
+		assertTrue(ret);
+		
+		ret = EzShop.modifyPointsOnCard(card, -5);
+		assertTrue(ret);
 		
 		return;
 	}

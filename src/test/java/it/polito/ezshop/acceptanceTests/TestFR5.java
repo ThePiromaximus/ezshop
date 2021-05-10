@@ -26,7 +26,7 @@ public class TestFR5 {
 			
 		}		
 		
-		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		id = EzShop.createUser("Marzio", "password", "Administrator");
 		assertTrue(id > 0);
 		usr = EzShop.login("Marzio", "password");
 		assertTrue(usr != null);
@@ -72,7 +72,7 @@ public class TestFR5 {
 			
 		}
 		
-		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		id = EzShop.createUser("Marzio", "password", "Administrator");
 		assertTrue(id > 0);
 		usr = EzShop.login("Marzio", "password");
 		assertTrue(usr != null);
@@ -101,7 +101,7 @@ public class TestFR5 {
 			
 		}
 		
-		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		id = EzShop.createUser("Marzio", "password", "Administrator");
 		assertTrue(id > 0);
 		usr = EzShop.login("Marzio", "password");
 		assertTrue(usr != null);
@@ -133,7 +133,7 @@ public class TestFR5 {
 
 		}
 		
-		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		id = EzShop.createUser("Marzio", "password", "Administrator");
 		assertTrue(id > 0);
 		usr = EzShop.login("Marzio", "password");
 		assertTrue(usr != null);
@@ -202,7 +202,7 @@ public class TestFR5 {
 
 		}
 		
-		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		id = EzShop.createUser("Marzio", "password", "Administrator");
 		assertTrue(id > 0);
 		usr = EzShop.login("Marzio", "password");
 		assertTrue(usr != null);

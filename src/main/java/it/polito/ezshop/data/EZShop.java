@@ -911,7 +911,7 @@ public class EZShop implements EZShopInterface {
     		throw new InvalidQuantityException();
 
     	ProductType refProd = products.get(productCode);
-		if(refProd == null || refProd.getQuantity() < amount)
+		if(refProd == null)
 			return false;
 		SaleTransaction sale = openedSaleTransactions.get(transactionId);
 		if(sale == null)

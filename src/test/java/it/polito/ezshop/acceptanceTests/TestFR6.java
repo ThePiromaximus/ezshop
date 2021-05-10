@@ -431,5 +431,116 @@ public class TestFR6 {
 		return;
 	}
 	
+	@Test
+	public void testEndSaleTransaction() throws InvalidTransactionIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, InvalidProductIdException, InvalidQuantityException {
+		EZShopInterface EzShop = new EZShop();
+		Integer id = 0;
+		User usr;
+		boolean ret = false;
+		
+		try {
+			ret = EzShop.endSaleTransaction(id);
+			fail();
+		} catch (UnauthorizedException e) {
+			
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "Administrator");
+		assertTrue(id > 0);
+		usr = EzShop.login("Marzio", "password");
+		assertTrue(usr != null);
+		
+		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10.0, "Music CD");
+		assertTrue(id != -1);
+		
+		ret = EzShop.updateQuantity(id, 2);
+		assertTrue(ret);
+		
+		id = EzShop.startSaleTransaction();
+		assertTrue(id > 0);
+		
+		ret = EzShop.addProductToSale(id, "122474487139", 1);
+		assertTrue(ret);
+		
+		try {
+			ret = EzShop.endSaleTransaction(null);
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.endSaleTransaction(0);
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		ret = EzShop.endSaleTransaction(id+1);
+		assertTrue(!ret);
+		
+		ret = EzShop.endSaleTransaction(id);
+		assertTrue(ret);
+		
+		return;
+	}
 	
+	@Test
+	public void testDeleteSaleTransaction() throws InvalidTransactionIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidQuantityException {
+		EZShopInterface EzShop = new EZShop();
+		Integer id = 0;
+		User usr;
+		boolean ret = false;
+		
+		try {
+			ret = EzShop.deleteSaleTransaction(id);
+			fail();
+		} catch (UnauthorizedException e) {
+			
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "Administrator");
+		assertTrue(id > 0);
+		usr = EzShop.login("Marzio", "password");
+		assertTrue(usr != null);
+		
+		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10.0, "Music CD");
+		assertTrue(id != -1);
+		
+		ret = EzShop.updateQuantity(id, 2);
+		assertTrue(ret);
+		
+		id = EzShop.startSaleTransaction();
+		assertTrue(id > 0);
+		
+		ret = EzShop.addProductToSale(id, "122474487139", 1);
+		assertTrue(ret);
+		
+		try {
+			ret = EzShop.deleteSaleTransaction(null);
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.deleteSaleTransaction(0);
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		ret = EzShop.deleteSaleTransaction(id+1);
+		assertTrue(!ret);
+		
+		ret = EzShop.deleteSaleTransaction(id);
+		assertTrue(ret);
+		
+		ret = EzShop.endSaleTransaction(id);
+		assertTrue(ret);
+		ret = EzShop.deleteSaleTransaction(id);
+		assertTrue(ret);
+		
+		return;
+	}
 }

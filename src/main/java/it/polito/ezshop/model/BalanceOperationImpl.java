@@ -61,7 +61,7 @@ public class BalanceOperationImpl implements it.polito.ezshop.data.BalanceOperat
 	public String getType() {
 		return this.type;
 	}
-	// TODO Ruggero
+
 	@Override
 	public void setType(String type) {
 		this.type = type;

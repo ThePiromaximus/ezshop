@@ -1353,7 +1353,7 @@ public class EZShop implements EZShopInterface {
     
     //Metodo per verificare la validità di un barcode
     // https://www.gs1.org/services/how-calculate-check-digit-manually
-    public static boolean barCodeIsValid(String barCode) {
+    private static boolean barCodeIsValid(String barCode) {
     	int bcSize = barCode.length();
     	boolean r = false;
     	

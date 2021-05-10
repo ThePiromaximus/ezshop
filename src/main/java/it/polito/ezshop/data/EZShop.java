@@ -238,7 +238,7 @@ public class EZShop implements EZShopInterface {
         if ( id == null || id <= 0)
         	throw new InvalidPricePerUnitException();
         
-        if(!products.containsKey(newCode))
+        if(products.containsKey(newCode))
         	return false;
     	   
     	for ( ProductType product : products.values())

@@ -869,10 +869,10 @@ public class EZShop implements EZShopInterface {
     	if(loggedUser != null && !loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier"))
     		throw new UnauthorizedException();
     	
-    	if(transactionId <= 0 || transactionId == null)
+    	if(transactionId == null || transactionId <= 0)
     		throw new InvalidTransactionIdException();
     	
-    	if(productCode.isEmpty() || productCode == null || !barCodeIsValid(productCode))
+    	if(productCode == null || productCode.isEmpty() || !barCodeIsValid(productCode))
     		throw new InvalidProductCodeException();
     	
     	if(amount < 0)

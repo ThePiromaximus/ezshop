@@ -34,7 +34,7 @@ public class TestFR6 {
 	}
 	
 	@Test
-	public void testAddProductToSale() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidTransactionIdException, InvalidProductIdException {
+	public void testAddProductToSale() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException, InvalidProductDescriptionException, InvalidPricePerUnitException, InvalidTransactionIdException, InvalidProductIdException, InvalidLocationException {
 		EZShopInterface EzShop = new EZShop();
 		Integer id = 0;
 		User usr;
@@ -54,6 +54,9 @@ public class TestFR6 {
 		
 		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10, "Music CD");
 		assertTrue(id != -1);
+		
+		ret = EzShop.updatePosition(id, "001-abcd-002");
+		assertTrue(ret);
 		
 		ret = EzShop.updateQuantity(id, 2);
 		assertTrue(ret);
@@ -83,14 +86,14 @@ public class TestFR6 {
 		}
 		
 		try {
-			ret = EzShop.addProductToSale(null, "", 1);
+			ret = EzShop.addProductToSale(id, "", 1);
 			fail();
 		} catch (InvalidProductCodeException e) {
 			
 		}
 		
 		try {
-			ret = EzShop.addProductToSale(null, "notValidBarcode", 1);
+			ret = EzShop.addProductToSale(id, "notValidBarcode", 1);
 			fail();
 		} catch (InvalidProductCodeException e) {
 			
@@ -119,17 +122,17 @@ public class TestFR6 {
 	}
 	
 	@Test
-	public void testDeleteProductFromSale() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidQuantityException {
+	public void testDeleteProductFromSale() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidQuantityException, InvalidLocationException {
 		EZShopInterface EzShop = new EZShop();
 		Integer id = 0;
 		User usr;
 		boolean ret = false;
 		
 		try {
-			ret = EzShop.deleteProductFromSale(id, "", 1);
+			ret = EzShop.deleteProductFromSale(1, "122474487139", 1);
 			fail();
 		} catch (UnauthorizedException e) {
-			
+			System.out.println("I got here");
 		}
 		
 		id = EzShop.createUser("Marzio", "password", "Administrator");
@@ -139,6 +142,9 @@ public class TestFR6 {
 		
 		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10, "Music CD");
 		assertTrue(id != -1);
+		
+		ret = EzShop.updatePosition(id, "001-abcd-002");
+		assertTrue(ret);
 		
 		ret = EzShop.updateQuantity(id, 2);
 		assertTrue(ret);
@@ -207,7 +213,7 @@ public class TestFR6 {
 	}
 	
 	@Test
-	public void testApplyDiscountRateToProduct() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidQuantityException, InvalidDiscountRateException {
+	public void testApplyDiscountRateToProduct() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidQuantityException, InvalidDiscountRateException, InvalidLocationException {
 		EZShopInterface EzShop = new EZShop();
 		Integer id = 0;
 		User usr;
@@ -225,14 +231,20 @@ public class TestFR6 {
 		usr = EzShop.login("Marzio", "password");
 		assertTrue(usr != null);
 		
-		id = EzShop.createProductType("TwentyOnePilots - Blurryface", "122548187895", 10, "Music CD");
+		id = EzShop.createProductType("TwentyOnePilots - Blurryface", "978020137962", 10, "Music CD");
 		assertTrue(id != -1);
+		
+		ret = EzShop.updatePosition(id, "001-abcd-003");
+		assertTrue(ret);
 		
 		ret = EzShop.updateQuantity(id, 2);
 		assertTrue(ret);
 		
 		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10, "Music CD");
 		assertTrue(id != -1);
+		
+		ret = EzShop.updatePosition(id, "001-abcd-002");
+		assertTrue(ret);
 		
 		ret = EzShop.updateQuantity(id, 2);
 		assertTrue(ret);
@@ -298,7 +310,7 @@ public class TestFR6 {
 		ret = EzShop.applyDiscountRateToProduct(id+1, "122474487139", 0.1);
 		assertTrue(!ret);
 		
-		ret = EzShop.applyDiscountRateToProduct(id, "122548187895", 0.1);
+		ret = EzShop.applyDiscountRateToProduct(id, "978020137962", 0.1);
 		assertTrue(!ret);
 		
 		ret = EzShop.applyDiscountRateToProduct(id, "122474487139", 0.1);
@@ -367,7 +379,7 @@ public class TestFR6 {
 	}
 	
 	@Test
-	public void testComputePointsForSale() throws InvalidTransactionIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidQuantityException, InvalidProductIdException, InvalidPaymentException {
+	public void testComputePointsForSale() throws InvalidTransactionIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidQuantityException, InvalidProductIdException, InvalidPaymentException, InvalidLocationException {
 		EZShopInterface EzShop = new EZShop();
 		Integer id = 0, points = 0;
 		double change = 0;
@@ -388,6 +400,9 @@ public class TestFR6 {
 		
 		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10.0, "Music CD");
 		assertTrue(id != -1);
+		
+		ret = EzShop.updatePosition(id, "001-abcd-002");
+		assertTrue(ret);
 		
 		ret = EzShop.updateQuantity(id, 2);
 		assertTrue(ret);
@@ -432,7 +447,7 @@ public class TestFR6 {
 	}
 	
 	@Test
-	public void testEndSaleTransaction() throws InvalidTransactionIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, InvalidProductIdException, InvalidQuantityException {
+	public void testEndSaleTransaction() throws InvalidTransactionIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, InvalidProductIdException, InvalidQuantityException, InvalidLocationException {
 		EZShopInterface EzShop = new EZShop();
 		Integer id = 0;
 		User usr;
@@ -452,6 +467,9 @@ public class TestFR6 {
 		
 		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10.0, "Music CD");
 		assertTrue(id != -1);
+		
+		ret = EzShop.updatePosition(id, "001-abcd-002");
+		assertTrue(ret);
 		
 		ret = EzShop.updateQuantity(id, 2);
 		assertTrue(ret);
@@ -486,7 +504,7 @@ public class TestFR6 {
 	}
 	
 	@Test
-	public void testDeleteSaleTransaction() throws InvalidTransactionIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidQuantityException {
+	public void testDeleteSaleTransaction() throws InvalidTransactionIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidQuantityException, InvalidLocationException {
 		EZShopInterface EzShop = new EZShop();
 		Integer id = 0;
 		User usr;
@@ -506,6 +524,9 @@ public class TestFR6 {
 		
 		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10.0, "Music CD");
 		assertTrue(id != -1);
+		
+		ret = EzShop.updatePosition(id, "001-abcd-002");
+		assertTrue(ret);
 		
 		ret = EzShop.updateQuantity(id, 2);
 		assertTrue(ret);
@@ -536,6 +557,11 @@ public class TestFR6 {
 		ret = EzShop.deleteSaleTransaction(id);
 		assertTrue(ret);
 		
+		
+		id = EzShop.startSaleTransaction();
+		assertTrue(id > 0);
+		ret = EzShop.addProductToSale(id, "122474487139", 1);
+		assertTrue(ret);
 		ret = EzShop.endSaleTransaction(id);
 		assertTrue(ret);
 		ret = EzShop.deleteSaleTransaction(id);

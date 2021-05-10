@@ -162,19 +162,16 @@ public class TestFR5 {
 		try {
 			ret = EzShop.attachCardToCustomer(null, id);
 			fail();
-		} catch(InvalidCustomerIdException e) {
+		} catch(InvalidCustomerCardException e) {
 			
 		}
 		
 		try {
 			ret = EzShop.attachCardToCustomer("", id);
 			fail();
-		} catch(InvalidCustomerIdException e) {
+		} catch(InvalidCustomerCardException e) {
 			
 		}
-
-		ret = EzShop.attachCardToCustomer(card, id-1);
-		assertTrue(!ret);
 		
 		ret = EzShop.attachCardToCustomer(card, 150);
 		assertTrue(!ret);
@@ -182,12 +179,15 @@ public class TestFR5 {
 		ret = EzShop.attachCardToCustomer(card, id);
 		assertTrue(ret);
 		
+		ret = EzShop.attachCardToCustomer(card, id-1);
+		assertTrue(!ret);
+		
 		return;
 	}
 	
 	@SuppressWarnings("unused")
 	@Test
-	public void testModifyPointsOnCard() throws InvalidCustomerCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidCustomerNameException {
+	public void testModifyPointsOnCard() throws InvalidCustomerCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidCustomerNameException, InvalidCustomerIdException {
 		EZShopInterface EzShop = new EZShop();
 		Integer id = 0, points = 0;
 		String card = "";
@@ -225,6 +225,9 @@ public class TestFR5 {
 		} catch (InvalidCustomerCardException e) {
 
 		}
+		
+		ret = EzShop.attachCardToCustomer(card, id);
+		assertTrue(ret);
 		
 		ret = EzShop.modifyPointsOnCard(card + "a", 10);
 		assertTrue(!ret);

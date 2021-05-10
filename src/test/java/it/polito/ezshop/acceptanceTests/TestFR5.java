@@ -3,6 +3,8 @@ package it.polito.ezshop.acceptanceTests;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.List;
+
 import org.junit.Test;
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
@@ -24,7 +26,7 @@ public class TestFR5 {
 		
 		id = EzShop.createUser("Marzio", "password", "ADMIN");
 		assertTrue(id > 0);
-		
+		EzShop.login("Marzio", "password");
 		
 		try {
 			cus1 = EzShop.getCustomer(null);
@@ -46,6 +48,32 @@ public class TestFR5 {
 		try {
 			cus1 = EzShop.getCustomer(id);
 		} catch (InvalidCustomerIdException e) {
+			fail();
+		}
+		
+		return;
+	}
+	
+	@Test
+	public void testGetAllCustomers() throws UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
+		EZShopInterface EzShop = new EZShop();
+		Integer id = 0;
+		List<Customer> custList = null;
+		
+		try {
+			custList = EzShop.getAllCustomers();
+			fail();
+		} catch (UnauthorizedException e) {
+			
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		assertTrue(id > 0);
+		EzShop.login("Marzio", "password");
+		
+		try {
+			custList = EzShop.getAllCustomers();
+		} catch (UnauthorizedException e) {
 			fail();
 		}
 		

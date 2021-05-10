@@ -952,10 +952,13 @@ public class EZShop implements EZShopInterface {
 			return false;
 		
 		List<TicketEntry> entries = sale.getEntries();
-		entries.stream().filter(e -> productCode.equals(e.getBarCode())).findFirst()
-			.ifPresent(e -> e.setDiscountRate(discountRate));
+		Optional<TicketEntry> tmp = entries.stream().filter(e -> productCode.equals(e.getBarCode())).findFirst();
+    	if(tmp.isPresent()) {
+    		tmp.get().setDiscountRate(discountRate);
+    		return true;
+    	}
     	
-    	return true;
+    	return false;
     }
 
     @Override

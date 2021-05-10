@@ -202,7 +202,7 @@ public class EZShop implements EZShopInterface {
         	throw new InvalidPricePerUnitException();
         
         //BarCode must be unique        
-        if(!products.containsKey(productCode))
+        if(products.containsKey(productCode))
         	return -1;
 		
 		ProductType pt = new ProductTypeImpl();
@@ -239,7 +239,7 @@ public class EZShop implements EZShopInterface {
         if ( id == null || id <= 0)
         	throw new InvalidProductIdException();
         
-        if(!products.containsKey(newCode))
+        if(products.containsKey(newCode))
         	return false;
         
         if(products.size()!=0) 
@@ -1353,7 +1353,7 @@ public class EZShop implements EZShopInterface {
     
     //Metodo per verificare la validità di un barcode
     // https://www.gs1.org/services/how-calculate-check-digit-manually
-    private static boolean barCodeIsValid(String barCode) {
+    public static boolean barCodeIsValid(String barCode) {
     	int bcSize = barCode.length();
     	boolean r = false;
     	

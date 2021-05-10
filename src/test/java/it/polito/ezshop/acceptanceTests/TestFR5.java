@@ -115,4 +115,89 @@ public class TestFR5 {
 		
 		return;
 	}
+	
+	@SuppressWarnings("unused")
+	@Test
+	public void testAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidCustomerNameException{
+		EZShopInterface EzShop = new EZShop();
+		Integer id = 0;
+		String card = "";
+		User usr;
+		Customer cus1 = null;
+		boolean ret = false;
+		
+		try {
+			EzShop.attachCardToCustomer(card, id);
+			fail();
+		} catch (UnauthorizedException e) {
+
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		assertTrue(id > 0);
+		usr = EzShop.login("Marzio", "password");
+		assertTrue(usr != null);
+		
+		card = EzShop.createCard();
+		assertTrue(!card.equals(""));
+		id = EzShop.defineCustomer("Dave Grohl");
+		assertTrue(id > 0);
+		id = EzShop.defineCustomer("Keanu Reeves");
+		assertTrue(id > 0);
+		
+		try {
+			ret = EzShop.attachCardToCustomer(card, null);
+			fail();
+		} catch(InvalidCustomerIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.attachCardToCustomer(card, 0);
+			fail();
+		} catch(InvalidCustomerIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.attachCardToCustomer(null, id);
+			fail();
+		} catch(InvalidCustomerIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.attachCardToCustomer("", id);
+			fail();
+		} catch(InvalidCustomerIdException e) {
+			
+		}
+
+		try {
+			ret = EzShop.attachCardToCustomer(card, id-1);
+		} catch (InvalidCustomerIdException | InvalidCustomerCardException | UnauthorizedException e) {
+			e.printStackTrace();
+			fail();
+		}
+		assertTrue(!ret);
+		
+		try {
+			ret = EzShop.attachCardToCustomer(card, 150);
+		} catch (InvalidCustomerIdException | InvalidCustomerCardException | UnauthorizedException e) {
+			e.printStackTrace();
+			fail();
+		}
+		assertTrue(!ret);
+		
+		try {
+			ret = EzShop.attachCardToCustomer(card, id);
+		} catch (InvalidCustomerIdException | InvalidCustomerCardException | UnauthorizedException e) {
+			e.printStackTrace();
+			fail();
+		}
+		assertTrue(ret);
+		
+		
+		return;
+	}
 }

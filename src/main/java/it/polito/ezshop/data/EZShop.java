@@ -685,6 +685,7 @@ public class EZShop implements EZShopInterface {
     	//Il nome non deve essere nullo o vuoto
     	if((newCustomerName==null) || (newCustomerName.isEmpty()))
     		throw new InvalidCustomerNameException();
+  
     	//Il nome deve essere unico (dovrebbe, dalla documentazione del metodo non si capisce ma nel precedente metodo era così)
     	if(customers.size()!=0)
     	{
@@ -711,6 +712,7 @@ public class EZShop implements EZShopInterface {
 	    	if(newCustomerCard==null)
 	    		return true;
 	    	//Se la nuova carta è una stringa vuota si stacca la carta dal cliente
+	    	//(La si elimina in pratica)
 	    	if(newCustomerCard.isEmpty())
 	    	{
 	    		customers.get(id).setCustomerCard(null);
@@ -723,7 +725,7 @@ public class EZShop implements EZShopInterface {
 	    		for(Customer customer : customers.values())
 	    		{
 	    			//Se la carta è già in possesso di qualcuno ritorno falso
-	    			if(customer.getCustomerCard().equals(newCustomerCard))
+	    			if(customer.getCustomerCard()!= null && customer.getCustomerCard().equals(newCustomerCard))
 	    			{
 	    				return false;
 	    			}
@@ -740,7 +742,8 @@ public class EZShop implements EZShopInterface {
 	    	}
     	}
     	
-    	return false;
+    	return false;  	
+    	
     		
     }
 

@@ -205,7 +205,9 @@ public class TestFR7 {
 		// return transaction doesn't exist
 		assertTrue(ezShop.returnCashPayment(100) == -1);
 		// correct behavior
+		double oldBalance = ezShop.computeBalance();
 		assertTrue(ezShop.returnCashPayment(returnId) == 1000.0);
+		assertTrue(ezShop.computeBalance() == (oldBalance-1000.0));
 	}
 	
 	@Test
@@ -281,6 +283,8 @@ public class TestFR7 {
 		// check if card exists
 		
 		// correct behavior
+		double oldBalance = ezShop.computeBalance();
 		assertTrue(ezShop.returnCreditCardPayment(returnId, "5555555555554444") == 1000.0);
+		assertTrue(ezShop.computeBalance() == (oldBalance-1000.0));
 	}
 }

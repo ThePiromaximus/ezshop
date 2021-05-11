@@ -26,7 +26,7 @@ public class TestFR5 {
 			
 		}		
 		
-		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		id = EzShop.createUser("Marzio", "password", "Administrator");
 		assertTrue(id > 0);
 		usr = EzShop.login("Marzio", "password");
 		assertTrue(usr != null);
@@ -72,7 +72,7 @@ public class TestFR5 {
 			
 		}
 		
-		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		id = EzShop.createUser("Marzio", "password", "Administrator");
 		assertTrue(id > 0);
 		usr = EzShop.login("Marzio", "password");
 		assertTrue(usr != null);
@@ -101,7 +101,7 @@ public class TestFR5 {
 			
 		}
 		
-		id = EzShop.createUser("Marzio", "password", "ADMIN");
+		id = EzShop.createUser("Marzio", "password", "Administrator");
 		assertTrue(id > 0);
 		usr = EzShop.login("Marzio", "password");
 		assertTrue(usr != null);
@@ -112,6 +112,134 @@ public class TestFR5 {
 			fail();
 		}
 		assertTrue(!card.equals(""));
+		
+		return;
+	}
+	
+	@SuppressWarnings("unused")
+	@Test
+	public void testAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidCustomerNameException{
+		EZShopInterface EzShop = new EZShop();
+		Integer id = 0;
+		String card = "";
+		User usr;
+		Customer cus1 = null;
+		boolean ret = false;
+		
+		try {
+			EzShop.attachCardToCustomer(card, id);
+			fail();
+		} catch (UnauthorizedException e) {
+
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "Administrator");
+		assertTrue(id > 0);
+		usr = EzShop.login("Marzio", "password");
+		assertTrue(usr != null);
+		
+		card = EzShop.createCard();
+		assertTrue(!card.equals(""));
+		id = EzShop.defineCustomer("Dave Grohl");
+		assertTrue(id > 0);
+		id = EzShop.defineCustomer("Keanu Reeves");
+		assertTrue(id > 0);
+		
+		try {
+			ret = EzShop.attachCardToCustomer(card, null);
+			fail();
+		} catch(InvalidCustomerIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.attachCardToCustomer(card, 0);
+			fail();
+		} catch(InvalidCustomerIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.attachCardToCustomer(null, id);
+			fail();
+		} catch(InvalidCustomerCardException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.attachCardToCustomer("", id);
+			fail();
+		} catch(InvalidCustomerCardException e) {
+			
+		}
+		
+		ret = EzShop.attachCardToCustomer(card, 150);
+		assertTrue(!ret);
+		
+		ret = EzShop.attachCardToCustomer(card, id);
+		assertTrue(ret);
+		
+		ret = EzShop.attachCardToCustomer(card, id-1);
+		assertTrue(!ret);
+		
+		return;
+	}
+	
+	@SuppressWarnings("unused")
+	@Test
+	public void testModifyPointsOnCard() throws InvalidCustomerCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidCustomerNameException, InvalidCustomerIdException {
+		EZShopInterface EzShop = new EZShop();
+		Integer id = 0, points = 0;
+		String card = "";
+		User usr;
+		Customer cus1 = null;
+		boolean ret = false;
+		
+		try {
+			EzShop.modifyPointsOnCard(card, id);
+			fail();
+		} catch (UnauthorizedException e) {
+
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "Administrator");
+		assertTrue(id > 0);
+		usr = EzShop.login("Marzio", "password");
+		assertTrue(usr != null);
+		
+		card = EzShop.createCard();
+		assertTrue(!card.equals(""));
+		id = EzShop.defineCustomer("Keanu Reeves");
+		assertTrue(id > 0);
+		
+		try {
+			ret = EzShop.modifyPointsOnCard(null, 10);
+			fail();
+		} catch (InvalidCustomerCardException e) {
+
+		}
+		
+		try {
+			ret = EzShop.modifyPointsOnCard("", 10);
+			fail();
+		} catch (InvalidCustomerCardException e) {
+
+		}
+		
+		ret = EzShop.attachCardToCustomer(card, id);
+		assertTrue(ret);
+		
+		ret = EzShop.modifyPointsOnCard(card + "a", 10);
+		assertTrue(!ret);
+		
+		ret = EzShop.modifyPointsOnCard(card, -10);
+		assertTrue(!ret);
+		
+		ret = EzShop.modifyPointsOnCard(card, 10);
+		assertTrue(ret);
+		
+		ret = EzShop.modifyPointsOnCard(card, -5);
+		assertTrue(ret);
 		
 		return;
 	}

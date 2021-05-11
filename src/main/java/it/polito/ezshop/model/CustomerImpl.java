@@ -13,7 +13,7 @@ public class CustomerImpl implements it.polito.ezshop.data.Customer {
 		this.id = PROGRESSIVE_ID;
 		this.customerName = customerName;
 		this.customerCard = null;
-		this.points = null;
+		this.points = 0;
 		
 		PROGRESSIVE_ID++;
 	}

@@ -62,8 +62,8 @@ public class EZShop implements EZShopInterface {
 		if(password == null || password.isEmpty())
 			throw new InvalidPasswordException();
 	 
-		if((role == null ||role.isEmpty()) && !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
-			throw new InvalidRoleException();
+		if ((role == null || role.isEmpty()) || !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
+        	throw new InvalidRoleException();
 	
 	
 		//L'username deve essere univoco
@@ -96,9 +96,9 @@ public class EZShop implements EZShopInterface {
 		if(users.containsKey(id)) {
 			users.remove(id);
 			return true;
-		} else {
+		}else {
 			return false;
-		}
+			}
 		
 	}
 
@@ -140,7 +140,7 @@ public class EZShop implements EZShopInterface {
     	if(id==null ||  id <= 0)
         	throw new InvalidUserIdException();
        
-        if ((role == null || role.isEmpty()) && !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
+        if ((role == null || role.isEmpty()) || !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
         	throw new InvalidRoleException();
         
         for(User user : users.values()) {
@@ -189,13 +189,14 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
+    	
     	if(this.loggedUser==null || this.loggedUser.getRole().equals("Cashier"))
     		throw new UnauthorizedException();
     	
         if (description == null || description.isEmpty())
         	throw new InvalidProductDescriptionException();
         
-        if (productCode == null || productCode.isEmpty() || barCodeIsValid(productCode) == false)
+        if((productCode == null) || (productCode.length() == 0) || (!barCodeIsValid(productCode)))
         	throw new InvalidProductCodeException();
 
         if (pricePerUnit <= 0)
@@ -230,7 +231,7 @@ public class EZShop implements EZShopInterface {
         if (newDescription == null || newDescription.isEmpty())
         	throw new InvalidProductDescriptionException();
         
-        if (newCode == null || newCode.isEmpty() || barCodeIsValid(newCode) == false)
+        if((newCode == null) || (newCode.length() == 0) || (!barCodeIsValid(newCode)))
         	throw new InvalidProductCodeException();
 
         if (newPrice <= 0)

@@ -55,14 +55,14 @@ public class EZShop implements EZShopInterface {
 	@Override
 	public Integer createUser(String username, String password, String role) throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 	
-		if(username.isEmpty() || username == null)
+		if(username == null ||username.isEmpty())
 			throw new InvalidUsernameException();
 	
 	
-		if(password.isEmpty() || password == null)
+		if(password == null || password.isEmpty())
 			throw new InvalidPasswordException();
 	 
-		if((role.isEmpty() || role == null ) && !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
+		if((role == null ||role.isEmpty()) && !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
 			throw new InvalidRoleException();
 	
 	
@@ -87,7 +87,7 @@ public class EZShop implements EZShopInterface {
 	@Override
 	public boolean deleteUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
 		
-		if(!this.loggedUser.getRole().equals("Administrator") || this.loggedUser==null)
+		if(this.loggedUser==null ||!this.loggedUser.getRole().equals("Administrator"))
 			throw new UnauthorizedException();
 		
 		if(id == null || id <= 0) 
@@ -105,7 +105,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public List<User> getAllUsers() throws UnauthorizedException {
 
-    	if(!this.loggedUser.getRole().equals("Administrator") || this.loggedUser==null)
+    	if(this.loggedUser==null || !this.loggedUser.getRole().equals("Administrator"))
     		throw new UnauthorizedException();
     	
     	return new ArrayList<User>(users.values());
@@ -114,7 +114,7 @@ public class EZShop implements EZShopInterface {
     @Override
     public User getUser(Integer id) throws InvalidUserIdException, UnauthorizedException {
   
-    	if(!this.loggedUser.getRole().equals("Administrator") || this.loggedUser==null)
+    	if(this.loggedUser==null || !this.loggedUser.getRole().equals("Administrator") )
     		throw new UnauthorizedException();
     	
     	if(id == null || id <= 0)
@@ -134,13 +134,13 @@ public class EZShop implements EZShopInterface {
     @Override
     public boolean updateUserRights(Integer id, String role) throws InvalidUserIdException, InvalidRoleException, UnauthorizedException {
     	
-    	if(!this.loggedUser.getRole().equals("Administrator") || this.loggedUser==null)
+    	if(this.loggedUser==null || !this.loggedUser.getRole().equals("Administrator"))
     		throw new UnauthorizedException();
     	
     	if(id==null ||  id <= 0)
         	throw new InvalidUserIdException();
        
-        if ((role.isEmpty() || role == null ) && !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
+        if ((role == null || role.isEmpty()) && !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
         	throw new InvalidRoleException();
         
         for(User user : users.values()) {
@@ -192,13 +192,13 @@ public class EZShop implements EZShopInterface {
     	if(this.loggedUser==null || this.loggedUser.getRole().equals("Cashier"))
     		throw new UnauthorizedException();
     	
-        if (description.isEmpty() || description == null)
+        if (description == null || description.isEmpty())
         	throw new InvalidProductDescriptionException();
         
-        if (productCode.isEmpty() || productCode == null || barCodeIsValid(productCode) == false)
+        if (productCode == null || productCode.isEmpty() || barCodeIsValid(productCode) == false)
         	throw new InvalidProductCodeException();
 
-        if (pricePerUnit <= 0 || pricePerUnit == 0)
+        if (pricePerUnit <= 0)
         	throw new InvalidPricePerUnitException();
         
         //BarCode must be unique        
@@ -227,31 +227,36 @@ public class EZShop implements EZShopInterface {
     	if(this.loggedUser==null || this.loggedUser.getRole().equals("Cashier"))
     		throw new UnauthorizedException();
     	
-        if (newDescription.isEmpty() || newDescription == null)
+        if (newDescription == null || newDescription.isEmpty())
         	throw new InvalidProductDescriptionException();
         
-        if (newCode.isEmpty() || newCode == null || barCodeIsValid(newCode) == false)
+        if (newCode == null || newCode.isEmpty() || barCodeIsValid(newCode) == false)
         	throw new InvalidProductCodeException();
 
         if (newPrice <= 0)
         	throw new InvalidPricePerUnitException();
+        
         if ( id == null || id <= 0)
-        	throw new InvalidPricePerUnitException();
+        	throw new InvalidProductIdException();
         
         if(products.containsKey(newCode))
         	return false;
+        
+        if(products.size()!=0) 
+        {
     	   
-    	for ( ProductType product : products.values())
-    	{
-    		if(product.getId() == id)
-    		{
-    			product.setBarCode(newCode);
-    			product.setProductDescription(newDescription);
-    			product.setNote(newNote);
-    			product.setPricePerUnit(newPrice);
-    	    	return true;
-    		 }
-    	}
+        	for ( ProductType product : products.values())
+        	{
+        		if(product.getId() == id)
+        		{
+        			product.setBarCode(newCode);
+        			product.setProductDescription(newDescription);
+        			product.setNote(newNote);
+        			product.setPricePerUnit(newPrice);
+        			return true;
+        		}
+        	}
+        }
     		
 		return false;
 
@@ -266,13 +271,16 @@ public class EZShop implements EZShopInterface {
     	if(id == null || id <= 0) 
     		throw new InvalidProductIdException();
     	
-    	for(ProductType product : products.values())
+		if(products.size()!=0)
 		{
-			if(product.getId() == id)
-			{	
-				products.remove(product.getBarCode());
-		    	return true;
+			for(ProductType product : products.values())
+			{
+				if(product.getId() == id)
+				{	
+					products.remove(product.getBarCode());
+					return true;
 				
+				}
 			}
 		}
     	

@@ -1172,13 +1172,10 @@ public class EZShop implements EZShopInterface {
     	if( returnId == null || returnId <= 0)
         	throw new InvalidTransactionIdException();
         
-        if(!closedReturnTransactions.containsKey(returnId))
+        if(!closedReturnTransactions.containsKey(returnId) || paidReturnTransactions.containsKey(returnId))
         	return false;
         
         ReturnTransactionImpl rt = closedReturnTransactions.get(returnId);
-        
-        if(paidReturnTransactions.containsKey(returnId))
-        	return false;
         
     	for(TicketEntry te : rt.getEntries()) {
     		ProductType p = products.get(te.getBarCode());

@@ -63,8 +63,8 @@ public class EZShop implements EZShopInterface {
 		if(password == null || password.isEmpty())
 			throw new InvalidPasswordException();
 	 
-		if((role == null ||role.isEmpty()) && !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
-			throw new InvalidRoleException();
+		if ((role == null || role.isEmpty()) || !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
+        	throw new InvalidRoleException();
 	
 	
 		//L'username deve essere univoco
@@ -97,9 +97,9 @@ public class EZShop implements EZShopInterface {
 		if(users.containsKey(id)) {
 			users.remove(id);
 			return true;
-		} else {
+		}else {
 			return false;
-		}
+			}
 		
 	}
 
@@ -141,7 +141,7 @@ public class EZShop implements EZShopInterface {
     	if(id==null ||  id <= 0)
         	throw new InvalidUserIdException();
        
-        if ((role == null || role.isEmpty()) && !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
+        if ((role == null || role.isEmpty()) || !role.equals("Administrator") && !role.equals("Cashier") && !role.equals("ShopManager") )
         	throw new InvalidRoleException();
         
         for(User user : users.values()) {
@@ -190,13 +190,14 @@ public class EZShop implements EZShopInterface {
 
     @Override
     public Integer createProductType(String description, String productCode, double pricePerUnit, String note) throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException {
+    	
     	if(this.loggedUser==null || this.loggedUser.getRole().equals("Cashier"))
     		throw new UnauthorizedException();
     	
         if (description == null || description.isEmpty())
         	throw new InvalidProductDescriptionException();
         
-        if (productCode == null || productCode.isEmpty() || barCodeIsValid(productCode) == false)
+        if((productCode == null) || (productCode.length() == 0) || (!barCodeIsValid(productCode)))
         	throw new InvalidProductCodeException();
 
         if (pricePerUnit <= 0)
@@ -231,7 +232,7 @@ public class EZShop implements EZShopInterface {
         if (newDescription == null || newDescription.isEmpty())
         	throw new InvalidProductDescriptionException();
         
-        if (newCode == null || newCode.isEmpty() || barCodeIsValid(newCode) == false)
+        if((newCode == null) || (newCode.length() == 0) || (!barCodeIsValid(newCode)))
         	throw new InvalidProductCodeException();
 
         if (newPrice <= 0)
@@ -341,8 +342,6 @@ public class EZShop implements EZShopInterface {
         
         if(this.loggedUser==null || this.loggedUser.getRole().equals("Cashier"))
     		throw new UnauthorizedException();
-        if(toBeAdded<=0)
-        	return false;
         
         if(productId!=null && productId>0)
         {
@@ -377,8 +376,13 @@ public class EZShop implements EZShopInterface {
         		}
         	}
         }
+        else
+        {
+        	throw new InvalidProductIdException();
+        }
     	
     	//Non ho trovato il prodotto
+        //Il prodotto non esiste
     	return false;
     }
 
@@ -447,6 +451,11 @@ public class EZShop implements EZShopInterface {
     		{
     			if(pricePerUnit>0)
     			{
+    				//Controllo che il prodotto sia in inventario
+    				//Altrimenti torno -1
+    				if(!products.containsKey(productCode))
+    					return -1;
+    				
     				//Creo nuovo ordine e lo aggiungo alla lista
 					Order o = new OrderImpl(productCode, pricePerUnit, quantity);
 					orders.put(o.getOrderId(), o);
@@ -481,6 +490,8 @@ public class EZShop implements EZShopInterface {
     		{
     			if(pricePerUnit>0)
     			{
+    				if(!products.containsKey(productCode))
+    					return -1;
 					
 					if(this.balance >= (quantity*pricePerUnit))
 		    		{
@@ -526,14 +537,9 @@ public class EZShop implements EZShopInterface {
     		if(orders.containsKey(orderId))
     		{
     			//L'ordine è presente
-    			if((orders.get(orderId).getStatus().equals("ISSUED")) || (orders.get(orderId).getStatus().equals("PAYED")))
+    			if(orders.get(orderId).getStatus().equals("ISSUED"))
     			{
-    				if(orders.get(orderId).getStatus().equals("PAYED"))
-    				{
-    					//L'ordine è già stato pagato torno senza fare nulla
-    					return true;
-    				}
-    				
+    				    				
     				//L'ordine è in stato ISSUED quindi va pagato
     				double pricePerUnit = orders.get(orderId).getPricePerUnit();
     				int quantity = orders.get(orderId).getQuantity();
@@ -680,6 +686,7 @@ public class EZShop implements EZShopInterface {
     	//Il nome non deve essere nullo o vuoto
     	if((newCustomerName==null) || (newCustomerName.isEmpty()))
     		throw new InvalidCustomerNameException();
+  
     	//Il nome deve essere unico (dovrebbe, dalla documentazione del metodo non si capisce ma nel precedente metodo era così)
     	if(customers.size()!=0)
     	{
@@ -706,6 +713,7 @@ public class EZShop implements EZShopInterface {
 	    	if(newCustomerCard==null)
 	    		return true;
 	    	//Se la nuova carta è una stringa vuota si stacca la carta dal cliente
+	    	//(La si elimina in pratica)
 	    	if(newCustomerCard.isEmpty())
 	    	{
 	    		customers.get(id).setCustomerCard(null);
@@ -718,7 +726,7 @@ public class EZShop implements EZShopInterface {
 	    		for(Customer customer : customers.values())
 	    		{
 	    			//Se la carta è già in possesso di qualcuno ritorno falso
-	    			if(customer.getCustomerCard().equals(newCustomerCard))
+	    			if(customer.getCustomerCard()!= null && customer.getCustomerCard().equals(newCustomerCard))
 	    			{
 	    				return false;
 	    			}
@@ -735,7 +743,8 @@ public class EZShop implements EZShopInterface {
 	    	}
     	}
     	
-    	return false;
+    	return false;  	
+    	
     		
     }
 

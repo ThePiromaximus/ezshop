@@ -1,5 +1,7 @@
 package it.polito.ezshop.acceptanceTests;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -10,6 +12,165 @@ import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
 
 public class TestFR5 {
+	
+	@Test
+	public void testDefineCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException
+	{
+		EZShopInterface ezshop = new EZShop();
+		//loggedUser = null -> throw UnauthorizedException
+		try 
+		{
+			ezshop.defineCustomer("Giovanni");
+			fail("Expected an UnauthorizedException to be thrown");
+		}catch(UnauthorizedException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//customerName = null -> throw InvalidCustomerNameException 
+		ezshop = new EZShop();
+		try 
+		{
+			ezshop.createUser("admin", "admin", "Administrator");
+			ezshop.login("admin", "admin");
+			ezshop.defineCustomer(null);
+			fail("Expected an InvalidCustomerNameException to be thrown");
+		}catch(InvalidCustomerNameException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//Insert a customer name which is already present on system -> return -1
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		ezshop.defineCustomer("Gabriele");
+		assertTrue(ezshop.defineCustomer("Gabriele")==-1);
+		
+		//All is good -> return id of customer
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		assertTrue(ezshop.defineCustomer("Mario")>0);
+	}
+	
+	@Test
+	public void testModifyCustomer() throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException
+	{
+		EZShopInterface ezshop = new EZShop();
+		//loggedUser = null -> throw UnauthorizedException
+		try 
+		{
+			ezshop.modifyCustomer(null, null, null);
+			fail("Expected an UnauthorizedException to be thrown");
+		}catch(UnauthorizedException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//customerName = null -> throw InvalidCustomerNameException 
+		ezshop = new EZShop();
+		try
+		{
+			ezshop = new EZShop();
+			ezshop.createUser("admin", "admin", "Administrator");
+			ezshop.login("admin", "admin");
+			ezshop.defineCustomer("Mario");
+			ezshop.modifyCustomer(1, null, "1111111111");
+			fail("Expected an InvalidCustomerNameException to be thrown");
+		}catch(InvalidCustomerNameException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//customerCard = 123456789 (9 digits) -> throw InvalidCustomerCardException 
+		ezshop = new EZShop();
+		try
+		{
+			ezshop = new EZShop();
+			ezshop.createUser("admin", "admin", "Administrator");
+			ezshop.login("admin", "admin");
+			ezshop.defineCustomer("Mario");
+			ezshop.modifyCustomer(6, "Mario", "123456789");
+			fail("Expected an InvalidCustomerCardException to be thrown");
+		}catch(InvalidCustomerCardException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//customerCard = "" -> return true 
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		ezshop.defineCustomer("Mario");
+		assertTrue(ezshop.modifyCustomer(7, "Mario", ""));
+		
+		//customerCard = null -> return true 
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		ezshop.defineCustomer("Mario");
+		assertTrue(ezshop.modifyCustomer(8, "Mario", null));
+		
+		//customerCard already assigned to another user -> return false
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		ezshop.defineCustomer("Mario");
+		ezshop.modifyCustomer(10, "Mario", "0123456789");
+		ezshop.defineCustomer("Salvatore");
+		assertFalse(ezshop.modifyCustomer(11, "Salvatore", "0123456789"));
+		
+		//All is good -> return true
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		ezshop.defineCustomer("Mario");
+		assertTrue(ezshop.modifyCustomer(11, "Giovanni", "7777777777"));		
+		
+	}
+	
+	@Test
+	public void testDeleteCustomer() throws InvalidCustomerIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidCustomerNameException
+	{
+		EZShopInterface ezshop = new EZShop();
+		//loggedUser = null -> throw UnauthorizedException
+		try 
+		{
+			ezshop.deleteCustomer(null);
+			fail("Expected an UnauthorizedException to be thrown");
+		}catch(UnauthorizedException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//loggedUser = null -> throw InvalidCustomerIdException
+		ezshop = new EZShop();
+		try 
+		{
+			ezshop.createUser("admin", "admin", "Administrator");
+			ezshop.login("admin", "admin");
+			ezshop.deleteCustomer(-1);
+			fail("Expected an InvalidCustomerIdException to be thrown");
+		}catch(InvalidCustomerIdException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//customerId does not exist -> return false
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		assertFalse(ezshop.deleteCustomer(35171));
+		
+		//All is good -> return true
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		ezshop.defineCustomer("Giovanni");
+		assertTrue(ezshop.deleteCustomer(13));
+		
+	}
 	
 	@SuppressWarnings("unused")
 	@Test

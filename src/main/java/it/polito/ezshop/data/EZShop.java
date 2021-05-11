@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 public class EZShop implements EZShopInterface {
 	
+	//TODO: change all ClassX to ClassXImpl
 	/* Sale Transactions */
 	private HashMap<Integer, SaleTransaction> openedSaleTransactions = new HashMap<Integer, SaleTransaction>();
 	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
@@ -1310,7 +1311,8 @@ public class EZShop implements EZShopInterface {
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager")))
     		throw new UnauthorizedException();
-    	
+    	//TODO: refactor this method
+    	//TODO: add getBalanceOperation to orders, sales and returns
     	final LocalDate fromFinal;
     	final LocalDate toFinal;
     	Collection<BalanceOperation> orders = this.orders.values().stream().filter((Order o) -> o.getStatus().equals("PAYED")).map(OrderImpl.mapToBalanceOperation()).collect(Collectors.toSet());

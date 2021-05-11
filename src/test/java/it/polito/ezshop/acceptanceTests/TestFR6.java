@@ -4,9 +4,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.junit.Test;
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
@@ -684,7 +681,8 @@ public class TestFR6 {
 		Integer productId = ezShop.createProductType("Lenovo Yoga Slim 7", "1845678901001", 1000.0, "Notebook");
 		ezShop.updatePosition(productId, "001-abcd-003");		
 		ezShop.updateQuantity(productId, 10);
-		Integer productId2 = ezShop.createProductType("Samsung A52", "8806090987977", 400.0, "Smartphone");
+		
+		ezShop.createProductType("Samsung A52", "8806090987977", 400.0, "Smartphone");
 		ezShop.updatePosition(productId, "002-abcd-003");		
 		ezShop.updateQuantity(productId, 10);
 		
@@ -842,18 +840,21 @@ public class TestFR6 {
 		
 		try {
 			ezShop.deleteReturnTransaction(0);
+			fail();
 		} catch (InvalidTransactionIdException e) {
 			// pass
 		}
 		
 		try {
 			ezShop.deleteReturnTransaction(-1);
+			fail();
 		} catch (InvalidTransactionIdException e) {
 			// pass
 		}
 		
 		try {
 			ezShop.deleteReturnTransaction(null);
+			fail();
 		} catch (InvalidTransactionIdException e) {
 			// pass
 		}

@@ -1,5 +1,6 @@
 package it.polito.ezshop.acceptanceTests;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -568,5 +569,237 @@ public class TestFR6 {
 		assertTrue(ret);
 		
 		return;
+	}
+	
+	@Test
+	public void testGetSaleTransaction() throws InvalidTransactionIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException {
+		EZShopInterface ezShop = new EZShop();
+
+		try {
+			ezShop.getSaleTransaction(0);
+			fail();
+		}catch(UnauthorizedException e) {
+			//pass
+		}
+
+		
+		ezShop.createUser("ruggero", "password", "Administrator");
+		ezShop.login("ruggero", "password");
+		Integer id = ezShop.createProductType("Lenovo Yoga Slim 7", "1845678901001", 1000.0, "Notebook");
+		ezShop.updatePosition(id, "001-abcd-003");		
+		ezShop.updateQuantity(id, 2);
+		
+		id = ezShop.startSaleTransaction();
+		ezShop.addProductToSale(id, "1845678901001", 1);
+		assertTrue(ezShop.getSaleTransaction(id) == null);
+		ezShop.endSaleTransaction(id);
+		assertTrue(ezShop.getSaleTransaction(id) != null);
+		
+		try {
+			ezShop.getSaleTransaction(0);
+			fail();
+		}catch(InvalidTransactionIdException e) {
+			//pass
+		}
+		
+		try {
+			ezShop.getSaleTransaction(-1);
+			fail();
+		}catch(InvalidTransactionIdException e) {
+			//pass
+		}
+		
+		try {
+			ezShop.getSaleTransaction(null);
+			fail();
+		}catch(InvalidTransactionIdException e) {
+			//pass
+		}
+	}
+	
+	@Test
+	public void testStartReturnTransaction() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidTransactionIdException, InvalidQuantityException, InvalidPaymentException {
+		EZShopInterface ezShop = new EZShop();
+		
+		try {
+			ezShop.startReturnTransaction(1);
+			fail();
+		}catch(UnauthorizedException e) {
+			//pass
+		}
+		
+		ezShop.createUser("ruggero", "password", "Administrator");
+		ezShop.login("ruggero", "password");
+		
+		try {
+			ezShop.startReturnTransaction(0);
+			fail();
+		}catch(InvalidTransactionIdException e) {
+			//pass;
+		}
+		
+		try {
+			ezShop.startReturnTransaction(-1);
+			fail();
+		}catch(InvalidTransactionIdException e) {
+			//pass;
+		}
+		
+		try {
+			ezShop.startReturnTransaction(null);
+			fail();
+		}catch(InvalidTransactionIdException e) {
+			//pass;
+		}
+		
+		assertTrue(ezShop.startReturnTransaction(1) == -1);
+		
+		Integer productId = ezShop.createProductType("Lenovo Yoga Slim 7", "1845678901001", 1000.0, "Notebook");
+		ezShop.updatePosition(productId, "001-abcd-003");		
+		ezShop.updateQuantity(productId, 10);
+		Integer saleId = ezShop.startSaleTransaction();
+		ezShop.addProductToSale(saleId, "1845678901001", 2);
+		ezShop.endSaleTransaction(saleId);
+		ezShop.receiveCashPayment(saleId, 2000.0);
+		
+		assertTrue(ezShop.startReturnTransaction(saleId) >= 0);
+	}
+	
+	@Test
+	public void testReturnProduct() throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidPaymentException {
+		EZShopInterface ezShop = new EZShop();
+		
+		try {
+			ezShop.returnProduct(0, null, 0);
+			fail();
+		}catch(UnauthorizedException e) {
+			//pass
+		}
+		
+		ezShop.createUser("ruggero", "password", "Administrator");
+		ezShop.login("ruggero", "password");
+		Integer productId = ezShop.createProductType("Lenovo Yoga Slim 7", "1845678901001", 1000.0, "Notebook");
+		ezShop.updatePosition(productId, "001-abcd-003");		
+		ezShop.updateQuantity(productId, 10);
+		Integer productId2 = ezShop.createProductType("Samsung A52", "8806090987977", 400.0, "Smartphone");
+		ezShop.updatePosition(productId, "002-abcd-003");		
+		ezShop.updateQuantity(productId, 10);
+		
+		Integer saleId = ezShop.startSaleTransaction();
+		ezShop.addProductToSale(saleId, "1845678901001", 3);
+		ezShop.endSaleTransaction(saleId);
+		ezShop.receiveCashPayment(saleId, 3000.0);
+		
+		Integer returnId = ezShop.startReturnTransaction(saleId);
+		
+		try {
+			ezShop.returnProduct(-1, null, 0);
+		} catch (InvalidTransactionIdException e){
+			//pass
+		}
+		
+		try {
+			ezShop.returnProduct(0, null, 0);
+		} catch (InvalidTransactionIdException e){
+			//pass
+		}
+		
+		try {
+			ezShop.returnProduct(null, null, 0);
+		} catch (InvalidTransactionIdException e){
+			//pass
+		}
+		
+		try {
+			ezShop.returnProduct(returnId, "", 1);
+		} catch (InvalidProductCodeException e) {
+			//pass
+		}
+		
+		try {
+			ezShop.returnProduct(returnId, null, 1);
+		} catch (InvalidProductCodeException e) {
+			//pass
+		}
+		
+		try {
+			ezShop.returnProduct(returnId, "123", 1);
+		} catch (InvalidProductCodeException e) {
+			//pass
+		}
+		
+		try {
+			ezShop.returnProduct(returnId, "1845678901001", 0);
+		} catch (InvalidQuantityException e) {
+			//pass
+		}
+		
+		try {
+			ezShop.returnProduct(returnId, "1845678901001", -1);
+		} catch (InvalidQuantityException e) {
+			//pass
+		}
+		
+		// product does not exists
+		assertFalse(ezShop.returnProduct(returnId, "8015696020203", 1));
+		// product was not in the transiction
+		assertFalse(ezShop.returnProduct(returnId, "8806090987977", 1));
+		// amount is higher thant the one in the sale transaction
+		assertFalse(ezShop.returnProduct(returnId, "1845678901001", 4));
+		// transaction does not exist
+		assertFalse(ezShop.returnProduct(100, "1845678901001", 1));
+		
+		// operation successfull
+		assertTrue(ezShop.returnProduct(returnId, "1845678901001", 1));
+		// i try to add again the same product with an higher amount
+		// should return true but set the amount to return equals to the amount
+		// in the sale transaction
+		assertTrue(ezShop.returnProduct(returnId, "1845678901001", 3));
+	}
+	
+	@Test
+	public void testEndReturnTransaction() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidTransactionIdException, InvalidPaymentException, InvalidQuantityException {
+		EZShopInterface ezShop = new EZShop();
+		
+		try {
+			ezShop.endReturnTransaction(null, false);
+		} catch (UnauthorizedException e) {
+			// pass
+		}
+		ezShop.createUser("ruggero", "password", "Administrator");
+		ezShop.login("ruggero", "password");
+		Integer productId = ezShop.createProductType("Lenovo Yoga Slim 7", "1845678901001", 1000.0, "Notebook");
+		ezShop.updatePosition(productId, "001-abcd-003");		
+		ezShop.updateQuantity(productId, 10);
+		
+		Integer saleId = ezShop.startSaleTransaction();
+		ezShop.addProductToSale(saleId, "1845678901001", 3);
+		ezShop.endSaleTransaction(saleId);
+		ezShop.receiveCashPayment(saleId, 3000.0);
+		
+		Integer returnId = ezShop.startReturnTransaction(saleId);
+		ezShop.returnProduct(returnId, "1845678901001", 1);
+		
+		try {
+			ezShop.endReturnTransaction(0, false);
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			//pass;
+		}
+		
+		try {
+			ezShop.endReturnTransaction(-1, false);
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			//pass;
+		}
+		
+		try {
+			ezShop.endReturnTransaction(null, false);
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			//pass;
+		}
+		
 	}
 }

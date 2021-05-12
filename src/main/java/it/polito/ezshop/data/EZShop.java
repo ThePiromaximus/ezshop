@@ -814,9 +814,7 @@ public class EZShop implements EZShopInterface {
     		throw new InvalidCustomerCardException();
     	
     	List<Customer> customersList = getAllCustomers();
-    	// If the db is not reachable, return an empty string
-    	if(customersList == null)
-    		return false;
+
     	// Check if no other customer is using the same card and if the customer exists. If true, assign the card
     	if(customersList.stream().filter(c -> customerCard.equals(c.getCustomerCard())).count() == 0 && customers.containsKey(customerId)) {
 			customers.get(customerId).setCustomerCard(customerCard);
@@ -834,9 +832,6 @@ public class EZShop implements EZShopInterface {
     		throw new InvalidCustomerCardException();
     	
     	List<Customer> customersList = getAllCustomers();
-    	// If the db is not reachable, return an empty string
-    	if(customersList == null)
-    		return false;
     	
     	if(customersList.stream().filter(c -> customerCard.equals(c.getCustomerCard())).count() == 1) {
     		Customer tmp = customersList.stream().filter(c -> customerCard.equals(c.getCustomerCard()))

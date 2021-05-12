@@ -90,8 +90,8 @@ public class TestFR5 {
 			ezshop = new EZShop();
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
-			ezshop.defineCustomer("Mario");
-			ezshop.modifyCustomer(6, "Mario", "123456789");
+			Integer costumerId = ezshop.defineCustomer("Mario");
+			ezshop.modifyCustomer(costumerId, "Mario", "123456789");
 			fail("Expected an InvalidCustomerCardException to be thrown");
 		}catch(InvalidCustomerCardException e)
 		{
@@ -102,15 +102,15 @@ public class TestFR5 {
 		ezshop = new EZShop();
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.defineCustomer("Mario");
-		assertTrue(ezshop.modifyCustomer(7, "Mario", ""));
+		Integer costumerId = ezshop.defineCustomer("Mario");
+		assertTrue(ezshop.modifyCustomer(costumerId, "Mario", ""));
 		
 		//customerCard = null -> return true 
 		ezshop = new EZShop();
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.defineCustomer("Mario");
-		assertTrue(ezshop.modifyCustomer(8, "Mario", null));
+		costumerId = ezshop.defineCustomer("Mario");
+		assertTrue(ezshop.modifyCustomer(costumerId, "Mario", null));
 		
 		//customerCard already assigned to another user -> return false
 		ezshop = new EZShop();
@@ -118,15 +118,15 @@ public class TestFR5 {
 		ezshop.login("admin", "admin");
 		ezshop.defineCustomer("Mario");
 		ezshop.modifyCustomer(10, "Mario", "0123456789");
-		ezshop.defineCustomer("Salvatore");
-		assertFalse(ezshop.modifyCustomer(11, "Salvatore", "0123456789"));
+		costumerId = ezshop.defineCustomer("Salvatore");
+		assertFalse(ezshop.modifyCustomer(costumerId, "Salvatore", "0123456789"));
 		
 		//All is good -> return true
 		ezshop = new EZShop();
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.defineCustomer("Mario");
-		assertTrue(ezshop.modifyCustomer(11, "Giovanni", "7777777777"));		
+		costumerId = ezshop.defineCustomer("Mario");
+		assertTrue(ezshop.modifyCustomer(costumerId, "Giovanni", "7777777777"));		
 		
 	}
 	
@@ -167,8 +167,8 @@ public class TestFR5 {
 		ezshop = new EZShop();
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.defineCustomer("Giovanni");
-		assertTrue(ezshop.deleteCustomer(13));
+		Integer costumerId = ezshop.defineCustomer("Giovanni");
+		assertTrue(ezshop.deleteCustomer(costumerId));
 		
 	}
 	

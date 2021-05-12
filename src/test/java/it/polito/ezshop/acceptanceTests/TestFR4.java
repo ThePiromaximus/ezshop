@@ -67,9 +67,9 @@ public class TestFR4 {
 		ezshop = new EZShop();
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		System.out.println(ezshop.createProductType("product", "6291041500213", 1, ""));
-		System.out.println(ezshop.updatePosition(25, "1-a-1"));
-		assertTrue(ezshop.updateQuantity(25, 1));
+		Integer productId = ezshop.createProductType("product", "6291041500213", 1, "");
+		ezshop.updatePosition(productId, "001-abcd-001");
+		assertTrue(ezshop.updateQuantity(productId, 1));
 		
 		//location = "notWorkingLocation" -> throws InvalidLocationException
 		ezshop = new EZShop();
@@ -360,8 +360,8 @@ public class TestFR4 {
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
 		ezshop.recordBalanceUpdate(10);
-		ezshop.issueOrder("6291041500213", 1, 1);
-		assertTrue(ezshop.payOrder(8));
+		Integer orderId = ezshop.issueOrder("6291041500213", 1, 1);
+		assertTrue(ezshop.payOrder(orderId));
 	}
 	
 	@Test
@@ -388,8 +388,8 @@ public class TestFR4 {
 			ezshop.login("admin", "admin");
 			ezshop.createProductType("product", "000000000000", 1, "");
 			ezshop.recordBalanceUpdate(10);
-			ezshop.payOrderFor("000000000000", 1, 1);
-			ezshop.recordOrderArrival(2);
+			Integer orderId = ezshop.payOrderFor("000000000000", 1, 1);
+			ezshop.recordOrderArrival(orderId);
 			fail("Expected an InvalidLocationException to be thrown");
 		}catch(InvalidLocationException e)
 		{
@@ -419,11 +419,13 @@ public class TestFR4 {
 		ezshop = new EZShop();
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.createProductType("product", "000000000000", 1, "");
-		ezshop.updatePosition(34, "1-a-1");
+
+		Integer productId = ezshop.createProductType("product", "000000000000", 1, "");
+		ezshop.updatePosition(productId, "001-abcd-001");
 		ezshop.recordBalanceUpdate(10);
-		System.out.println(ezshop.payOrderFor("000000000000", 1, 1));
-		assertTrue(ezshop.recordOrderArrival(3));	
+		Integer orderId = ezshop.payOrderFor("000000000000", 1, 1);
+		assertTrue(ezshop.recordOrderArrival(orderId));	
+
 		
 		
 	}

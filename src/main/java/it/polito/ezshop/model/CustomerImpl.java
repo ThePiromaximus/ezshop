@@ -2,6 +2,7 @@ package it.polito.ezshop.model;
 
 public class CustomerImpl implements it.polito.ezshop.data.Customer {
 	private static int PROGRESSIVE_ID = 1;
+	private static int PROGRESSIVE_CARD_ID = 0;
 	
 	private String customerName;
 	private String customerCard;
@@ -56,6 +57,10 @@ public class CustomerImpl implements it.polito.ezshop.data.Customer {
 	@Override
 	public void setPoints(Integer points) {
 		this.points = points;
+	}
+	
+	public static int getProgressiveCard() {
+		return PROGRESSIVE_CARD_ID++;
 	}
 
 }

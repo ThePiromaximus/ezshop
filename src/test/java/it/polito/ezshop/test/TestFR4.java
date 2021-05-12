@@ -1,4 +1,4 @@
-package it.polito.ezshop.acceptanceTests;
+package it.polito.ezshop.test;
 import static org.junit.Assert.*;
 
 import java.util.*;
@@ -6,7 +6,6 @@ import java.util.*;
 import org.junit.Test;
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
-import it.polito.ezshop.model.*;
 
 public class TestFR4 {
 
@@ -445,7 +444,6 @@ public class TestFR4 {
 		}
 		
 		//All is good -> return List of all orders
-		ezshop = new EZShop();
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "000000000000", 1, "");
@@ -453,7 +451,7 @@ public class TestFR4 {
 		ezshop.recordBalanceUpdate(10);
 		ezshop.issueOrder("000000000000", 1, 1);
 		ezshop.issueOrder("6291041500213", 20, 1);
-		List<Order> list = new ArrayList<Order>();
+		List<Order> list = ezshop.getAllOrders();
 		assertNotNull(list);
 		
 	}

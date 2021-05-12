@@ -1,4 +1,4 @@
-package it.polito.ezshop.acceptanceTests;
+package it.polito.ezshop.test;
 import static org.junit.Assert.*;
 
 import java.util.List;
@@ -6,23 +6,41 @@ import java.util.List;
 import org.junit.Test;
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
-import it.polito.ezshop.model.*;
 
-/*
- * @Test
- *	public void testFooThrowsIndexOutOfBoundsException() {
- *	    try {
- *	        foo.doStuff();
- *	        fail("expected exception was not occured.");
- *	    } catch(IndexOutOfBoundsException e) {
- *	        //if execution reaches here, 
- *	        //it indicates this exception was occured.
- *	        //so we need not handle it.
- *	    }
- *	}
- */
+
 public class TestFR1 {
+	
+		@Test
+		public void testLogout() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
+			EZShopInterface EzShop = new EZShop();
+			Integer id = 0;
+			User usr;
+			boolean ret;
 
+			ret = EzShop.logout();
+			assertTrue(!ret);
+			
+			id = EzShop.createUser("Marzio", "password", "Administrator");
+			assertTrue(id > 0);
+			usr = EzShop.login("Marzio", "password");
+			assertTrue(usr != null);
+
+			ret = EzShop.logout();
+			assertTrue(ret);
+			
+			return;
+		}
+		
+		@Test
+		public void testReset() {
+			EZShopInterface EzShop = new EZShop();
+			
+			EzShop.reset();
+			
+			return;
+		}
+
+		@SuppressWarnings("unused")
 		@Test
 		public void testCreateUser() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 			
@@ -116,6 +134,7 @@ public class TestFR1 {
 			
 		}
 		
+		@SuppressWarnings("unused")
 		@Test
 		public void testDeleteUser() throws InvalidUserIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 			
@@ -184,6 +203,7 @@ public class TestFR1 {
 			assertTrue(res);
 		}
 		
+		@SuppressWarnings("unused")
 		@Test
 		public void testGetAllUsers() throws UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException{
 			
@@ -211,8 +231,14 @@ public class TestFR1 {
 				assertNotNull(e);
 			}
 			
+			ezshop.createUser("A", "A", "Administrator");
+			ezshop.login("A", "A");
+			List<User> res = ezshop.getAllUsers();
+			assertNotNull(res);
+			
 	}
 		
+		@SuppressWarnings("unused")
 		@Test
 		public void testGetUser() throws UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidUserIdException{
 			//loggedUser = null -> throws UnauthorizedException
@@ -280,6 +306,7 @@ public class TestFR1 {
 			
 		}
 		
+		@SuppressWarnings("unused")
 		@Test
 		public void testUpdateUserRights() throws InvalidUserIdException, InvalidRoleException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException {
 			
@@ -389,6 +416,7 @@ public class TestFR1 {
 		}
 
 		
+		@SuppressWarnings("unused")
 		@Test
 		public void testLogin() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 			

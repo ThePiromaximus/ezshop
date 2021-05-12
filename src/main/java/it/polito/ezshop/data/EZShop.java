@@ -797,15 +797,8 @@ public class EZShop implements EZShopInterface {
     		throw new UnauthorizedException();
     	
     	List<Customer> customersList = getAllCustomers();
-    	// If the db is not reachable, return an empty string
-    	if(customersList == null)
-    		return "";
     	// Else loop until you generate a unique CardId and return it
-    	while(true) {
-	    	String retCard = UUID.randomUUID().toString();
-	    	if(customersList.stream().filter(c -> !retCard.equals(c.getCustomerCard())).count() == 0)
-	    		return retCard;
-    	}
+    	return String.format("%010d", CustomerImpl.getProgressiveCard());
     }
 
     @Override

@@ -1438,10 +1438,11 @@ public class EZShop implements EZShopInterface {
     	return r;
     }
     
-    //Metodo per arrotondare al multiplo di 10 successivo
+    //Metodo per arrotondare al multiplo di 10 successivo (maggiore)
     //Necessario per la validazione del barcode
     public static int RoundUp(int toRound)
     {
+    	if(toRound<0) return 0;
         if (toRound % 10 == 0) return toRound;
         return (10 - toRound % 10) + toRound;
     }

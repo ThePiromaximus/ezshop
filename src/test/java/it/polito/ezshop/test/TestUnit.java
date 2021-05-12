@@ -17,9 +17,7 @@ public class TestUnit {
 		//barCode = "" -> return false
 		assertFalse(EZShop.barCodeIsValid(""));
 		//barCode = "111111111" (length==9) -> return false
-		assertFalse(EZShop.barCodeIsValid("111111111"));
-		//barCode = "111111111111" (length==12) -> return false
-		assertFalse(EZShop.barCodeIsValid("111111111111"));
+		assertFalse(EZShop.barCodeIsValid("123"));
 		//barCode = "111111111111" (length==12) -> return false
 		assertFalse(EZShop.barCodeIsValid("111111111111"));
 		//barCode = "746299013160" -> return true
@@ -39,6 +37,8 @@ public class TestUnit {
 		//creditCard = null -> return false
 		assertFalse(EZShop.creditCardIsValid(null));
 		//creditCard = "" -> return false
+		assertFalse(EZShop.creditCardIsValid("11111111"));
+		//creditCard = "4194343567131588" -> return true
 		assertTrue(EZShop.creditCardIsValid("4194343567131588"));
 	}
 	
@@ -50,6 +50,8 @@ public class TestUnit {
 		assertTrue(EZShop.RoundUp(0)==0);
 		//toRound = 1 -> return 10
 		assertTrue(EZShop.RoundUp(1)==10);
+		//toRound = -2 -> return 0
+		assertTrue(EZShop.RoundUp(-2)==0);
 	}
 	
 	

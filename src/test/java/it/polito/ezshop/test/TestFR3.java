@@ -1,4 +1,4 @@
-package it.polito.ezshop.acceptanceTests;
+package it.polito.ezshop.test;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;

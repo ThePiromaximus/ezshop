@@ -1,5 +1,5 @@
 package it.polito.ezshop.test;
-
+import static org.junit.Assert.*;
 import static org.junit.Assert.*;
 import java.util.List;
 import org.junit.Test;
@@ -12,22 +12,44 @@ public class TestUnit {
 	@Test
 	public void testBarcodeIsValid() {
 		
+		//barCode = null -> return false
+		assertFalse(EZShop.barCodeIsValid(null));
+		//barCode = "" -> return false
+		assertFalse(EZShop.barCodeIsValid(""));
+		//barCode = "111111111" (length==9) -> return false
+		assertFalse(EZShop.barCodeIsValid("111111111"));
+		//barCode = "111111111111" (length==12) -> return false
+		assertFalse(EZShop.barCodeIsValid("111111111111"));
+		//barCode = "111111111111" (length==12) -> return false
+		assertFalse(EZShop.barCodeIsValid("111111111111"));
+		//barCode = "746299013160" -> return true
+		assertTrue(EZShop.barCodeIsValid("746299013160"));
+		//barCode = "6291041500213" -> return true
+		assertTrue(EZShop.barCodeIsValid("6291041500213"));
+		//barCode = "37181020812812" -> return true
+		assertTrue(EZShop.barCodeIsValid("37181020812812"));
 		
-		return;
+		
 	}
 	
 	@Test
 	public void testCreditCardIsValid() {
-		
-		
-		return;
+		//creditCard = "" -> return false
+		assertFalse(EZShop.creditCardIsValid(""));
+		//creditCard = null -> return false
+		assertFalse(EZShop.creditCardIsValid(null));
+		//creditCard = "" -> return false
+		assertTrue(EZShop.creditCardIsValid("4194343567131588"));
 	}
 	
 	@Test
 	public void testRoundUp() {
-		
-		
-		return;
+		//toRound = 10 -> return 10
+		assertTrue(EZShop.RoundUp(10)==10);
+		//toRound = 0 -> return 0
+		assertTrue(EZShop.RoundUp(0)==0);
+		//toRound = 1 -> return 10
+		assertTrue(EZShop.RoundUp(1)==10);
 	}
 	
 	

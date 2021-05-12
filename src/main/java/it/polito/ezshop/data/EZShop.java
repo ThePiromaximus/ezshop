@@ -1359,7 +1359,10 @@ public class EZShop implements EZShopInterface {
     
     //Metodo per verificare la validità di un barcode
     // https://www.gs1.org/services/how-calculate-check-digit-manually
-    private static boolean barCodeIsValid(String barCode) {
+    public static boolean barCodeIsValid(String barCode) {
+    	if(barCode==null)
+    		return false;
+    	
     	int bcSize = barCode.length();
     	boolean r = false;
     	
@@ -1437,14 +1440,14 @@ public class EZShop implements EZShopInterface {
     
     //Metodo per arrotondare al multiplo di 10 successivo
     //Necessario per la validazione del barcode
-    private static int RoundUp(int toRound)
+    public static int RoundUp(int toRound)
     {
         if (toRound % 10 == 0) return toRound;
         return (10 - toRound % 10) + toRound;
     }
     
     // https://www.geeksforgeeks.org/luhn-algorithm/
-    private static boolean creditCardIsValid(String creditCard) {
+    public static boolean creditCardIsValid(String creditCard) {
     	if(creditCard == null || creditCard.isEmpty())
     		return false;
     	

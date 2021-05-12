@@ -11,6 +11,7 @@ import it.polito.ezshop.exceptions.*;
 
 public class TestFR3 {
 	
+	@SuppressWarnings("unused")
 	@Test 
 	public void testCreateProductType() throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 		
@@ -120,6 +121,7 @@ public class TestFR3 {
 		
 
 }
+	@SuppressWarnings("unused")
 	@Test 
 	public void testUpdateProduct() throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 		
@@ -264,6 +266,7 @@ public class TestFR3 {
 
 	}
 	
+	@SuppressWarnings("unused")
 	@Test 
 	public void testDeleteProductType() throws InvalidProductIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException {
 		
@@ -346,6 +349,7 @@ public class TestFR3 {
 		assertTrue(res);
 	}
 	
+	@SuppressWarnings("unused")
 	@Test
 	public void testGetAllProductTypes() throws UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException{
 		//loggedUser = null -> throws UnauthorizedException

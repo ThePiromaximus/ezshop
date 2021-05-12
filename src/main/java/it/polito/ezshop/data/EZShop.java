@@ -391,7 +391,7 @@ public class EZShop implements EZShopInterface {
     	if(this.loggedUser==null || this.loggedUser.getRole().equals("Cashier"))
     		throw new UnauthorizedException();
     	
-    	if(productId>0 && productId!=null)
+    	if(productId!=null && productId>0)
     	{
     		if(newPos.matches("[0-9]+[-][a-zA-Z]+[-][0-9]+"))
     		{

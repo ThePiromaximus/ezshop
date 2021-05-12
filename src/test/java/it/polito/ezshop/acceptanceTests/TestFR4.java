@@ -67,9 +67,9 @@ public class TestFR4 {
 		ezshop = new EZShop();
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.createProductType("product", "6291041500213", 1, "");
-		ezshop.updatePosition(5, "1-a-1");
-		assertTrue(ezshop.updateQuantity(5, 1));
+		System.out.println(ezshop.createProductType("product", "6291041500213", 1, ""));
+		System.out.println(ezshop.updatePosition(25, "1-a-1"));
+		assertTrue(ezshop.updateQuantity(25, 1));
 		
 		//location = "notWorkingLocation" -> throws InvalidLocationException
 		ezshop = new EZShop();
@@ -88,6 +88,7 @@ public class TestFR4 {
 		
 	}
 	
+	@Test
 	public void testUpdatePosition() throws InvalidProductIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidLocationException
 	{
 		//loggedUser = Cashier -> throws UnauthorizedException
@@ -419,9 +420,9 @@ public class TestFR4 {
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "000000000000", 1, "");
-		ezshop.updatePosition(14, "1-a-1");
+		ezshop.updatePosition(34, "1-a-1");
 		ezshop.recordBalanceUpdate(10);
-		ezshop.payOrderFor("000000000000", 1, 1);
+		System.out.println(ezshop.payOrderFor("000000000000", 1, 1));
 		assertTrue(ezshop.recordOrderArrival(3));	
 		
 		

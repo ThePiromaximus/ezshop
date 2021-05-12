@@ -359,8 +359,8 @@ public class TestFR4 {
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
 		ezshop.recordBalanceUpdate(10);
-		ezshop.issueOrder("6291041500213", 1, 1);
-		assertTrue(ezshop.payOrder(8));
+		Integer orderId = ezshop.issueOrder("6291041500213", 1, 1);
+		assertTrue(ezshop.payOrder(orderId));
 	}
 	
 	@Test
@@ -387,8 +387,8 @@ public class TestFR4 {
 			ezshop.login("admin", "admin");
 			ezshop.createProductType("product", "000000000000", 1, "");
 			ezshop.recordBalanceUpdate(10);
-			ezshop.payOrderFor("000000000000", 1, 1);
-			ezshop.recordOrderArrival(2);
+			Integer orderId = ezshop.payOrderFor("000000000000", 1, 1);
+			ezshop.recordOrderArrival(orderId);
 			fail("Expected an InvalidLocationException to be thrown");
 		}catch(InvalidLocationException e)
 		{
@@ -421,8 +421,8 @@ public class TestFR4 {
 		Integer productId = ezshop.createProductType("product", "000000000000", 1, "");
 		ezshop.updatePosition(productId, "001-abcd-001");
 		ezshop.recordBalanceUpdate(10);
-		ezshop.payOrderFor("000000000000", 1, 1);
-		assertTrue(ezshop.recordOrderArrival(3));	
+		Integer orderId = ezshop.payOrderFor("000000000000", 1, 1);
+		assertTrue(ezshop.recordOrderArrival(orderId));	
 		
 		
 	}

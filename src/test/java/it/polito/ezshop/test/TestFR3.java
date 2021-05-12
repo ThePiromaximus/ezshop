@@ -375,6 +375,12 @@ public class TestFR3 {
 		{
 			assertNotNull(e);
 		}
+		
+		ezshop.createUser("A", "A", "Administrator");
+		ezshop.login("A", "A");
+		List<ProductType> res = ezshop.getAllProductTypes();
+		assertNotNull(res);
+		
 	}
 	
 	@Test 

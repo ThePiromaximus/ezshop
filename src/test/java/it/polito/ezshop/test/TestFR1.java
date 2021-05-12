@@ -9,6 +9,36 @@ import it.polito.ezshop.exceptions.*;
 
 
 public class TestFR1 {
+	
+		@Test
+		public void testLogout() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
+			EZShopInterface EzShop = new EZShop();
+			Integer id = 0;
+			User usr;
+			boolean ret;
+
+			ret = EzShop.logout();
+			assertTrue(!ret);
+			
+			id = EzShop.createUser("Marzio", "password", "Administrator");
+			assertTrue(id > 0);
+			usr = EzShop.login("Marzio", "password");
+			assertTrue(usr != null);
+
+			ret = EzShop.logout();
+			assertTrue(ret);
+			
+			return;
+		}
+		
+		@Test
+		public void testReset() {
+			EZShopInterface EzShop = new EZShop();
+			
+			EzShop.reset();
+			
+			return;
+		}
 
 		@SuppressWarnings("unused")
 		@Test
@@ -200,6 +230,11 @@ public class TestFR1 {
 			{
 				assertNotNull(e);
 			}
+			
+			ezshop.createUser("A", "A", "Administrator");
+			ezshop.login("A", "A");
+			List<User> res = ezshop.getAllUsers();
+			assertNotNull(res);
 			
 	}
 		

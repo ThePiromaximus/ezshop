@@ -11,9 +11,11 @@ import it.polito.ezshop.exceptions.*;
 public class TestFR6 {
 	
 	@Test
-	public void testStartSaleTransaction() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException {
+	public void testStartSaleTransaction() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidTransactionIdException, InvalidPaymentException {
 		EZShopInterface EzShop = new EZShop();
-		Integer id = 0;
+		Integer id = 0, id2 = 0, id3 = 0, id4 = 0;
+		double change = 0;
+		boolean ret = false;
 		User usr;
 		
 		try {
@@ -30,6 +32,25 @@ public class TestFR6 {
 		
 		id = EzShop.startSaleTransaction();
 		assertTrue(id > 0);
+		
+		id2 = EzShop.startSaleTransaction();
+		assertTrue(id2 > 0);
+		
+		ret = EzShop.endSaleTransaction(id2);
+		assertTrue(ret);
+		ret = EzShop.deleteSaleTransaction(id);
+		assertTrue(ret);
+		id3 = EzShop.startSaleTransaction();
+		assertTrue(id3 > 0);
+		
+		ret = EzShop.endSaleTransaction(id3);
+		assertTrue(ret);
+		change = EzShop.receiveCashPayment(id3, 1.0);
+		assertTrue(change == 1.0);
+		ret = EzShop.deleteSaleTransaction(id2);
+		assertTrue(ret);
+		id4 = EzShop.startSaleTransaction();
+		assertTrue(id4 > 0);
 		
 		return;
 	}

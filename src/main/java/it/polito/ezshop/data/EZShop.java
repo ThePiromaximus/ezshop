@@ -9,23 +9,22 @@ import java.util.stream.Stream;
 
 public class EZShop implements EZShopInterface {
 	
-	//TODO: change all ClassX to ClassXImpl
 	/* Sale Transactions */
-	private HashMap<Integer, SaleTransaction> openedSaleTransactions = new HashMap<Integer, SaleTransaction>();
-	private HashMap<Integer, SaleTransaction> closedSaleTransactions = new HashMap<Integer, SaleTransaction>();
-	private HashMap<Integer, SaleTransaction> paidSaleTransactions = new HashMap<Integer, SaleTransaction>();
+	private HashMap<Integer, SaleTransactionImpl> openedSaleTransactions = new HashMap<Integer, SaleTransactionImpl>();
+	private HashMap<Integer, SaleTransactionImpl> closedSaleTransactions = new HashMap<Integer, SaleTransactionImpl>();
+	private HashMap<Integer, SaleTransactionImpl> paidSaleTransactions = new HashMap<Integer, SaleTransactionImpl>();
 	/* Return Transactions */
     private HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, ReturnTransactionImpl> closedReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     private HashMap<Integer, ReturnTransactionImpl> paidReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     /* Orders and products */
-	private HashMap<Integer, Order> orders = new HashMap<Integer, Order>();
-	private HashMap<String, ProductType> products = new HashMap<String, ProductType>();
+	private HashMap<Integer, OrderImpl> orders = new HashMap<Integer, OrderImpl>();
+	private HashMap<String, ProductTypeImpl> products = new HashMap<String, ProductTypeImpl>();
     /* Balance operation */
-    private HashMap<Integer, BalanceOperation> balanceOperations = new HashMap<Integer, BalanceOperation>();
+    private HashMap<Integer, BalanceOperationImpl> balanceOperations = new HashMap<Integer, BalanceOperationImpl>();
     /* Users and customers */
-    private HashMap<Integer, User> users = new HashMap<Integer, User>();
-	private HashMap<Integer, Customer> customers = new HashMap<Integer, Customer>();
+    private HashMap<Integer, UserImpl> users = new HashMap<Integer, UserImpl>();
+	private HashMap<Integer, CustomerImpl> customers = new HashMap<Integer, CustomerImpl>();
 
 	
 	/*
@@ -76,7 +75,7 @@ public class EZShop implements EZShopInterface {
 			}
 		}
 		
-		User us = new UserImpl();
+		UserImpl us = new UserImpl();
 		us.setUsername(username);
 		us.setPassword(password);
 		us.setRole(role);
@@ -207,7 +206,7 @@ public class EZShop implements EZShopInterface {
         if(products.containsKey(productCode))
         	return -1;
 		
-		ProductType pt = new ProductTypeImpl();
+		ProductTypeImpl pt = new ProductTypeImpl();
 		pt.setBarCode(productCode);
 		pt.setProductDescription(description);
 		pt.setPricePerUnit(pricePerUnit);
@@ -457,7 +456,7 @@ public class EZShop implements EZShopInterface {
     					return -1;
     				
     				//Creo nuovo ordine e lo aggiungo alla lista
-					Order o = new OrderImpl(productCode, pricePerUnit, quantity);
+					OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
 					orders.put(o.getOrderId(), o);
 					return o.getOrderId();
     			}
@@ -496,7 +495,7 @@ public class EZShop implements EZShopInterface {
 					if(this.balance >= (quantity*pricePerUnit))
 		    		{
 		    			//Creo nuovo ordine e lo aggiungo alla lista
-						Order o = new OrderImpl(productCode, pricePerUnit, quantity);
+						OrderImpl o = new OrderImpl(productCode, pricePerUnit, quantity);
 						o.setStatus("PAYED");
 						orders.put(o.getOrderId(), o);
 		    			//Decremento bilancio
@@ -667,7 +666,7 @@ public class EZShop implements EZShopInterface {
     	
     	if((customerName!=null) && (!customerName.isEmpty()))
     	{
-    		Customer customer = new CustomerImpl(customerName);
+    		CustomerImpl customer = new CustomerImpl(customerName);
     		customers.put(customer.getId(), customer);
     		return customer.getId();
     	}
@@ -876,7 +875,7 @@ public class EZShop implements EZShopInterface {
     	} else {
     		max = Collections.max(openedSaleTransactions.keySet());
     	}
-    	SaleTransaction sale = new SaleTransactionImpl();
+    	SaleTransactionImpl sale = new SaleTransactionImpl();
     	sale.setTicketNumber(max+1);
     	sale.setEntries(new ArrayList<TicketEntry>());
     	openedSaleTransactions.put(max+1, sale);
@@ -1030,7 +1029,7 @@ public class EZShop implements EZShopInterface {
     	if(transactionId == null || transactionId <= 0)
     		throw new InvalidTransactionIdException();
     	
-    	SaleTransaction sale = openedSaleTransactions.get(transactionId);
+    	SaleTransactionImpl sale = openedSaleTransactions.get(transactionId);
 		if(sale == null)
 			return false;
 		
@@ -1213,7 +1212,7 @@ public class EZShop implements EZShopInterface {
     	if(!closedSaleTransactions.containsKey(ticketNumber))
     		return -1;
     	
-    	SaleTransaction st = closedSaleTransactions.get(ticketNumber);
+    	SaleTransactionImpl st = closedSaleTransactions.get(ticketNumber);
     	
     	if(cash < st.getPrice())
     		return -1;
@@ -1246,7 +1245,7 @@ public class EZShop implements EZShopInterface {
         if(!closedSaleTransactions.containsKey(ticketNumber))
     		return false;
         
-        SaleTransaction st = closedSaleTransactions.get(ticketNumber);
+        SaleTransactionImpl st = closedSaleTransactions.get(ticketNumber);
     	closedSaleTransactions.remove(ticketNumber);
     	paidSaleTransactions.put(ticketNumber, st);
     	this.balance += st.getPrice();
@@ -1308,8 +1307,10 @@ public class EZShop implements EZShopInterface {
     	if(toBeAdded + this.balance < 0)
     		return false;
     	
-    	BalanceOperation bp = new BalanceOperationImpl();
+    	BalanceOperationImpl bp = new BalanceOperationImpl();
     	bp.setMoney(toBeAdded);
+    	bp.setType(toBeAdded >= 0 ? "CREDIT" : "DEBIT");
+    	bp.setDate(LocalDate.now());
     	balanceOperations.put(bp.getBalanceId(), bp);
     	
     	this.balance += toBeAdded;
@@ -1320,14 +1321,13 @@ public class EZShop implements EZShopInterface {
     public List<BalanceOperation> getCreditsAndDebits(LocalDate from, LocalDate to) throws UnauthorizedException {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager")))
     		throw new UnauthorizedException();
-    	//TODO: refactor this method
-    	//TODO: add getBalanceOperation to orders, sales and returns
+
     	final LocalDate fromFinal;
     	final LocalDate toFinal;
-    	Collection<BalanceOperation> orders = this.orders.values().stream().filter((Order o) -> o.getStatus().equals("PAYED")).map(OrderImpl.mapToBalanceOperation()).collect(Collectors.toSet());
-    	Collection<BalanceOperation> sales = this.paidSaleTransactions.values().stream().map(SaleTransactionImpl.mapToBalanceOperation()).collect(Collectors.toSet());
-    	Collection<BalanceOperation> returns = this.paidReturnTransactions.values().stream().map(ReturnTransactionImpl.mapToBalanceOperation()).collect(Collectors.toSet());
-    	Collection<BalanceOperation> balanceOperations = this.balanceOperations.values();
+    	Collection<BalanceOperation> orders = this.orders.values().stream().filter((OrderImpl o) -> o.getStatus().equals("PAYED")).map((OrderImpl o) -> o.getBalanceOperation()).collect(Collectors.toSet());
+    	Collection<BalanceOperation> sales = this.paidSaleTransactions.values().stream().map((SaleTransactionImpl s) -> s.getBalanceOperation()).collect(Collectors.toSet());
+    	Collection<BalanceOperation> returns = this.paidReturnTransactions.values().stream().map((ReturnTransactionImpl r) -> r.getBalanceOperation()).collect(Collectors.toSet());
+    	Collection<BalanceOperation> balanceOperations = this.balanceOperations.values().stream().map((BalanceOperationImpl b) -> (BalanceOperation)b).collect(Collectors.toSet());
     	
     	List<BalanceOperation> creditsAndDebits = Stream.concat(orders.stream(),
     													Stream.concat(sales.stream(),
@@ -1341,18 +1341,24 @@ public class EZShop implements EZShopInterface {
     		toFinal = to;
     	}
     	
-    	creditsAndDebits = creditsAndDebits.stream().filter((BalanceOperation bo) -> {
-    		LocalDate date = bo.getDate();
-    		if(fromFinal != null && toFinal != null) {
-    			return (fromFinal.isBefore(date) || fromFinal.equals(date)) && (toFinal.isAfter(date) || toFinal.equals(date));
-    		}
-    		
-    		if(fromFinal == null) {
-    			return toFinal.isAfter(date) || toFinal.equals(date);
-    		}
-    		
-    		return fromFinal.isBefore(date) || toFinal.equals(date);
-    	}).collect(Collectors.toList());
+    	creditsAndDebits = creditsAndDebits.stream()
+    			.filter((BalanceOperation bo) -> {
+		    		LocalDate date = bo.getDate();
+		    		if(fromFinal == null && toFinal == null)
+		    			return true;
+		    		
+		    		if(fromFinal != null && toFinal != null) {
+		    			return (fromFinal.isBefore(date) || fromFinal.equals(date)) && (toFinal.isAfter(date) || toFinal.equals(date));
+		    		}
+		    		
+		    		if(fromFinal == null) {
+		    			return toFinal.isAfter(date) || toFinal.equals(date);
+		    		}
+		    		
+		    		return fromFinal.isBefore(date) || fromFinal.equals(date);
+		    	})
+    			.sorted((BalanceOperation bo1, BalanceOperation bo2) -> bo1.getBalanceId() - bo2.getBalanceId())
+    			.collect(Collectors.toList());
     	return creditsAndDebits;
     }
 

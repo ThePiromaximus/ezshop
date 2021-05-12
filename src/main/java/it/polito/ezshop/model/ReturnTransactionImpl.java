@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Function;
 
 public class ReturnTransactionImpl{
 	private static Integer PROGRESSIVE_ID = 1;
@@ -16,9 +15,13 @@ public class ReturnTransactionImpl{
 	private List<TicketEntry> entries = new ArrayList<TicketEntry>();
 	private double price = 0;
 	private LocalDate date = LocalDate.now();
+	private BalanceOperationImpl balanceOperation = new BalanceOperationImpl();
 	
 	public ReturnTransactionImpl() {
 		this.id = PROGRESSIVE_ID;
+		this.balanceOperation.setDate(date);
+		this.balanceOperation.setType("RETURN");
+		this.balanceOperation.setMoney(0);
 		PROGRESSIVE_ID++;
 	}
 
@@ -50,6 +53,7 @@ public class ReturnTransactionImpl{
 	}
 
 	public void setPrice(double price) {
+		//this.balanceOperation.setMoney(-price);
 		this.price = price;
 	}
 	
@@ -61,13 +65,7 @@ public class ReturnTransactionImpl{
 		return this.date;
 	}
 	
-	public static Function<? super ReturnTransactionImpl, BalanceOperationImpl> mapToBalanceOperation() {
-		return (T) -> {
-			BalanceOperationImpl retBo = new BalanceOperationImpl();
-			retBo.setDate(T.getDate());
-			retBo.setMoney(T.getPrice());
-			retBo.setType("PAYED");
-			return retBo;
-		};
+	public BalanceOperation getBalanceOperation() {
+		return this.balanceOperation;
 	}
 }

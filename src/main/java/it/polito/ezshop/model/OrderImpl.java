@@ -1,7 +1,8 @@
 package it.polito.ezshop.model;
 
 import java.time.LocalDate;
-import java.util.function.Function;
+
+import it.polito.ezshop.data.BalanceOperation;
 
 public class OrderImpl implements it.polito.ezshop.data.Order {
 	
@@ -14,6 +15,7 @@ public class OrderImpl implements it.polito.ezshop.data.Order {
 	private String status;
 	private Integer orderId;
 	private LocalDate date = LocalDate.now();
+	private BalanceOperationImpl balanceOperation = new BalanceOperationImpl();
 	
 	public OrderImpl(String productCode, double pricePerUnit, Integer quantity)
 	{
@@ -28,7 +30,7 @@ public class OrderImpl implements it.polito.ezshop.data.Order {
 		this.productCode = productCode;
 		this.pricePerUnit = pricePerUnit;
 		this.quantity = quantity;
-		
+		this.balanceOperation.setType("ORDER");
 		PROGRESSIVE_ID++;
 	}
 	
@@ -79,6 +81,10 @@ public class OrderImpl implements it.polito.ezshop.data.Order {
 
 	@Override
 	public void setStatus(String status) {
+		if(status != null && status.equals("PAYED")) {
+			this.balanceOperation.setDate(this.getDate());
+			this.balanceOperation.setMoney(-this.quantity*this.getPricePerUnit());
+		}
 		this.status = status;
 	}
 
@@ -95,16 +101,9 @@ public class OrderImpl implements it.polito.ezshop.data.Order {
 	public LocalDate getDate() {
 		return this.date;
 	}
-	
-	public static Function<? super it.polito.ezshop.data.Order, BalanceOperationImpl> mapToBalanceOperation() {
-		return (T) -> {
-			BalanceOperationImpl retBo = new BalanceOperationImpl();
-			OrderImpl F = (OrderImpl) T;
-			retBo.setDate(F.getDate());
-			retBo.setMoney(F.getQuantity()*F.getPricePerUnit());
-			retBo.setType("PAYED");
-			return retBo;
-		};
+
+	public BalanceOperation getBalanceOperation() {
+		return this.balanceOperation;
 	}
 
 }

@@ -4,8 +4,13 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
+
 import org.junit.Test;
 
+import it.polito.ezshop.data.BalanceOperation;
 import it.polito.ezshop.data.EZShop;
 import it.polito.ezshop.data.EZShopInterface;
 import it.polito.ezshop.exceptions.InvalidLocationException;
@@ -56,6 +61,8 @@ public class TestFR8 {
 			} catch (UnauthorizedException e) {
 				//pass
 			}
+			LocalDate from = LocalDate.now().minusDays(5);
+			LocalDate to = LocalDate.now().plusDays(5);
 			
 			ezShop.createUser("ruggero", "password", "Administrator");
 			ezShop.login("ruggero", "password");
@@ -68,9 +75,54 @@ public class TestFR8 {
 			ezShop.endSaleTransaction(saleId);
 			ezShop.receiveCashPayment(saleId, 3000.0);
 			
+			List<BalanceOperation> bos = ezShop.getCreditsAndDebits(from, to);
+			Collections.reverse(bos);
+			assertTrue(bos.size() == 1);
+			assertTrue(bos.get(0).getMoney() == 3000.0);
+			assertTrue(bos.get(0).getType().equals("SALE"));
+			
 			Integer returnId = ezShop.startReturnTransaction(saleId);
+			Collections.reverse(bos);
 			ezShop.returnProduct(returnId, "1845678901001", 1);
 			ezShop.endReturnTransaction(returnId, true);
+			ezShop.returnCashPayment(returnId);
+			
+			bos = ezShop.getCreditsAndDebits(from, to);
+			Collections.reverse(bos);
+			assertTrue(bos.size() == 2);
+			assertTrue(bos.get(0).getMoney() == 0);
+			assertTrue(bos.get(0).getType().equals("RETURN"));
+			
+			ezShop.payOrderFor("1845678901001", 2, 700.0);
+			bos = ezShop.getCreditsAndDebits(from, to);
+			Collections.reverse(bos);
+			assertTrue(bos.size() == 3);
+			assertTrue(bos.get(0).getMoney() == -1400.0);
+			assertTrue(bos.get(0).getType().equals("ORDER"));
+			
+			ezShop.recordBalanceUpdate(500.0);
+			bos = ezShop.getCreditsAndDebits(from, to);
+			Collections.reverse(bos);
+			assertTrue(bos.size() == 4);
+			assertTrue(bos.get(0).getMoney() == 500.0);
+			assertTrue(bos.get(0).getType().equals("CREDIT"));
+			
+			ezShop.recordBalanceUpdate(-200.0);
+			bos = ezShop.getCreditsAndDebits(from, to);
+			Collections.reverse(bos);
+			assertTrue(bos.size() == 5);
+			assertTrue(bos.get(0).getMoney() == -200.0);
+			assertTrue(bos.get(0).getType().equals("DEBIT"));
+			
+			double balance = 0;
+			for(BalanceOperation b : bos) {
+				balance += b.getMoney();
+			}
+			assertTrue(balance == ezShop.computeBalance());
+			assertTrue(ezShop.getCreditsAndDebits(LocalDate.now().plusDays(1), null).size() == 0);
+			assertTrue(ezShop.getCreditsAndDebits(null, LocalDate.now().minusDays(1)).size() == 0);
+			assertTrue(ezShop.getCreditsAndDebits(null, null).size() == 5);
+			assertTrue(ezShop.getCreditsAndDebits(to, from).size() == 5);
 		}
 		
 		@Test

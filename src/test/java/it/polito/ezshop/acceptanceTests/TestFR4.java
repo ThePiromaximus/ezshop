@@ -6,7 +6,6 @@ import java.util.*;
 import org.junit.Test;
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
-import it.polito.ezshop.model.*;
 
 public class TestFR4 {
 

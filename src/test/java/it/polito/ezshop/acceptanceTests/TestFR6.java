@@ -133,7 +133,7 @@ public class TestFR6 {
 			ret = EzShop.deleteProductFromSale(1, "122474487139", 1);
 			fail();
 		} catch (UnauthorizedException e) {
-			System.out.println("I got here");
+			//pass
 		}
 		
 		id = EzShop.createUser("Marzio", "password", "Administrator");

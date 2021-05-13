@@ -1,7 +1,11 @@
 package it.polito.ezshop.model;
 
-public class UserImpl implements it.polito.ezshop.data.User {
-	private static Integer PROGRESSIVE_ID = 1;
+public class UserImpl implements it.polito.ezshop.data.User, java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3604756898428141276L;
+	public static Integer PROGRESSIVE_ID = 1;
 	private Integer id;
 	private String username;
 	private String password;

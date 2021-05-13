@@ -2,9 +2,14 @@ package it.polito.ezshop.model;
 
 import java.time.LocalDate;
 
-public class BalanceOperationImpl implements it.polito.ezshop.data.BalanceOperation {
+public class BalanceOperationImpl implements it.polito.ezshop.data.BalanceOperation, java.io.Serializable {
 	
-	private static int PROGRESSIVE_ID = 1;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4723766654100249403L;
+
+	public static int PROGRESSIVE_ID = 1;
 	
 	private int balanceId;
 	private LocalDate date;

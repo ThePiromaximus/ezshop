@@ -25,7 +25,7 @@ import it.polito.ezshop.exceptions.UnauthorizedException;
 public class TestFR7 {
 	@Test
 	public void testReceiveCashPayment() throws InvalidTransactionIdException, InvalidPaymentException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException {
-		EZShopInterface ezShop = new EZShop();
+		EZShopInterface ezShop = new EZShop(0);
 		
 		try {
 			ezShop.receiveCashPayment(null, 0);
@@ -88,7 +88,7 @@ public class TestFR7 {
 	
 	@Test
 	public void testReceiveCreditCardPayment() throws InvalidTransactionIdException, InvalidCreditCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException {
-		EZShopInterface ezShop = new EZShop();
+		EZShopInterface ezShop = new EZShop(0);
 		
 		try {
 			ezShop.receiveCreditCardPayment(null, null);
@@ -157,7 +157,7 @@ public class TestFR7 {
 	
 	@Test
 	public void testReturnCashPayment() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductIdException, UnauthorizedException, InvalidLocationException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, InvalidTransactionIdException, InvalidQuantityException, InvalidPaymentException {
-		EZShopInterface ezShop = new EZShop();
+		EZShopInterface ezShop = new EZShop(0);
 		
 		try {
 			ezShop.returnCashPayment(null);
@@ -212,7 +212,7 @@ public class TestFR7 {
 	
 	@Test
 	public void testReturnCreditCardPayment() throws InvalidTransactionIdException, InvalidCreditCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException, InvalidPaymentException {
-		EZShopInterface ezShop = new EZShop();
+		EZShopInterface ezShop = new EZShop(0);
 		
 		try {
 			ezShop.returnCreditCardPayment(null, null);

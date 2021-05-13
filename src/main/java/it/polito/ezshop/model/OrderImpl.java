@@ -4,9 +4,14 @@ import java.time.LocalDate;
 
 import it.polito.ezshop.data.BalanceOperation;
 
-public class OrderImpl implements it.polito.ezshop.data.Order {
+public class OrderImpl implements it.polito.ezshop.data.Order, java.io.Serializable {
 	
-	private static Integer PROGRESSIVE_ID = 1;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -4574389633191223453L;
+
+	public static Integer PROGRESSIVE_ID = 1;
 	
 	private Integer balanceId;
 	private String productCode;

@@ -2,13 +2,20 @@ package it.polito.ezshop.data;
 
 import it.polito.ezshop.exceptions.*;
 import it.polito.ezshop.model.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EZShop implements EZShopInterface {
+public class EZShop implements EZShopInterface, java.io.Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	/* Sale Transactions */
 	private HashMap<Integer, SaleTransactionImpl> openedSaleTransactions = new HashMap<Integer, SaleTransactionImpl>();
 	private HashMap<Integer, SaleTransactionImpl> closedSaleTransactions = new HashMap<Integer, SaleTransactionImpl>();
@@ -33,8 +40,81 @@ public class EZShop implements EZShopInterface {
      */
     private double balance = 0;
     private User loggedUser=null;
+    
+    public EZShop(){
+    	EZShop ezshop = this;
+    	
+    	Runtime.getRuntime().addShutdownHook(new Thread () {
+    		public void run() {
+    			try {
+    	    		File ezshopFile = new File("ezshop.bin");
+    	    		if(!ezshopFile.exists()) {
+    	    			ezshopFile.createNewFile();
+    	    		}
+    				FileOutputStream ezshopFos = new FileOutputStream(ezshopFile, false);
+    				ObjectOutputStream ezshopOos = new ObjectOutputStream(ezshopFos);
+    				ezshopOos.writeObject(ezshop);
+    				ezshopOos.close();
+    				ezshopFos.close();
+    			} catch (Exception e) {
+    				e.printStackTrace();
+    			}
+    		}
+    	});
+    	
+    	
+		File ezshopFile = new File("ezshop.bin");
+		if(!ezshopFile.exists()) {
+			return;
+		}
+    	try {
 
-
+			FileInputStream ezshopFis = new FileInputStream(ezshopFile);
+			ObjectInputStream ezshopOis = new ObjectInputStream(ezshopFis);
+			EZShop ez = (EZShop) ezshopOis.readObject();
+			ezshopOis.close();
+			ezshopFis.close();
+			this.balance = ez.balance;
+			this.loggedUser = ez.loggedUser;
+			this.customers = ez.customers;
+			this.users = ez.users;
+			this.balanceOperations = ez.balanceOperations;
+			this.products = ez.products;
+			this.orders = ez.orders;
+			this.paidReturnTransactions = ez.paidReturnTransactions;
+			this.closedReturnTransactions = ez.closedReturnTransactions;
+			this.paidSaleTransactions = ez.paidSaleTransactions;
+			this.closedSaleTransactions = ez.closedSaleTransactions;
+			
+			if(customers.size() > 0)
+				CustomerImpl.PROGRESSIVE_ID = customers.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(users.size() > 0)
+				UserImpl.PROGRESSIVE_ID = users.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(balanceOperations.size() > 0)
+				BalanceOperationImpl.PROGRESSIVE_ID = balanceOperations.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(products.size() > 0)
+				ProductTypeImpl.PROGRESSIVE_ID = products.values().stream().map((ProductTypeImpl p) -> p.getId()).max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(orders.size() > 0)
+				OrderImpl.PROGRESSIVE_ID = orders.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(closedReturnTransactions.size() > 0 || paidReturnTransactions.size() > 0)
+				ReturnTransactionImpl.PROGRESSIVE_ID = Stream.concat(closedReturnTransactions.keySet().stream(),
+						paidReturnTransactions.keySet().stream()).max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			
+		} catch (Exception e) {
+			ezshopFile.delete();
+		}
+    }
+    
+    public EZShop(int test) {
+    	
+    }
+    
     public void reset() {
     	
     	this.balance = 0;
@@ -796,7 +876,6 @@ public class EZShop implements EZShopInterface {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
     		throw new UnauthorizedException();
     	
-    	List<Customer> customersList = getAllCustomers();
     	// Else loop until you generate a unique CardId and return it
     	return String.format("%010d", CustomerImpl.getProgressiveCard());
     }
@@ -1060,7 +1139,7 @@ public class EZShop implements EZShopInterface {
     	if( transactionId == null|| transactionId <= 0 )
     		throw new InvalidTransactionIdException();
 
-    	return closedSaleTransactions.get(transactionId);
+    	return paidSaleTransactions.get(transactionId);
     }
 
     @Override

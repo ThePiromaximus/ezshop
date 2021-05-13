@@ -16,7 +16,7 @@ public class TestFR3 {
 	public void testCreateProductType() throws InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 		
 		//loggedUser = null -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
 			Integer id = ezshop.createProductType(null, null, 0, null);
@@ -27,7 +27,7 @@ public class TestFR3 {
 		}
 		
 		//loggedUser = Cashier -> throws UnauthorizedException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("cashier", "cashier", "Cashier");
 		ezshop.login("cashier", "cashier");
 		try
@@ -40,7 +40,7 @@ public class TestFR3 {
 		}
 		
 		//productCode = "" -> throws InvalidProductCodeException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -53,7 +53,7 @@ public class TestFR3 {
 		}
 		
 		//productCode = null -> throws InvalidProductCodeException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -66,7 +66,7 @@ public class TestFR3 {
 		}
 		
 		//productDescription = null -> throws InvalidProductDescriptionException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -79,7 +79,7 @@ public class TestFR3 {
 		}
 		
 		//productDescription = ""-> throws InvalidProductDescriptionException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -92,7 +92,7 @@ public class TestFR3 {
 		}
 		
 		//pricePerUnit = 0 -> throws InvalidpricePerUnitException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -105,14 +105,14 @@ public class TestFR3 {
 		}
 		
 		//barCode = "6291041500213 "  -> return id > 0
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		Integer id = ezshop.createProductType("product", "6291041500213", 1, "");
 		assertTrue(id > 0);
 		
 		//barCode = "6291041500213 "  -> BarCode already exists return -1
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
@@ -126,7 +126,7 @@ public class TestFR3 {
 	public void testUpdateProduct() throws InvalidProductIdException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 		
 		//loggedUser = null -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
 			Boolean res = ezshop.updateProduct(null, null, null, 0, null);
@@ -137,7 +137,7 @@ public class TestFR3 {
 		}
 		
 		//loggedUser = Cashier -> throws UnauthorizedException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("cashier", "cashier", "Cashier");
 		ezshop.login("cashier", "cashier");
 		try
@@ -150,7 +150,7 @@ public class TestFR3 {
 		}
 		
 		//productCode = "" -> throws InvalidProductCodeException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -163,7 +163,7 @@ public class TestFR3 {
 		}
 		
 		//productCode = null -> throws InvalidProductCodeException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -176,7 +176,7 @@ public class TestFR3 {
 		}
 		
 		//productDescription = null -> throws InvalidProductDescriptionException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -189,7 +189,7 @@ public class TestFR3 {
 		}
 		
 		//productDescription = "" -> throws InvalidProductDescriptionException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -202,7 +202,7 @@ public class TestFR3 {
 		}
 		
 		//pricePerUnit = 0 -> throws InvalidpricePerUnitException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -215,7 +215,7 @@ public class TestFR3 {
 		}
 		
 		//id = null -> throws InvalidProductIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -228,7 +228,7 @@ public class TestFR3 {
 		}
 		
 		//id = "" -> throws InvalidProductIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -241,7 +241,7 @@ public class TestFR3 {
 		}
 		
 		//modify product with id=2 and valid barCode return true 
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		Integer id = ezshop.createProductType("product", "6291041500213", 1, "");
@@ -249,7 +249,7 @@ public class TestFR3 {
 		assertTrue(res);
 		
 		//modify product with id=3 and barCode that already exists return false 
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		id = ezshop.createProductType("product", "6291041500213", 1, "");
@@ -258,7 +258,7 @@ public class TestFR3 {
 		assertFalse(res);
 		
 		//modify product with id=100 that doesn't exists return false 
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		res = ezshop.updateProduct(100,"product A","0123456789012", 2, "note");
@@ -271,7 +271,7 @@ public class TestFR3 {
 	public void testDeleteProductType() throws InvalidProductIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException {
 		
 		//loggedUser = null -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
 			boolean id = ezshop.deleteProductType(null);
@@ -282,7 +282,7 @@ public class TestFR3 {
 		}
 		
 		//loggedUser = Cashier -> throws UnauthorizedException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("cashier", "cashier", "Cashier");
 		ezshop.login("cashier", "cashier");
 		try
@@ -295,7 +295,7 @@ public class TestFR3 {
 		}
 		
 		//id = null -> throws InvalidProductIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -308,7 +308,7 @@ public class TestFR3 {
 		}
 		
 		//id = "" -> throws InvalidProductIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -321,7 +321,7 @@ public class TestFR3 {
 		}
 		
 		//id = negative number -> throws InvalidUserIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
@@ -334,14 +334,14 @@ public class TestFR3 {
 		}
 		
 		//id = "100"  -> id isn't present return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		boolean res = ezshop.deleteProductType(100);
 		assertFalse(res);
 		
 		//id = "5"  -> id present return true 
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		Integer id = (ezshop.createProductType("product", "6291041500213", 1, ""));
@@ -353,7 +353,7 @@ public class TestFR3 {
 	@Test
 	public void testGetAllProductTypes() throws UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException{
 		//loggedUser = null -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
 			List<ProductType> res = ezshop.getAllProductTypes();
@@ -364,7 +364,7 @@ public class TestFR3 {
 		}
 		
 		//loggedUser = Cashier -> throws UnauthorizedException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("cashierB", "cashier", "Cashier");
 		ezshop.login("cashierB", "cashier");
 		try
@@ -388,10 +388,10 @@ public class TestFR3 {
 	{
 		
 		//loggedUser = null -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
-			ProductType p = ezshop.getProductTypeByBarCode(null);
+			ezshop.getProductTypeByBarCode(null);
 			fail("Expected an UnauthorizedException to be thrown");
 		}catch(UnauthorizedException e)
 		{
@@ -399,12 +399,12 @@ public class TestFR3 {
 		}
 		
 		//barCode = null -> throws InvalidProductCodeException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
 		{
-			ProductType p = ezshop.getProductTypeByBarCode(null);
+			ezshop.getProductTypeByBarCode(null);
 			fail("Expected an InvalidProductCodeException to be thrown");
 		}catch(InvalidProductCodeException e)
 		{
@@ -412,12 +412,12 @@ public class TestFR3 {
 		}
 		
 		//barCode = "" -> throws InvalidProductCodeException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		try
 		{
-			ProductType p = ezshop.getProductTypeByBarCode("");
+			ezshop.getProductTypeByBarCode("");
 			fail("Expected an InvalidProductCodeException to be thrown");
 		}catch(InvalidProductCodeException e)
 		{
@@ -425,7 +425,7 @@ public class TestFR3 {
 		}
 		
 		//barCode = "6291041500213 "  -> return product
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
@@ -433,7 +433,7 @@ public class TestFR3 {
 		assertNotNull(p);
 		
 		//barCode = "6291041500213 " BUT product isnt present -> return product
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		p = ezshop.getProductTypeByBarCode("6291041500213");
@@ -445,11 +445,10 @@ public class TestFR3 {
 	public void testGetProductTypeByDescription() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException
 	{
 		//loggedUser = null -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
-			List<ProductType> l = new ArrayList<ProductType>();
-			l = ezshop.getProductTypesByDescription(null);
+			ezshop.getProductTypesByDescription(null);
 			fail("Expected an UnauthorizedException to be thrown");
 		}catch(UnauthorizedException e)
 		{
@@ -457,7 +456,7 @@ public class TestFR3 {
 		}
 		
 		//description = "product"  -> return list of all products which contains the word "product" in theri description
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product with a name", "6291041500213", 1, "");
@@ -467,7 +466,7 @@ public class TestFR3 {
 		assertTrue(l.size()==2);
 		
 		//description = "I can't find anything"  -> return empty list
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product with a name", "6291041500213", 1, "");
@@ -476,7 +475,7 @@ public class TestFR3 {
 		assertTrue(l.size()==0);
 		
 		//description = null  -> return full list
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product with a name", "6291041500213", 1, "");

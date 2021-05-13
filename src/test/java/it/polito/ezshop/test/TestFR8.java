@@ -30,7 +30,7 @@ public class TestFR8 {
 
 		@Test
 		public void testRecordBalanceUpdate() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException {
-			EZShopInterface ezShop = new EZShop();
+			EZShopInterface ezShop = new EZShop(0);
 			
 			try {
 				ezShop.recordBalanceUpdate(0);
@@ -53,7 +53,7 @@ public class TestFR8 {
 		
 		@Test
 		public void testGetCreditsAndDebits() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductIdException, InvalidLocationException, UnauthorizedException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, InvalidTransactionIdException, InvalidQuantityException, InvalidPaymentException {
-			EZShopInterface ezShop = new EZShop();
+			EZShopInterface ezShop = new EZShop(0);
 			
 			try {
 				ezShop.getCreditsAndDebits(null, null);
@@ -127,7 +127,7 @@ public class TestFR8 {
 		
 		@Test
 		public void testComputeBalance() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, InvalidProductIdException, InvalidLocationException, InvalidTransactionIdException, InvalidPaymentException, InvalidQuantityException {
-			EZShopInterface ezShop = new EZShop();
+			EZShopInterface ezShop = new EZShop(0);
 			
 			try {
 				ezShop.computeBalance();

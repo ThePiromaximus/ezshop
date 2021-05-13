@@ -6,7 +6,11 @@ import java.util.List;
 import it.polito.ezshop.data.BalanceOperation;
 import it.polito.ezshop.data.TicketEntry;
 
-public class SaleTransactionImpl implements it.polito.ezshop.data.SaleTransaction {
+public class SaleTransactionImpl implements it.polito.ezshop.data.SaleTransaction, java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -9109210677396483532L;
 	private Integer ticketNumber;
 	private List<TicketEntry> entries;
 	private double discountRate;

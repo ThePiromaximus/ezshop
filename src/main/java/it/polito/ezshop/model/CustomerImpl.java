@@ -1,8 +1,12 @@
 package it.polito.ezshop.model;
 
-public class CustomerImpl implements it.polito.ezshop.data.Customer {
-	private static int PROGRESSIVE_ID = 1;
-	private static int PROGRESSIVE_CARD_ID = 0;
+public class CustomerImpl implements it.polito.ezshop.data.Customer, java.io.Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -8560560860577292262L;
+	public static int PROGRESSIVE_ID = 1;
+	public static int PROGRESSIVE_CARD_ID = 0;
 	
 	private String customerName;
 	private String customerCard;

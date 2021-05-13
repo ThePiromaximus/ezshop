@@ -118,6 +118,8 @@ public class TestFR3 {
 		ezshop.createProductType("product", "6291041500213", 1, "");
 		id = ezshop.createProductType("product1", "6291041500213", 1, "");
 		assertTrue(id < 0);
+		id = ezshop.createProductType("product2", "122474487139", 1, null);
+		assertTrue(id > 0);
 		
 
 }

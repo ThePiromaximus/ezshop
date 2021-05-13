@@ -349,12 +349,8 @@ public class EZShop implements EZShopInterface {
         		if(product.getId()==productId)
         		{
         			
-        			if(product.getLocation()==null)
-        				return false;
-        			
-        			if(product.getLocation().isEmpty())
-        				return false;
-        			
+        			if(product.getLocation()==null || product.getLocation().isEmpty())
+        				return false;        			
         			
         			if(product.getQuantity()!=null)	
         				newQuantity = product.getQuantity() + toBeAdded;
@@ -1021,10 +1017,8 @@ public class EZShop implements EZShopInterface {
 		if(sale == null)
 			return false;
 		
-		if(closedSaleTransactions.putIfAbsent(transactionId, sale) != null)
-			return false;
-		if(openedSaleTransactions.remove(transactionId) == null)
-			return false;
+		closedSaleTransactions.putIfAbsent(transactionId, sale);
+		openedSaleTransactions.remove(transactionId);
     	
         return true;
     }

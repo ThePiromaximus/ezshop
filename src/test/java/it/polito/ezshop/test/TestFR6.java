@@ -174,7 +174,7 @@ public class TestFR6 {
 		id = EzShop.startSaleTransaction();
 		assertTrue(id > 0);
 		
-		ret = EzShop.addProductToSale(id, "122474487139", 1);
+		ret = EzShop.addProductToSale(id, "122474487139", 2);
 		assertTrue(ret);
 
 		try {
@@ -225,10 +225,10 @@ public class TestFR6 {
 		ret = EzShop.deleteProductFromSale(id+1, "122474487139", 4);
 		assertTrue(!ret);
 		
-		ret = EzShop.deleteProductFromSale(id, "122474487139", 5);
+		ret = EzShop.deleteProductFromSale(id, "122474487139", 1);
 		assertTrue(ret);
 		
-		ret = EzShop.deleteProductFromSale(id, "122474487139", 1);
+		ret = EzShop.deleteProductFromSale(id, "122474487139", 2);
 		assertTrue(ret);
 		
 		return;
@@ -273,6 +273,9 @@ public class TestFR6 {
 		
 		id = EzShop.startSaleTransaction();
 		assertTrue(id > 0);
+		
+		ret = EzShop.addProductToSale(id+1, "122474487139", 1);
+		assertTrue(!ret);
 		
 		ret = EzShop.addProductToSale(id, "122474487139", 1);
 		assertTrue(ret);

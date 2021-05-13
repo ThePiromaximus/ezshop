@@ -43,9 +43,16 @@ public class TestFR4 {
 		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.createProductType("product", "6291041500213", 1, "");
-		ezshop.updatePosition(2, "1-a-1");
-		assertFalse(ezshop.updateQuantity(1, -2));
+		int id = ezshop.createProductType("product", "6291041500213", 1, "");
+		ezshop.updatePosition(id, "1-a-1");
+		assertFalse(ezshop.updateQuantity(id, -10));
+		
+		//final quantity is negative -> return false
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		id = ezshop.createProductType("product", "6291041500213", 1, "");
+		assertFalse(ezshop.updateQuantity(id, 1));
 		
 		//product is not present -> return false
 		ezshop = new EZShop(0);
@@ -94,9 +101,6 @@ public class TestFR4 {
 		EZShop ezshop = new EZShop(0);
 		try
 		{
-			ezshop.createUser("admin", "admin", "Cashier");
-			ezshop.login("admin", "admin");
-			ezshop.createProductType("product", "6291041500213", 1, "");
 			ezshop.updatePosition(1, "1-a-1");
 			fail("Expected an UnauthorizedException to be thrown");
 		}catch(UnauthorizedException e)
@@ -136,10 +140,10 @@ public class TestFR4 {
 		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.createProductType("product", "6291041500213", 1, "");
-		ezshop.updatePosition(4, "1-a-1");
-		ezshop.createProductType("another product", "0000000000000", 1, "");
-		assertFalse(ezshop.updatePosition(5, "1-a-1"));
+		int id = ezshop.createProductType("product", "6291041500213", 1, "");
+		ezshop.updatePosition(id, "1-a-1");
+		id = ezshop.createProductType("another product", "0000000000000", 1, "");
+		assertFalse(ezshop.updatePosition(id, "1-a-1"));
 		
 		//product does not exist -> return false
 		ezshop = new EZShop(0);
@@ -349,9 +353,17 @@ public class TestFR4 {
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
 		ezshop.recordBalanceUpdate(10);
-		ezshop.issueOrder("6291041500213", 1, 1);
-		ezshop.payOrder(3);
+		Integer orderId = ezshop.issueOrder("6291041500213", 1, 1);
+		ezshop.payOrder(orderId);
 		assertFalse(ezshop.payOrder(3));
+		
+		//Not enough balance to pay for order -> return false
+		ezshop = new EZShop();
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		ezshop.createProductType("product", "6291041500213", 1, "");
+		orderId = ezshop.issueOrder("6291041500213", 1, 1);
+		assertFalse(ezshop.payOrder(orderId));
 		
 		//All is good -> return true
 		ezshop = new EZShop(0);
@@ -359,8 +371,9 @@ public class TestFR4 {
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
 		ezshop.recordBalanceUpdate(10);
-		Integer orderId = ezshop.issueOrder("6291041500213", 1, 1);
+		orderId = ezshop.issueOrder("6291041500213", 1, 1);
 		assertTrue(ezshop.payOrder(orderId));
+		assertFalse(ezshop.payOrder(orderId));
 	}
 	
 	@Test

@@ -429,12 +429,8 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         		if(product.getId()==productId)
         		{
         			
-        			if(product.getLocation()==null)
-        				return false;
-        			
-        			if(product.getLocation().isEmpty())
-        				return false;
-        			
+        			if(product.getLocation()==null || product.getLocation().isEmpty())
+        				return false;        			
         			
         			if(product.getQuantity()!=null)	
         				newQuantity = product.getQuantity() + toBeAdded;
@@ -933,6 +929,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     		if(closedSaleTransactions.isEmpty()) {
     			if(paidSaleTransactions.isEmpty()) {
     				max = 1;
+    				return max;
     			} else {
     				max = Collections.max(paidSaleTransactions.keySet());
     			}
@@ -1100,10 +1097,8 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 		if(sale == null)
 			return false;
 		
-		if(closedSaleTransactions.putIfAbsent(transactionId, sale) != null)
-			return false;
-		if(openedSaleTransactions.remove(transactionId) == null)
-			return false;
+		closedSaleTransactions.putIfAbsent(transactionId, sale);
+		openedSaleTransactions.remove(transactionId);
     	
         return true;
     }

@@ -41,6 +41,8 @@ public class TestUnit {
 		assertFalse(EZShop.creditCardIsValid("11111111"));
 		//creditCard = "4194343567131588" -> return true
 		assertTrue(EZShop.creditCardIsValid("4194343567131588"));
+		//creditCard = "41943435671315883" -> return false
+		assertFalse(EZShop.creditCardIsValid("41943435671315883"));
 	}
 	
 	@Test

@@ -20,6 +20,10 @@ public class TestUnit {
 		assertFalse(EZShop.barCodeIsValid("123"));
 		//barCode = "111111111111" (length==12) -> return false
 		assertFalse(EZShop.barCodeIsValid("111111111111"));
+		//barCode = "111111111111" (length==13) -> return false
+		assertFalse(EZShop.barCodeIsValid("1111111111111"));
+		//barCode = "111111111111" (length==14) -> return false
+		assertFalse(EZShop.barCodeIsValid("11111111111111"));
 		//barCode = "746299013160" -> return true
 		assertTrue(EZShop.barCodeIsValid("746299013160"));
 		//barCode = "6291041500213" -> return true

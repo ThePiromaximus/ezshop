@@ -1369,9 +1369,6 @@ public class EZShop implements EZShopInterface {
     	if(barCode.matches("[0-9]{12,14}"))
     	{
     		//Il bar code deve essere una stringa composta da numeri
-    	
-	    	if( (bcSize == 12) || (bcSize == 13) || (bcSize == 14) )
-	    	{
 	    		int sum = 0;
 	    		int mul; //Può essere 1 o 3
 	    		int digit; 
@@ -1425,15 +1422,6 @@ public class EZShop implements EZShopInterface {
 	    		}
 	    		
 	    	}
-	    	else
-	    	{
-	    		r = false;
-	    	}
-    	}
-    	else
-    	{
-    		r = false;
-    	}
     	
     	return r;
     }

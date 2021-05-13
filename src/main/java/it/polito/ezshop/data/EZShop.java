@@ -850,6 +850,7 @@ public class EZShop implements EZShopInterface {
     		if(closedSaleTransactions.isEmpty()) {
     			if(paidSaleTransactions.isEmpty()) {
     				max = 1;
+    				return max;
     			} else {
     				max = Collections.max(paidSaleTransactions.keySet());
     			}

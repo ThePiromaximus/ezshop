@@ -929,21 +929,20 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     		if(closedSaleTransactions.isEmpty()) {
     			if(paidSaleTransactions.isEmpty()) {
     				max = 1;
-    				return max;
     			} else {
-    				max = Collections.max(paidSaleTransactions.keySet());
+    				max = Collections.max(paidSaleTransactions.keySet()) + 1;
     			}
     		} else {
-    			max = Collections.max(closedSaleTransactions.keySet());
+    			max = Collections.max(closedSaleTransactions.keySet()) + 1;
     		}    			
     	} else {
-    		max = Collections.max(openedSaleTransactions.keySet());
+    		max = Collections.max(openedSaleTransactions.keySet()) + 1;
     	}
     	SaleTransactionImpl sale = new SaleTransactionImpl();
-    	sale.setTicketNumber(max+1);
+    	sale.setTicketNumber(max);
     	sale.setEntries(new ArrayList<TicketEntry>());
-    	openedSaleTransactions.put(max+1, sale);
-    	return (max+1);
+    	openedSaleTransactions.put(max, sale);
+    	return max;
     }
 
     @Override

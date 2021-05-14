@@ -5,6 +5,7 @@ import it.polito.ezshop.model.*;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -32,7 +33,8 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     /* Users and customers */
     private HashMap<Integer, UserImpl> users = new HashMap<Integer, UserImpl>();
 	private HashMap<Integer, CustomerImpl> customers = new HashMap<Integer, CustomerImpl>();
-
+	
+	private HashMap<String, CreditCardImpl> creditCards = new HashMap<String, CreditCardImpl>();
 	
 	/*
      Questa variabile rappresenta il bilancio corrente del sistema (=/= balanceOperation che invece rappresenta una singola operazione)
@@ -43,6 +45,21 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     
     public EZShop(){
     	EZShop ezshop = this;
+    	File creditCardsFile = new File("creditCard.txt");
+    	try {
+			Scanner s = new Scanner(creditCardsFile);
+			while(s.hasNext()) {
+				String line = s.nextLine();
+				if(line.startsWith("#"))
+					continue;
+				String code = line.split(";")[0];
+				Double balance = Double.valueOf(line.split(";")[1]);
+				creditCards.put(code, new CreditCardImpl(code, balance));
+			}
+			s.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
     	
     	Runtime.getRuntime().addShutdownHook(new Thread () {
     		public void run() {
@@ -112,7 +129,21 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     }
     
     public EZShop(int test) {
-    	
+    	File creditCardsFile = new File("creditCard.txt");
+    	try {
+			Scanner s = new Scanner(creditCardsFile);
+			while(s.hasNext()) {
+				String line = s.nextLine();
+				if(line.startsWith("#"))
+					continue;
+				String code = line.split(";")[0];
+				Double balance = Double.valueOf(line.split(";")[1]);
+				creditCards.put(code, new CreditCardImpl(code, balance));
+			}
+			s.close();
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
     }
     
     public void reset() {
@@ -1295,18 +1326,17 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         if(!creditCardIsValid(creditCard))
         	throw new InvalidCreditCardException();
         
-        /* TODO credit card handling
-         * if(!creditsCard.contains(creditCard)
-         * 		return false;
-         * 
-         * here something to check credit card balance and check if it is registered
-         *
-         */
-        
+        if(!creditCards.containsKey(creditCard))
+      		return false;
+
         if(!closedSaleTransactions.containsKey(ticketNumber))
     		return false;
         
         SaleTransactionImpl st = closedSaleTransactions.get(ticketNumber);
+        
+        if (creditCards.get(creditCard).getBalance() < st.getPrice())
+        	return false;
+        
     	closedSaleTransactions.remove(ticketNumber);
     	paidSaleTransactions.put(ticketNumber, st);
     	this.balance += st.getPrice();
@@ -1342,13 +1372,8 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         if(!creditCardIsValid(creditCard))
         	throw new InvalidCreditCardException();
         
-        /* TODO credit card handling
-         * if(!creditsCard.contains(creditCard)
-         * 		return false;
-         * 
-         * here something to check credit card balance and check if it is registered
-         *
-         */
+        if(!creditCards.containsKey(creditCard))
+        		return -1;
         
         if(openedReturnTransactions.containsKey(returnId) || !closedReturnTransactions.containsKey(returnId) || paidReturnTransactions.containsKey(returnId))
         	return -1;

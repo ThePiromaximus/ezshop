@@ -9,10 +9,10 @@ import it.polito.ezshop.exceptions.*;
 
 
 public class TestFR1 {
-	
 		@Test
 		public void testLogout() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 			EZShopInterface EzShop = new EZShop(0);
+
 			Integer id = 0;
 			User usr;
 			boolean ret;
@@ -27,7 +27,6 @@ public class TestFR1 {
 
 			ret = EzShop.logout();
 			assertTrue(ret);
-			
 			return;
 		}
 		

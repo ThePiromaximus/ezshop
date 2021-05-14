@@ -149,8 +149,13 @@ public class TestFR7 {
 			// pass
 		}
 		double oldBalance = ezShop.computeBalance();
+		//non existing id
 		assertFalse(ezShop.receiveCreditCardPayment(100, "5555555555554444"));
-		//check if returns false when card has not enough money or is not registered
+		//card with not enough money
+		assertFalse(ezShop.receiveCreditCardPayment(saleId, "0000000000000000"));
+		//card not registered
+		assertFalse(ezShop.receiveCreditCardPayment(saleId, "4111111111111111"));
+		//ok
 		assertTrue(ezShop.receiveCreditCardPayment(saleId, "5555555555554444"));
 		assertTrue(ezShop.computeBalance() == (oldBalance + 3000.0));
 	}
@@ -280,8 +285,8 @@ public class TestFR7 {
 		}
 		
 		assertTrue(ezShop.returnCreditCardPayment(100, "5555555555554444") == -1);
-		// check if card exists
-		
+		// non existing card
+		assertFalse(ezShop.receiveCreditCardPayment(saleId, "4111111111111111"));
 		// correct behavior
 		double oldBalance = ezShop.computeBalance();
 		assertTrue(ezShop.returnCreditCardPayment(returnId, "5555555555554444") == 1000.0);

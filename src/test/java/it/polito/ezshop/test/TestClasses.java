@@ -130,5 +130,12 @@ public class TestClasses {
 		assertTrue(ui.getPassword() == null);
 		assertTrue(ui.getRole() == null);
 		assertTrue(ui.getUsername() == null);
+		
+		CreditCardImpl cci = new CreditCardImpl(null, null);
+		cci.setBalance(null);
+		cci.setCode(null);
+		
+		assertTrue(cci.getBalance() == null);
+		assertTrue(cci.getCode() == null);
 	}
 }

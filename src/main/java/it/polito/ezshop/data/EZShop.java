@@ -58,7 +58,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			}
 			s.close();
 		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+
 		}
     	
     	Runtime.getRuntime().addShutdownHook(new Thread () {
@@ -74,7 +74,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     				ezshopOos.close();
     				ezshopFos.close();
     			} catch (Exception e) {
-    				e.printStackTrace();
+
     			}
     		}
     	});
@@ -142,7 +142,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			}
 			s.close();
 		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
+
 		}
     }
     
@@ -463,10 +463,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         			if(product.getLocation()==null || product.getLocation().isEmpty())
         				return false;        			
         			
-        			if(product.getQuantity()!=null)	
-        				newQuantity = product.getQuantity() + toBeAdded;
-        			else
-        				newQuantity = toBeAdded;
+        			newQuantity = product.getQuantity() + toBeAdded;
     				
         			if(newQuantity>=0)
         			{
@@ -700,10 +697,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 	    				String barCode = p.getBarCode();
 	    				int oldQuantity;
 	    				
-	    				if(p.getQuantity()==null)
-	    					oldQuantity = 0;
-	    				else 
-	    					oldQuantity = p.getQuantity();
+	    				oldQuantity = p.getQuantity();
 	    				
 	    				int quantityToAdd = o.getQuantity();
 	    				products.get(barCode).setQuantity(oldQuantity + quantityToAdd);

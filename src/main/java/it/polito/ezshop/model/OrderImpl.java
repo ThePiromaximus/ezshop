@@ -16,7 +16,7 @@ public class OrderImpl implements it.polito.ezshop.data.Order, java.io.Serializa
 	private Integer balanceId;
 	private String productCode;
 	private double pricePerUnit;
-	private int quantity;
+	private int quantity = 0;
 	private String status;
 	private Integer orderId;
 	private LocalDate date = LocalDate.now();

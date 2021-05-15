@@ -289,7 +289,10 @@ public class TestFR7 {
 		assertFalse(ezShop.receiveCreditCardPayment(saleId, "4111111111111111"));
 		// correct behavior
 		double oldBalance = ezShop.computeBalance();
+		assertTrue(ezShop.returnCreditCardPayment(returnId, "0") == -1);
 		assertTrue(ezShop.returnCreditCardPayment(returnId, "5555555555554444") == 1000.0);
 		assertTrue(ezShop.computeBalance() == (oldBalance-1000.0));
+		
+		
 	}
 }

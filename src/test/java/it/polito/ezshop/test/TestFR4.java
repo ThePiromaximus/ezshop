@@ -48,7 +48,7 @@ public class TestFR4 {
 		assertFalse(ezshop.updateQuantity(id, -10));
 		
 		//final quantity is negative -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		id = ezshop.createProductType("product", "6291041500213", 1, "");
@@ -434,8 +434,12 @@ public class TestFR4 {
 
 		Integer productId = ezshop.createProductType("product", "000000000000", 1, "");
 		ezshop.updatePosition(productId, "001-abcd-001");
-		ezshop.recordBalanceUpdate(10);
-		Integer orderId = ezshop.payOrderFor("000000000000", 1, 1);
+		ezshop.recordBalanceUpdate(10);	
+		Integer orderId = ezshop.issueOrder("000000000000", 1, 1);
+		assertFalse(ezshop.recordOrderArrival(orderId));
+		assertFalse(ezshop.recordOrderArrival(orderId));
+		assertTrue(ezshop.payOrder(orderId));
+		assertTrue(ezshop.recordOrderArrival(orderId));	
 		assertTrue(ezshop.recordOrderArrival(orderId));	
 
 		

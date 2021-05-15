@@ -358,7 +358,7 @@ public class TestFR4 {
 		assertFalse(ezshop.payOrder(3));
 		
 		//Not enough balance to pay for order -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");

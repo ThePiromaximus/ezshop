@@ -949,7 +949,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
     		throw new UnauthorizedException();
     	
-    	Integer max;
+    	Integer max = 0;
     	if(openedSaleTransactions.isEmpty()) {
     		if(closedSaleTransactions.isEmpty()) {
     			if(paidSaleTransactions.isEmpty()) {
@@ -1158,7 +1158,10 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if( transactionId == null|| transactionId <= 0 )
     		throw new InvalidTransactionIdException();
 
-    	return paidSaleTransactions.get(transactionId);
+    	SaleTransactionImpl ret = closedSaleTransactions.get(transactionId);
+    	if(ret == null)
+    		ret = paidSaleTransactions.get(transactionId);
+    	return ret;
     }
 
     @Override

@@ -7,6 +7,7 @@ import static org.junit.Assert.fail;
 import org.junit.Test;
 import it.polito.ezshop.data.*;
 import it.polito.ezshop.exceptions.*;
+import it.polito.ezshop.model.SaleTransactionImpl;
 
 public class TestFR6 {
 	
@@ -617,7 +618,7 @@ public class TestFR6 {
 		ezShop.addProductToSale(id, "1845678901001", 1);
 		assertTrue(ezShop.getSaleTransaction(id) == null);
 		ezShop.endSaleTransaction(id);
-		assertTrue(ezShop.getSaleTransaction(id) == null);
+		assertTrue(SaleTransaction.class.isInstance(ezShop.getSaleTransaction(id)));
 		ezShop.receiveCashPayment(id, 1000.0);
 		assertTrue(SaleTransaction.class.isInstance(ezShop.getSaleTransaction(id)));
 		try {

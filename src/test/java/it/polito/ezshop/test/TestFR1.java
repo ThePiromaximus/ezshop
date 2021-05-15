@@ -32,7 +32,8 @@ public class TestFR1 {
 		
 		@Test
 		public void testReset() {
-			EZShopInterface EzShop = new EZShop(0);
+			EZShopInterface EzShop = new EZShop();
+			EzShop = new EZShop(0);
 			
 			EzShop.reset();
 			

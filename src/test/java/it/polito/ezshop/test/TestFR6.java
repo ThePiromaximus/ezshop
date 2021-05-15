@@ -140,6 +140,8 @@ public class TestFR6 {
 		
 		ret = EzShop.addProductToSale(id, "122474487139", 1);
 		assertTrue(ret);
+		ret = EzShop.addProductToSale(id, "122474487139", 1);
+		assertTrue(ret);
 		
 		return;
 	}

@@ -949,20 +949,12 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
     		throw new UnauthorizedException();
     	
-    	Integer max = 0;
-    	if(openedSaleTransactions.isEmpty()) {
-    		if(closedSaleTransactions.isEmpty()) {
-    			if(paidSaleTransactions.isEmpty()) {
-    				max = 1;
-    			} else {
-    				max = Collections.max(paidSaleTransactions.keySet()) + 1;
-    			}
-    		} else {
-    			max = Collections.max(closedSaleTransactions.keySet()) + 1;
-    		}    			
-    	} else {
-    		max = Collections.max(openedSaleTransactions.keySet()) + 1;
-    	}
+    	Integer max = 1;
+    	Stream<Integer> st = Stream.concat(openedSaleTransactions.keySet().stream(), closedSaleTransactions.keySet().stream());
+    	st = Stream.concat(st, paidSaleTransactions.keySet().stream()).filter(t -> t != null);
+    	List<Integer> stList = st.toList();
+    	if(!stList.isEmpty())
+    		max = stList.stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
     	SaleTransactionImpl sale = new SaleTransactionImpl();
     	sale.setTicketNumber(max);
     	sale.setEntries(new ArrayList<TicketEntry>());
@@ -977,7 +969,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	
     	if(transactionId == null || transactionId <= 0)
     		throw new InvalidTransactionIdException();
-    	
+    
     	if(productCode == null || productCode.isEmpty() || !barCodeIsValid(productCode))
     		throw new InvalidProductCodeException();
     	
@@ -992,12 +984,18 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			return false;
 		
 		List<TicketEntry> entries = sale.getEntries();
-		TicketEntry productToInsert = new TicketEntryImpl(productCode, amount);
-		productToInsert.setProductDescription(refProd.getProductDescription());
-		productToInsert.setPricePerUnit(refProd.getPricePerUnit());
-		
-		entries.add(productToInsert);
-		sale.setPrice(sale.getPrice() + amount * productToInsert.getPricePerUnit());
+		try {
+			TicketEntry tk = entries.stream().filter(e -> e.getBarCode().equals(productCode)).findFirst().get();
+			tk.setAmount(tk.getAmount() + amount);
+			sale.setPrice(tk.getAmount() * tk.getPricePerUnit());
+		}
+		catch (NoSuchElementException e) {
+			TicketEntry productToInsert = new TicketEntryImpl(productCode, amount);
+			productToInsert.setProductDescription(refProd.getProductDescription());
+			productToInsert.setPricePerUnit(refProd.getPricePerUnit());
+			entries.add(productToInsert);
+			sale.setPrice(sale.getPrice() + amount * productToInsert.getPricePerUnit());
+		}
 		
 		return true;
     }

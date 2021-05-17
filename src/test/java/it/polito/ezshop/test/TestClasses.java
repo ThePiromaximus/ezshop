@@ -39,6 +39,7 @@ public class TestClasses {
 		assertTrue(ci.getCustomerName() == null);
 		assertTrue(ci.getId() == 0);
 		assertTrue(ci.getPoints() == null);
+		assertTrue(CustomerImpl.getProgressiveCard() >= 0);
 
 		OrderImpl oi = new OrderImpl("test", 0, 0);
 		oi.setBalanceId(null);

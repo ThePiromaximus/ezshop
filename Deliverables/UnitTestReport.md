@@ -2,9 +2,9 @@
 
 Authors: Angela D'Antonio, Gabriele Inzerillo, Ruggero Nocera, Marzio Vallero
 
-Date: 12/05/2021
+Date: 17/05/2021
 
-Version: 1.0
+Version: 1.1
 
 # Contents
 
@@ -109,6 +109,31 @@ Version: 1.0
 | toRound >= 0 | Valid           | RoundUp(0) -> test passes    | void testRoundUp() |
 | toRound < 0  | Valid           | RoundUp(-2) -> test passes   | void testRoundUp() |
 
+### **Class EzShop - method *testClasses***
+
+**Criteria for method *testClasses*:**
+
+ - Ensure setters' consistency through getters.
+
+**Predicates for method *testClasses*:**
+
+| Criteria        | Predicate |
+| --------------- | --------- |
+| Consistency | object.setField(value); object.getField() == value|
+
+**Boundaries**:
+
+| Criteria        | Boundary values |
+| --------------- | --------------- |
+| Not applicable | Not applicable |
+
+**Combination of predicates**:
+
+| Criteria 1   | Valid / Invalid | Description of the test case | JUnit test case    |
+| ------------ | --------------- | ---------------------------- | ------------------ |
+| Consistency | Valid | object.setField(value); object.getField() == value -> test passes | void testClasses() |
+| Consistency | Valid | object.setField(value); object.getField() != value -> test fails | void testClasses() |
+
 # White Box Unit Tests
 
 ### Test cases definition
@@ -118,9 +143,11 @@ Version: 1.0
 |TestUnit|testBarcodeIsValid()|
 |TestUnit|testCreditCardIsValid()|
 |TestUnit|testRoundUp()|
+|TestClasses|testClasses()|
 
 ### Code coverage report
 ![image](./TestReport/unitTestCoverage.png)
+![image](./TestReport/testClassesCoverage.png)
 
 ### Loop coverage analysis
 

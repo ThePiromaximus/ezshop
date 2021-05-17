@@ -532,11 +532,12 @@ public class TestFR6 {
 	}
 	
 	@Test
-	public void testDeleteSaleTransaction() throws InvalidTransactionIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidQuantityException, InvalidLocationException {
+	public void testDeleteSaleTransaction() throws InvalidTransactionIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidQuantityException, InvalidLocationException, InvalidPaymentException {
 		EZShopInterface EzShop = new EZShop(0);
 		Integer id = 0;
 		User usr;
 		boolean ret = false;
+		double cash = 0.0;
 		
 		try {
 			ret = EzShop.deleteSaleTransaction(id);
@@ -592,6 +593,17 @@ public class TestFR6 {
 		assertTrue(ret);
 		ret = EzShop.endSaleTransaction(id);
 		assertTrue(ret);
+		ret = EzShop.deleteSaleTransaction(id);
+		assertTrue(ret);
+		
+		id = EzShop.startSaleTransaction();
+		assertTrue(id > 0);
+		ret = EzShop.addProductToSale(id, "122474487139", 1);
+		assertTrue(ret);
+		ret = EzShop.endSaleTransaction(id);
+		assertTrue(ret);
+		cash = EzShop.receiveCashPayment(id, 10.0);
+		assertTrue(cash == 0.0);
 		ret = EzShop.deleteSaleTransaction(id);
 		assertTrue(ret);
 		

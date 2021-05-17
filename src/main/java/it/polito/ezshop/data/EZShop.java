@@ -1134,18 +1134,30 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     		throw new InvalidTransactionIdException();
     	
     	SaleTransaction sale = openedSaleTransactions.get(transactionId);
-		if(sale == null) {
-			sale = closedSaleTransactions.get(transactionId);
-			if(sale == null) {
-				return false;
-			} else {
-				closedSaleTransactions.remove(transactionId);
-			}				
-		} else {
-			openedSaleTransactions.remove(transactionId);
-		}
-		
-        return true;
+    	if(sale != null) {
+    		openedSaleTransactions.remove(transactionId);
+			return true;
+    	}
+    	sale = closedSaleTransactions.get(transactionId);
+    	if(sale != null) {
+    		sale.getEntries().stream().forEach(t -> {
+    			ProductType pr = products.get(t.getBarCode());
+    			pr.setQuantity(pr.getQuantity() + t.getAmount());			
+    		});
+    		closedSaleTransactions.remove(transactionId);
+			return true;
+    	}
+    	sale = paidSaleTransactions.get(transactionId);
+    	if(sale != null) {
+    		sale.getEntries().stream().forEach(t -> {
+    			ProductType pr = products.get(t.getBarCode());
+    			pr.setQuantity(pr.getQuantity() + t.getAmount());			
+    		});
+    		this.balance += sale.getPrice();
+    		paidSaleTransactions.remove(transactionId);
+    		return true;
+    	}
+    	return false;
     }
 
     @Override

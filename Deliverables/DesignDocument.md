@@ -389,8 +389,8 @@ User <- GUI: successful message
 Actor User as U
 U -> GUI: Define a new customer
 GUI -> EZShop: defineCustomer()
-EZShop -> Customer: new Customer()
-EZShop <- Customer: return customer
+EZShop -> CustomerImpl: new CustomerImpl()
+EZShop <- CustomerImpl: return customer
 EZShop -> EZShop : customer.getID()
 GUI <- EZShop: return customerID
 U <- GUI: successful message
@@ -401,18 +401,15 @@ U <- GUI: successful message
 ```plantuml
 @startuml
 Actor User as U
-
 U -> GUI: Define a new card
 GUI -> EZShop: createCard()
-EZShop -> LoyaltyCard: new LoyaltyCard()
-EZShop <- LoyaltyCard: return loyaltyCard
-EZShop -> LoyaltyCard: loyaltyCard.getID()
+EZShop -> EZShop: return String
 GUI <- EZShop: return loyaltyCard
 U <- GUI: successful message
 U -> GUI: Attach card to customer
 GUI -> EZShop: attachCardToCustomer()
-EZShop -> Customer: customer.setLoyaltyCard()
-EZShop <- Customer: return true
+EZShop -> CustomerImpl: customer.setCustomerCard()
+EZShop <- CustomerImpl: return true
 GUI <- EZShop: return true
 U <- GUI: successful message
 @enduml
@@ -504,6 +501,11 @@ Cashier <- GUI: Print ticket
 Actor User as U
 U -> GUI: Manage payment by credit card
 GUI -> EZShop: receiveCreditCardPayment()
+EZShop -> EZShop: creditCardIsValid()
+EZShop -> SaleTransactionImpl: check ticket
+EZShop <- SaleTransactionImpl: return true
+EZShop -> CreditCardImpl: check balance
+EZShop <- CreditCardImpl: return true
 GUI <- EZShop: return true
 U <- GUI: successful message
 @enduml
@@ -515,8 +517,9 @@ U <- GUI: successful message
 Actor User as U
 U -> GUI: Manage payment by cash
 GUI -> EZShop: receiveCashPayment()
-EZShop -> SaleTransaction: saleTransaction.getAmount()
-EZShop <- SaleTransaction: return amount
+EZShop -> SaleTransactionImpl: saleTransaction.getAmount()
+EZShop <- SaleTransactionImpl: return amount
+EZShop -> EZShop: update balance
 GUI <- EZShop: return change
 U <- GUI: successful message (includes change)
 @enduml

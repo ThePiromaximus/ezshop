@@ -307,7 +307,7 @@ package it.polito.ezshop.exceptions {
 actor User
 User -> GUI: Insert description, productCode, pricePerUnit, note
 GUI -> EZShop: createProductType()
-EZShop -> ProductTypeImpl: new ProductType()
+EZShop -> ProductTypeImpl: new ProductTypeImpl()
 EZShop <- ProductTypeImpl: return productType
 EZShop -> ProductTypeImpl: productType.getID()
 EZShop <- ProductTypeImpl: return productID
@@ -315,8 +315,8 @@ GUI <- EZShop: return productID
 User <- GUI: successful message
 User -> GUI: Insert position of ProductType
 GUI -> EZShop: updatePosition()
-EZShop -> ProductTypeImpl: productType.setPosition()
-EZShop <- ProductTypeImpl: return true
+EZShop -> ProductTypeImpl: productType.setLocation()
+EZShop <- ProductTypeImpl: return
 GUI <- EZShop: return true
 User <- GUI: successful message
 @enduml
@@ -332,8 +332,8 @@ GUI <- EZShop: return productType
 User <- GUI: successful message
 User -> GUI: Insert new position of Product
 GUI -> EZShop: updatePosition()
-EZShop -> ProductTypeImpl: ProductType.setPosition()
-EZShop <- ProductTypeImpl: return true
+EZShop -> ProductTypeImpl: productType.setLocation()
+EZShop <- ProductTypeImpl: return
 GUI <- EZShop: return true
 User <- GUI: successful message
 @enduml
@@ -361,7 +361,7 @@ GUI -> Admin : Successfull message
 actor User
 User -> GUI: Insert productCode, quantity, pricePerUnit
 GUI -> EZShop: issueOrder()
-EZShop -> OrderImpl: new Order()
+EZShop -> OrderImpl: new OrderImpl()
 EZShop <- OrderImpl: return order
 EZShop -> OrderImpl: order.getID()
 EZShop <- OrderImpl: return orderID
@@ -391,7 +391,8 @@ U -> GUI: Define a new customer
 GUI -> EZShop: defineCustomer()
 EZShop -> CustomerImpl: new CustomerImpl()
 EZShop <- CustomerImpl: return customer
-EZShop -> EZShop : customer.getID()
+EZShop -> CustomerImpl : customer.getID()
+CustomerImpl -> EZShop : return id
 GUI <- EZShop: return customerID
 U <- GUI: successful message
 @enduml
@@ -403,8 +404,8 @@ U <- GUI: successful message
 Actor User as U
 U -> GUI: Define a new card
 GUI -> EZShop: createCard()
-EZShop -> EZShop: return String
-GUI <- EZShop: return loyaltyCard
+EZShop -> EZShop: generates card
+GUI <- EZShop: return String
 U <- GUI: successful message
 U -> GUI: Attach card to customer
 GUI -> EZShop: attachCardToCustomer()
@@ -433,7 +434,7 @@ GUI -> User : Successful message
 actor Cashier
 Cashier -> GUI: Start a new sale transaction
 GUI  -> EZShop: startSaleTransaction()
-EZShop -> SaleTransactionImpl: new SaleTransaction()
+EZShop -> SaleTransactionImpl: new SaleTransactionImpl()
 EZShop <- SaleTransactionImpl: return saleTransaction
 GUI <- EZShop: return ID
 GUI -> Cashier: Ask for product bar code
@@ -441,19 +442,20 @@ GUI -> Cashier: Ask for product units
 Cashier -> GUI: Insert product bar code
 Cashier -> GUI: Set N units of product P
 GUI  -> EZShop: addProductToSale()
-EZShop -> EZShop: products.get(productCode)
-EZShop -> SaleTransactionImpl: saleTransaction.setProductType()
-EZShop -> ProductTypeImpl : productType.setQuantity()
+EZShop -> TicketEntryImpl: products.get(productCode)
+EZShop -> TicketEntryImpl: new TicketEntryImpl()
+TicketEntryImpl -> EZShop: return ticketEntry
+EZShop -> TicketEntryImpl : ticketEntry.setAmount()
+EZShop -> SaleTransactionImpl: saleTransaction.setEntries()
 EZShop -> GUI: return true
 GUI -> Cashier : Ask for product discount rate 
 Cashier -> GUI: Apply product discount rate  
 GUI -> EZShop: applyDiscountRateToProduct()
-EZShop -> EZShop : productType.getID()
-EZShop -> SaleTransactionImpl: setDiscountRate()
+EZShop -> TicketEntryImpl : ticketEntry.getBarCode()
+EZShop -> SaleTransactionImpl: saleTransaction.setDiscountRate()
 EZShop -> GUI: return true
 Cashier -> GUI: End Sale transaction
 GUI  -> EZShop: endSaleTransaction()
-EZShop -> SaleTransactionImpl: saleTransaction.setState()
 GUI <- EZShop: return true
 Cashier -> GUI: Manage payment (UC7)
 Cashier <- GUI: Print sale receipt
@@ -467,7 +469,7 @@ Cashier <- GUI: Print sale receipt
 actor Cashier
 Cashier -> GUI: Start a new sale transaction
 GUI  -> EZShop: startSaleTransaction()
-EZShop -> SaleTransactionImpl: new SaleTransaction()
+EZShop -> SaleTransactionImpl: new SaleTransactionImpl()
 EZShop <- SaleTransactionImpl: return saleTransaction
 GUI <- EZShop: return ID
 GUI -> Cashier: Ask for product bar code
@@ -475,13 +477,13 @@ GUI -> Cashier: Ask for product units
 Cashier -> GUI: Insert product bar code
 Cashier -> GUI: Set N units of product P
 GUI  -> EZShop: addProductToSale()
-EZShop -> EZShop: productType.getID()
-EZShop -> SaleTransactionImpl: saleTransaction.setProductType()
-EZShop -> ProductTypeImpl: productType.setQuantity()
+EZShop -> TicketEntryImpl: new TicketEntryImpl()
+TicketEntryImpl -> EZShop: return ticketEntry
+EZShop -> ProductTypeImpl: ticketEntry.setAmount()
+EZShop -> SaleTransactionImpl: saleTransaction.setEntries()
 EZShop -> GUI: return true
 Cashier -> GUI: End Sale transaction
 GUI  -> EZShop: endSaleTransaction()
-EZShop -> SaleTransactionImpl: saleTransaction.setState()
 GUI <- EZShop: return true
 Cashier <- GUI: Ask for payment type
 Cashier -> GUI: Insert LoyaltyCard number
@@ -519,8 +521,8 @@ U <- GUI: successful message
 Actor User as U
 U -> GUI: Manage payment by cash
 GUI -> EZShop: receiveCashPayment()
-EZShop -> SaleTransactionImpl: saleTransaction.getAmount()
-EZShop <- SaleTransactionImpl: return amount
+EZShop -> SaleTransactionImpl: saleTransaction.getPrice()
+EZShop <- SaleTransactionImpl: return price
 EZShop -> EZShop: update balance
 GUI <- EZShop: return change
 U <- GUI: successful message (includes change)
@@ -533,7 +535,7 @@ U <- GUI: successful message (includes change)
 actor Cashier
 Cashier -> GUI : Insert transactionID
 GUI -> EZShop : startReturnTransaction()
-EZShop -> ReturnTransactionImpl : new ReturnTransaction()
+EZShop -> ReturnTransactionImpl : new ReturnTransactionImpl()
 ReturnTransactionImpl -> EZShop : return returnTransaction
 EZShop -> GUI : return returnTransaction.getId()
 GUI -> Cashier : Ask for product bar code
@@ -549,7 +551,6 @@ EZShop -> GUI : return true
 GUI -> Cashier : Manage credit card return
 Cashier -> GUI : Close return transaction
 GUI -> EZShop : endReturnTransaction()
-EZShop -> EZShop : openedReturnTransactions.get(returnId)
 EZShop -> ProductTypeImpl : productType.setAmount()
 EZShop -> GUI : return true
 GUI -> Cashier : Successful message
@@ -575,7 +576,8 @@ actor Cashier
 GUI -> Cashier: ask for credit card number
 Cashier -> GUI: Insert credit card number
 GUI -> EZShop: returnCreditCardPayment()
-EZShop -> ReturnTransactionImpl:  returnTransaction.getAmount()
+EZShop -> ReturnTransactionImpl:  returnTransaction.getPrice()
+EZShop <- ReturnTransactionImpl: return money
 GUI <- EZShop: return money
 Cashier <- GUI: Successful message
 @enduml

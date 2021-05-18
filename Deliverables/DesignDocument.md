@@ -361,10 +361,10 @@ GUI -> Admin : Successfull message
 actor User
 User -> GUI: Insert productCode, quantity, pricePerUnit
 GUI -> EZShop: issueOrder()
-EZShop -> Order: new Order()
-EZShop <- Order: return order
-EZShop -> Order: order.getID()
-EZShop <- Order: return orderID
+EZShop -> OrderImpl: new Order()
+EZShop <- OrderImpl: return order
+EZShop -> OrderImpl: order.getID()
+EZShop <- OrderImpl: return orderID
 GUI <- EZShop: return orderID
 User <- GUI: successful message
 @enduml
@@ -376,8 +376,8 @@ User <- GUI: successful message
 actor User
 User -> GUI: Insert orderID
 GUI -> EZShop: payOrder()
-EZShop -> Order: order.setStatus()
-EZShop <- Order: return true
+EZShop -> OrderImpl: order.setStatus()
+EZShop <- OrderImpl: return true
 GUI <- EZShop: return true
 User <- GUI: successful message
 @enduml

@@ -348,8 +348,8 @@ Admin -> GUI : Define credentials of new account
 Admin -> GUI : Select access rights
 Admin -> GUI : Confirms inserted data
 GUI -> EZShop : createUser()
-EZShop -> User : new User()
-User -> EZShop : return user
+EZShop -> UserImpl : new UserImpl()
+UserImpl -> EZShop : return user
 EZShop -> GUI : return userID
 GUI -> Admin : Successfull message
 @enduml
@@ -531,21 +531,24 @@ U <- GUI: successful message (includes change)
 actor Cashier
 Cashier -> GUI : Insert transactionID
 GUI -> EZShop : startReturnTransaction()
-EZShop -> ReturnTransaction : new ReturnTransaction()
-ReturnTransaction -> EZShop : return returnTransaction
-EZShop -> GUI : return ID
+EZShop -> ReturnTransactionImpl : new ReturnTransaction()
+ReturnTransactionImpl -> EZShop : return returnTransaction
+EZShop -> GUI : return returnTransaction.getId()
 GUI -> Cashier : Ask for product bar code
 GUI -> Cashier : Ask for product units
 Cashier -> GUI : Insert product bar code
 Cashier -> GUI : Set N units of product P
 GUI -> EZShop : returnProduct()
-EZShop -> EZShop : products.get(productID)
-EZShop -> ReturnTransaction : returnTransaction.setProduct()
-EZShop -> GUI : Manage  credit card return
+EZShop -> EZShop : openedReturnTransaction.get(returnId)
+EZShop -> TicketEntryImpl : new TicketEntryImpl()
+TicketEntryImpl -> EZShop : return ticketEntry
+EZShop -> ReturnTransactionImpl : returnTransaction.addEntry(ticketEntry)
+EZShop -> GUI : return true
 GUI -> Cashier : Manage credit card return
 Cashier -> GUI : Close return transaction
 GUI -> EZShop : endReturnTransaction()
-EZShop -> ProductType : productType.setQuantity()
+EZShop -> EZShop : openedReturnTransactions.get(returnId)
+EZShop -> ProductTypeImpl : productType.setAmount()
 EZShop -> GUI : return true
 GUI -> Cashier : Successful message
 @enduml
@@ -558,7 +561,7 @@ actor Manager
 Manager -> GUI : Select start date
 Manager -> GUI : Select end date
 GUI -> EZShop : getCreditsAndDebits()
-EZShop -> GUI : return balanceOperationList
+EZShop -> GUI : return creditsAndDebits
 GUI -> Manager : List displayed
 @enduml
 ```

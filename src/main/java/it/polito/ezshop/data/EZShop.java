@@ -952,7 +952,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	Integer max = 1;
     	Stream<Integer> st = Stream.concat(openedSaleTransactions.keySet().stream(), closedSaleTransactions.keySet().stream());
     	st = Stream.concat(st, paidSaleTransactions.keySet().stream()).filter(t -> t != null);
-    	List<Integer> stList = st.toList();
+    	List<Integer> stList = st.collect(Collectors.toList());
     	if(!stList.isEmpty())
     		max = stList.stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
     	SaleTransactionImpl sale = new SaleTransactionImpl();

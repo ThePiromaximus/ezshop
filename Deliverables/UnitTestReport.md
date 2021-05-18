@@ -146,8 +146,8 @@ Version: 1.1
 |TestClasses|testClasses()|
 
 ### Code coverage report
-![image](./TestReport/unitTestCoverage.png)
-![image](./TestReport/testClassesCoverage.png)
+![image](./TestReport/unitTestCoverage.PNG)
+![image](./TestReport/testClassesCoverage.PNG)
 
 ### Loop coverage analysis
 

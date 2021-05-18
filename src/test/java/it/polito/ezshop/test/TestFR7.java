@@ -25,7 +25,7 @@ import it.polito.ezshop.exceptions.UnauthorizedException;
 public class TestFR7 {
 	@Test
 	public void testReceiveCashPayment() throws InvalidTransactionIdException, InvalidPaymentException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException {
-		EZShopInterface ezShop = new EZShop();
+		EZShopInterface ezShop = new EZShop(0);
 		
 		try {
 			ezShop.receiveCashPayment(null, 0);
@@ -88,7 +88,7 @@ public class TestFR7 {
 	
 	@Test
 	public void testReceiveCreditCardPayment() throws InvalidTransactionIdException, InvalidCreditCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException {
-		EZShopInterface ezShop = new EZShop();
+		EZShopInterface ezShop = new EZShop(0);
 		
 		try {
 			ezShop.receiveCreditCardPayment(null, null);
@@ -149,15 +149,20 @@ public class TestFR7 {
 			// pass
 		}
 		double oldBalance = ezShop.computeBalance();
+		//non existing id
 		assertFalse(ezShop.receiveCreditCardPayment(100, "5555555555554444"));
-		//check if returns false when card has not enough money or is not registered
+		//card with not enough money
+		assertFalse(ezShop.receiveCreditCardPayment(saleId, "0000000000000000"));
+		//card not registered
+		assertFalse(ezShop.receiveCreditCardPayment(saleId, "4111111111111111"));
+		//ok
 		assertTrue(ezShop.receiveCreditCardPayment(saleId, "5555555555554444"));
 		assertTrue(ezShop.computeBalance() == (oldBalance + 3000.0));
 	}
 	
 	@Test
 	public void testReturnCashPayment() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductIdException, UnauthorizedException, InvalidLocationException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, InvalidTransactionIdException, InvalidQuantityException, InvalidPaymentException {
-		EZShopInterface ezShop = new EZShop();
+		EZShopInterface ezShop = new EZShop(0);
 		
 		try {
 			ezShop.returnCashPayment(null);
@@ -212,7 +217,7 @@ public class TestFR7 {
 	
 	@Test
 	public void testReturnCreditCardPayment() throws InvalidTransactionIdException, InvalidCreditCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException, InvalidPaymentException {
-		EZShopInterface ezShop = new EZShop();
+		EZShopInterface ezShop = new EZShop(0);
 		
 		try {
 			ezShop.returnCreditCardPayment(null, null);
@@ -280,11 +285,14 @@ public class TestFR7 {
 		}
 		
 		assertTrue(ezShop.returnCreditCardPayment(100, "5555555555554444") == -1);
-		// check if card exists
-		
+		// non existing card
+		assertFalse(ezShop.receiveCreditCardPayment(saleId, "4111111111111111"));
 		// correct behavior
 		double oldBalance = ezShop.computeBalance();
+		assertTrue(ezShop.returnCreditCardPayment(returnId, "0") == -1);
 		assertTrue(ezShop.returnCreditCardPayment(returnId, "5555555555554444") == 1000.0);
 		assertTrue(ezShop.computeBalance() == (oldBalance-1000.0));
+		
+		
 	}
 }

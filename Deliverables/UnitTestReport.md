@@ -2,9 +2,9 @@
 
 Authors: Angela D'Antonio, Gabriele Inzerillo, Ruggero Nocera, Marzio Vallero
 
-Date: 12/05/2021
+Date: 17/05/2021
 
-Version: 1.0
+Version: 1.1
 
 # Contents
 
@@ -17,14 +17,6 @@ Version: 1.0
 
 
 # Black Box Unit Tests
-
-    <Define here criteria, predicates and the combination of predicates for each function of each class.
-    Define test cases to cover all equivalence classes and boundary conditions.
-    In the table, report the description of the black box test case and (traceability) the correspondence with the JUnit test case writing the 
-    class and method name that contains the test case>
-    <JUnit test classes must be in src/test/java/it/polito/ezshop   You find here, and you can use,  class TestEzShops.java that is executed  
-    to start tests
-    >
 
  ### **Class EzShop - method *barcodeIsValid***
 
@@ -117,37 +109,57 @@ Version: 1.0
 | toRound >= 0 | Valid           | RoundUp(0) -> test passes    | void testRoundUp() |
 | toRound < 0  | Valid           | RoundUp(-2) -> test passes   | void testRoundUp() |
 
+### **Class EzShop - method *testClasses***
+
+**Criteria for method *testClasses*:**
+
+ - Ensure setters' consistency through getters.
+
+**Predicates for method *testClasses*:**
+
+| Criteria        | Predicate |
+| --------------- | --------- |
+| Consistency | object.setField(value); object.getField() == value|
+
+**Boundaries**:
+
+| Criteria        | Boundary values |
+| --------------- | --------------- |
+| Not applicable | Not applicable |
+
+**Combination of predicates**:
+
+| Criteria 1   | Valid / Invalid | Description of the test case | JUnit test case    |
+| ------------ | --------------- | ---------------------------- | ------------------ |
+| Consistency | Valid | object.setField(value); object.getField() == value -> test passes | void testClasses() |
+| Consistency | Valid | object.setField(value); object.getField() != value -> test fails | void testClasses() |
+
 # White Box Unit Tests
 
 ### Test cases definition
 
-    <JUnit test classes must be in src/test/java/it/polito/ezshop>
-    <Report here all the created JUnit test cases, and the units/classes under test >
-    <For traceability write the class and method name that contains the test case>
-
-
 | Unit name | JUnit test case |
 |--|--|
-|||
-|||
-||||
+|TestUnit|testBarcodeIsValid()|
+|TestUnit|testCreditCardIsValid()|
+|TestUnit|testRoundUp()|
+|TestClasses|testClasses()|
 
 ### Code coverage report
-
-    <Add here the screenshot report of the statement and branch coverage obtained using
-    the Eclemma tool. >
-
+![image](./TestReport/unitTestCoverage.PNG)
+![image](./TestReport/testClassesCoverage.PNG)
 
 ### Loop coverage analysis
 
-    <Identify significant loops in the units and reports the test cases
-    developed to cover zero, one or multiple iterations >
-
 |Unit name | Loop rows | Number of iterations | JUnit test case |
-|---|---|---|---|
-|||||
-|||||
-||||||
+|---|---|---:|---|
+|TestUnit|1378-1384|11|testBarcodeIsValid()|
+|TestUnit|1393-1399|12|testBarcodeIsValid()|
+|TestUnit|1408-1414|13|testBarcodeIsValid()|
+|TestUnit|1447-1462|[0, 15]|testCreditCardIsValid()|
+|TestUnit|1447-1462|16|testCreditCardIsValid()|
+|TestUnit|1447-1462|[17, maxint]|testCreditCardIsValid()|
+|TestUnit|None|Not applicable|testRoundUp()|
 
 
 

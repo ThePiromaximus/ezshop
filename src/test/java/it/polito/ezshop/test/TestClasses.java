@@ -39,6 +39,7 @@ public class TestClasses {
 		assertTrue(ci.getCustomerName() == null);
 		assertTrue(ci.getId() == 0);
 		assertTrue(ci.getPoints() == null);
+		assertTrue(CustomerImpl.getProgressiveCard() >= 0);
 
 		OrderImpl oi = new OrderImpl("test", 0, 0);
 		oi.setBalanceId(null);
@@ -130,5 +131,12 @@ public class TestClasses {
 		assertTrue(ui.getPassword() == null);
 		assertTrue(ui.getRole() == null);
 		assertTrue(ui.getUsername() == null);
+		
+		CreditCardImpl cci = new CreditCardImpl(null, null);
+		cci.setBalance(null);
+		cci.setCode(null);
+		
+		assertTrue(cci.getBalance() == null);
+		assertTrue(cci.getCode() == null);
 	}
 }

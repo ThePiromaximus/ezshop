@@ -3,9 +3,9 @@
 
 Authors: Angela D'Antonio, Gabriele Inzerillo, Ruggero Nocera, Marzio Vallero
 
-Date: 26/04/2021
+Date: 17/05/2021
 
-Version: 1.0
+Version: 1.1
 
 
 # Contents
@@ -25,26 +25,34 @@ Layered architeture whit MVC pattern.
 
 ```plantuml
 @startuml
-package it.polito.ezshop.model as EZShopModel
+package it.polito.ezshop as EzShop
 package it.polito.ezshop.data as EZShopData
 package it.polito.ezshop.exceptions as EZShopExceptions
-package it.polito.ezshop.gui as GUI
-package it.polito.ezshop.utils as EZShopUtils
+package it.polito.ezshop.model as EZShopModel
+package it.polito.ezshop.acceptanceTests as AcceptanceTests
+package it.polito.ezshop.test as Test
+package "ezshop-gui.jar" as GUI
+database ezshop.bin as DB
 
-EZShopUtils <-- EZShopModel
+EzShop <-- EZShopModel
 EZShopData <-- EZShopModel
 EZShopExceptions <-- EZShopModel
-GUI <--> EZShopModel
+EZShopData <-- GUI
+EZShopData <-- AcceptanceTests
+EZShopData <-- Test
+EZShopData <--> DB
 @enduml
 ```
-
+<-->
 
 # Low level design
 
-### it.polito.ezshop.model and it.polito.ezshop.data
+### it.polito.ezshop.data
 ```plantuml
 @startuml
 package it.polito.ezshop.data {
+top to bottom direction
+
     interface "EZShopInterface" as API{
     void reset()
     -- User Management --
@@ -102,132 +110,149 @@ package it.polito.ezshop.data {
     double computeBalance()
     }
 
-    class ShopWriter {
-       void writeShop(Shop)
+    class EZShop {
+        double balance
+        User loggedUser
+        HashMap<Integer, SaleTransactionImpl> openedSaleTransactions
+        HashMap<Integer, SaleTransactionImpl> closedSaleTransactions
+        HashMap<Integer, SaleTransactionImpl> paidSaleTransactions
+        HashMap<Integer, ReturnTransactionImpl> openedReturnTransactions
+        HashMap<Integer, ReturnTransactionImpl> closedReturnTransactions
+        HashMap<Integer, ReturnTransactionImpl> paidReturnTransactions
+        HashMap<Integer, OrderImpl> orders
+        HashMap<String, ProductTypeImpl> products
+        HashMap<Integer, BalanceOperationImpl> balanceOperations
+        HashMap<Integer, UserImpl> users
+        HashMap<Integer, CustomerImpl> customers
+        HashMap<String, CreditCardImpl> creditCards
+
+        +EZShop()
+        +EZShop(int)
+        -boolean creditCardIsValid(String)
+        -boolean barCodeIsValid(String)
+        -int RoundUp(int)
     }
-    class ShopReader {
-        Shop readShop()
+
+    together {
+
+        interface ProductType
+        interface SaleTransaction
+        interface TicketEntry
+        interface User
+        interface BalanceOperation
+        interface Customer
+        interface Order 
     }
 }
 
+ProductType -up[hidden]- EZShop 
+API <|-- EZShop : <<implements>>
+note right of Shop: Permanent class
+@enduml
+```
+
+### it.polito.ezshop.model
+```plantuml
+@startuml
 package it.polito.ezshop.model{
-    class Shop {
-        +users: HashMap<Integer, User>
-        +cards: HashMap<LoyaltyCard, Customer>
-        +products: HashMap<Integer, ProductType>
-        +saleTransactions: HashMap<Integer, SaleTransaction>
-        +orders: HashMap<Integer, Order>
-        +returnTransactions: HashMap<Integer, ReturnTransaction>
+    class UserImpl {
+        -id: Integer
+        -username: String
+        -password: String
+        -role: String
+        {static}serialVersionUID: final long
+        {static}PROGRESSIVE_ID: Integer
     }
 
-    note right of Shop: Permanent class
-
-    class User {
-        +userId: Integer
-        +username: String
-        +password: String
-        +Role: String
+    class ProductTypeImpl {
+        -id : Integer
+        -barCode : String
+        -productDescription : String
+        -pricePerUnit : Double 
+        -sellPrice : Float
+        -quantity : Integer
+        -discountRate : Float
+        -note : String
+        -location : String
+        {static}PROGRESSIVE_ID: Integer
     }
 
-
-    class ProductType {
-        +ID : Integer
-        +barCode : String
-        +description : String
-        +sellPrice : Float
-        +quantity : Interge
-        +discountRate : Float
-        +notes : String
-        +position : Position
+    class OrderImpl {
+        -balanceId : Integer
+        -productCode : String
+        -pricePerUnit : Double
+        -quntity : Integer
+        -status : String
+        -orderId : Integer
+        -date : LocalDate
+        -balanceOperation : BalanceOprationImpl
+        {static}PROGRESSIVE_ID: Integer
     }
 
-    class Position {
-        +aisleID : String
-        +rackID : String
-        +levelID : String
+    class CustomerImpl {
+        - id : Integer
+        - customerName : String
+        - points : Integer
+        - customerCard : Integer
+        {static}PROGRESSIVE_ID: Integer
+        {static}PROGRESSIVE_CARD_ID: Integer
+        {static}serialVersionUID: final long
     }
 
-    enum OrderState {
-        CREATED
-        PAYED
-        CLOSED
+    class BalanceOperationImpl {
+        - balanceId : Integer
+        - date: LocalDate
+        - money: double
+        - type: String
+        {static}PROGRESSIVE_ID: Integer
+        {static}serialVersionUID: final long
     }
 
-    class Order {
-        +supplier : String
-        +pricePerUnit : Float
-        +quntity : Integer
-        +status : OrderState
-        +products : List<Product>
+    class ReturnTransactionImpl {
+        -saleTransaction : SaleTransactionImpl
+        -id : Integer
+        -entries : List<TicketEntry>
+        -price : double
+        -date : LocalDate
+        -balanceOperation : BalanceOperationImpl
+        {static}PROGRESSIVE_ID: Integer
+        {static}serialVersionUID: final long
     }
 
-    class Customer {
-        + ID : Integer
-        + name : String
-        + surname : String
-        + card : LoyaltyCard
+    class SaleTransactionImpl {
+        -ticketNumber : Integer
+        -entries : List<TicketEntry>
+        -discountRate : double
+        -price : double
+        -date : LocalDate
+        -balanceOperation : BalanceOperationImpl
+        {static}PROGRESSIVE_ID: Integer
+        {static}serialVersionUID: final long
     }
 
-    class LoyaltyCard {
-        + ID : Integer
-        + points : Integer
-        
+    class TicketEntryImpl {
+        -barCode : String
+        -productDescription : String
+        -amount : Integer
+        -pricePerUnit : double
+        -discountRate : double
+        {static}serialVersionUID: final long
     }
 
-    class BalanceOperation {
-        + ID : Integer
-        + description : String
-        + amount : double
-        + date : LocalDate
-        + type : BOType
+    class CreditCardImpl {
+        -code :String
+        -balance:String
+        {static}serialVersionUID: final long
     }
 
-    enum BOType {
-    DEBIT
-    CREDIT
-    }
+    OrderImpl "1" -- "1" BalanceOperationImpl
+    ReturnTransactionImpl "1" -- "1" SaleTransactionImpl
+    ReturnTransactionImpl "1" -- "1" BalanceOperationImpl
+    ReturnTransactionImpl "1" -- "*" TicketEntryImpl
+    SaleTransactionImpl "1" -- "1" BalanceOperationImpl
+    SaleTransactionImpl "1" -- "*" TicketEntryImpl
 
-    class ReturnTransaction {
-        + quantity : Integer
-        + returnedValue : double
-        + product : Product
-        + committed : boolean
-    }
-
-    class SaleTransaction {
-        +date: LocalDate
-        +time: LocalTime
-        +cost: double
-        +paymentType: String
-        +discountRate: double
-        +state : TransactionState
-        +card : LoyaltyCard
-        +products : HashMap<Product, Quantity>
-    }
-
-    enum TransactionState {
-    CLOSED
-    PAID
-    CANCELED
-    }
 }
-LoyaltyCard "0..1" -- "1" Customer
-Shop -- "1..*" User
-Shop --  "*" ReturnTransaction
-Shop -- "*" Order
-Shop -- "*" SaleTransaction
-Shop -- "*" LoyaltyCard
-Shop -- "*" ProductType
-
-Position "0..1" -- "1" ProductType
-Order "1" --  "1" OrderState
-BalanceOperation "1" -- "1" BOType
-SaleTransaction "1" -- "1" TransactionState
-BalanceOperation <|-- ReturnTransaction
-BalanceOperation <|-- SaleTransaction
-BalanceOperation <|-- Order
-API <|-- Shop : <<implements>>
-
 @enduml
 ```
 
@@ -254,7 +279,6 @@ package it.polito.ezshop.exceptions {
     InvalidQuantityException -up--|> E
     InvalidRoleException -up-|> E
 
-    InvalidTicketNumberException -down-|> E
     InvalidTransactionIdException -down--|> E
     InvalidUserIdException -down-|> E
     InvalidUsernameException -down--|> E
@@ -275,14 +299,6 @@ package it.polito.ezshop.exceptions {
 | FR7 | V | | | | | | | | V | | | | |
 | FR8 | V | | | | V | V | | | V | V | V | V | V |
 
-
-
-
-
-
-
-
-
 # Verification sequence diagrams 
 
 ### Scenario 1.1
@@ -290,18 +306,18 @@ package it.polito.ezshop.exceptions {
 @startuml
 actor User
 User -> GUI: Insert description, productCode, pricePerUnit, note
-GUI -> Shop: createProductType()
-Shop -> ProductType: new ProductType()
-Shop <- ProductType: return productType
-Shop -> ProductType: productType.getID()
-Shop <- ProductType: return productID
-GUI <- Shop: return productID
+GUI -> EZShop: createProductType()
+EZShop -> ProductTypeImpl: new ProductType()
+EZShop <- ProductTypeImpl: return productType
+EZShop -> ProductTypeImpl: productType.getID()
+EZShop <- ProductTypeImpl: return productID
+GUI <- EZShop: return productID
 User <- GUI: successful message
 User -> GUI: Insert position of ProductType
-GUI -> Shop: updatePosition()
-Shop -> ProductType: productType.setPosition()
-Shop <- ProductType: return true
-GUI <- Shop: return true
+GUI -> EZShop: updatePosition()
+EZShop -> ProductTypeImpl: productType.setPosition()
+EZShop <- ProductTypeImpl: return true
+GUI <- EZShop: return true
 User <- GUI: successful message
 @enduml
 ```
@@ -311,14 +327,14 @@ User <- GUI: successful message
 @startuml
 actor User
 User -> GUI: Insert barcode
-GUI -> Shop: getProductTypeByBarCode()
-GUI <- Shop: return productType
+GUI -> EZShop: getProductTypeByBarCode()
+GUI <- EZShop: return productType
 User <- GUI: successful message
 User -> GUI: Insert new position of Product
-GUI -> Shop: updatePosition()
-Shop -> Position: position.setPosition()
-Shop <- Position: return true
-GUI <- Shop: return true
+GUI -> EZShop: updatePosition()
+EZShop -> ProductTypeImpl: ProductType.setPosition()
+EZShop <- ProductTypeImpl: return true
+GUI <- EZShop: return true
 User <- GUI: successful message
 @enduml
 ```
@@ -331,10 +347,10 @@ actor Admin
 Admin -> GUI : Define credentials of new account
 Admin -> GUI : Select access rights
 Admin -> GUI : Confirms inserted data
-GUI -> Shop : createUser()
-Shop -> User : new User()
-User -> Shop : return user
-Shop -> GUI : return userID
+GUI -> EZShop : createUser()
+EZShop -> UserImpl : new UserImpl()
+UserImpl -> EZShop : return user
+EZShop -> GUI : return userID
 GUI -> Admin : Successfull message
 @enduml
 ```
@@ -344,12 +360,12 @@ GUI -> Admin : Successfull message
 @startuml
 actor User
 User -> GUI: Insert productCode, quantity, pricePerUnit
-GUI -> Shop: issueOrder()
-Shop -> Order: new Order()
-Shop <- Order: return order
-Shop -> Order: order.getID()
-Shop <- Order: return orderID
-GUI <- Shop: return orderID
+GUI -> EZShop: issueOrder()
+EZShop -> OrderImpl: new Order()
+EZShop <- OrderImpl: return order
+EZShop -> OrderImpl: order.getID()
+EZShop <- OrderImpl: return orderID
+GUI <- EZShop: return orderID
 User <- GUI: successful message
 @enduml
 ```
@@ -359,10 +375,10 @@ User <- GUI: successful message
 @startuml
 actor User
 User -> GUI: Insert orderID
-GUI -> Shop: payOrder()
-Shop -> Order: order.setStatus()
-Shop <- Order: return true
-GUI <- Shop: return true
+GUI -> EZShop: payOrder()
+EZShop -> OrderImpl: order.setStatus()
+EZShop <- OrderImpl: return true
+GUI <- EZShop: return true
 User <- GUI: successful message
 @enduml
 ```
@@ -372,11 +388,11 @@ User <- GUI: successful message
 @startuml
 Actor User as U
 U -> GUI: Define a new customer
-GUI -> Shop: defineCustomer()
-Shop -> Customer: new Customer()
-Shop <- Customer: return customer
-Shop -> Shop : customer.getID()
-GUI <- Shop: return customerID
+GUI -> EZShop: defineCustomer()
+EZShop -> CustomerImpl: new CustomerImpl()
+EZShop <- CustomerImpl: return customer
+EZShop -> EZShop : customer.getID()
+GUI <- EZShop: return customerID
 U <- GUI: successful message
 @enduml
 ```
@@ -385,19 +401,16 @@ U <- GUI: successful message
 ```plantuml
 @startuml
 Actor User as U
-
 U -> GUI: Define a new card
-GUI -> Shop: createCard()
-Shop -> LoyaltyCard: new LoyaltyCard()
-Shop <- LoyaltyCard: return loyaltyCard
-Shop -> LoyaltyCard: loyaltyCard.getID()
-GUI <- Shop: return loyaltyCard
+GUI -> EZShop: createCard()
+EZShop -> EZShop: return String
+GUI <- EZShop: return loyaltyCard
 U <- GUI: successful message
 U -> GUI: Attach card to customer
-GUI -> Shop: attachCardToCustomer()
-Shop -> Customer: customer.setLoyaltyCard()
-Shop <- Customer: return true
-GUI <- Shop: return true
+GUI -> EZShop: attachCardToCustomer()
+EZShop -> CustomerImpl: customer.setCustomerCard()
+EZShop <- CustomerImpl: return true
+GUI <- EZShop: return true
 U <- GUI: successful message
 @enduml
 ```
@@ -408,8 +421,8 @@ U <- GUI: successful message
 actor User
 User -> GUI : Insert username
 User -> GUI : Insert password
-GUI -> Shop : login()
-Shop -> GUI : return user
+GUI -> EZShop : login()
+EZShop -> GUI : return user
 GUI -> User : Successful message
 @enduml
 ```
@@ -419,29 +432,29 @@ GUI -> User : Successful message
 @startuml
 actor Cashier
 Cashier -> GUI: Start a new sale transaction
-GUI  -> Shop: startSaleTransaction()
-Shop -> SaleTransaction: new SaleTransaction()
-Shop <- SaleTransaction: return saleTransaction
-GUI <- Shop: return ID
+GUI  -> EZShop: startSaleTransaction()
+EZShop -> SaleTransaction: new SaleTransaction()
+EZShop <- SaleTransaction: return saleTransaction
+GUI <- EZShop: return ID
 GUI -> Cashier: Ask for product bar code
 GUI -> Cashier: Ask for product units
 Cashier -> GUI: Insert product bar code
 Cashier -> GUI: Set N units of product P
-GUI  -> Shop: addProductToSale()
-Shop -> Shop: products.get(productCode)
-Shop -> SaleTransaction: saleTransaction.setProductType()
-Shop -> ProductType : productType.setQuantity()
-Shop -> GUI: return true
+GUI  -> EZShop: addProductToSale()
+EZShop -> EZShop: products.get(productCode)
+EZShop -> SaleTransaction: saleTransaction.setProductType()
+EZShop -> ProductType : productType.setQuantity()
+EZShop -> GUI: return true
 GUI -> Cashier : Ask for product discount rate 
 Cashier -> GUI: Apply product discount rate  
-GUI -> Shop: applyDiscountRateToProduct()
-Shop -> Shop : productType.getID()
-Shop -> SaleTransaction: setDiscountRate()
-Shop -> GUI: return true
+GUI -> EZShop: applyDiscountRateToProduct()
+EZShop -> EZShop : productType.getID()
+EZShop -> SaleTransaction: setDiscountRate()
+EZShop -> GUI: return true
 Cashier -> GUI: End Sale transaction
-GUI  -> Shop: endSaleTransaction()
-Shop -> SaleTransaction: saleTransaction.setState()
-GUI <- Shop: return true
+GUI  -> EZShop: endSaleTransaction()
+EZShop -> SaleTransaction: saleTransaction.setState()
+GUI <- EZShop: return true
 Cashier -> GUI: Manage payment (UC7)
 Cashier <- GUI: Print sale receipt
 @enduml
@@ -452,32 +465,32 @@ Cashier <- GUI: Print sale receipt
 @startuml
 actor Cashier
 Cashier -> GUI: Start a new sale transaction
-GUI  -> Shop: startSaleTransaction()
-Shop -> SaleTransaction: new SaleTransaction()
-Shop <- SaleTransaction: return saleTransaction
-GUI <- Shop: return ID
+GUI  -> EZShop: startSaleTransaction()
+EZShop -> SaleTransaction: new SaleTransaction()
+EZShop <- SaleTransaction: return saleTransaction
+GUI <- EZShop: return ID
 GUI -> Cashier: Ask for product bar code
 GUI -> Cashier: Ask for product units
 Cashier -> GUI: Insert product bar code
 Cashier -> GUI: Set N units of product P
-GUI  -> Shop: addProductToSale()
-Shop -> Shop: productType.getID()
-Shop -> SaleTransaction: saleTransaction.setProductType()
-Shop -> ProductType: productType.setQuantity()
-Shop -> GUI: return true
+GUI  -> EZShop: addProductToSale()
+EZShop -> EZShop: productType.getID()
+EZShop -> SaleTransaction: saleTransaction.setProductType()
+EZShop -> ProductTypeImpl: productType.setQuantity()
+EZShop -> GUI: return true
 Cashier -> GUI: End Sale transaction
-GUI  -> Shop: endSaleTransaction()
-Shop -> SaleTransaction: saleTransaction.setState()
-GUI <- Shop: return true
+GUI  -> EZShop: endSaleTransaction()
+EZShop -> SaleTransaction: saleTransaction.setState()
+GUI <- EZShop: return true
 Cashier <- GUI: Ask for payment type
 Cashier -> GUI: Insert LoyaltyCard number
-GUI -> Shop: computePointsForSale() 
-Shop -> GUI: return points 
+GUI -> EZShop: computePointsForSale() 
+EZShop -> GUI: return points 
 Cashier -> GUI: Manage payment(UC7)
-GUI -> Shop: modifyPointsOnCard()
-Shop -> LoyaltyCard: loyaltyCard.setPoints()
-Shop <- LoyaltyCard: return true
-Shop -> GUI: return true
+GUI -> EZShop: modifyPointsOnCard()
+EZShop -> LoyaltyCard: loyaltyCard.setPoints()
+EZShop <- LoyaltyCard: return true
+EZShop -> GUI: return true
 Cashier <- GUI: Print ticket
 @enduml
 ```
@@ -487,8 +500,13 @@ Cashier <- GUI: Print ticket
 @startuml
 Actor User as U
 U -> GUI: Manage payment by credit card
-GUI -> Shop: receiveCreditCardPayment()
-GUI <- Shop: return true
+GUI -> EZShop: receiveCreditCardPayment()
+EZShop -> EZShop: creditCardIsValid()
+EZShop -> SaleTransactionImpl: check ticket
+EZShop <- SaleTransactionImpl: return true
+EZShop -> CreditCardImpl: check balance
+EZShop <- CreditCardImpl: return true
+GUI <- EZShop: return true
 U <- GUI: successful message
 @enduml
 ```
@@ -498,10 +516,11 @@ U <- GUI: successful message
 @startuml
 Actor User as U
 U -> GUI: Manage payment by cash
-GUI -> Shop: receiveCashPayment()
-Shop -> SaleTransaction: saleTransaction.getAmount()
-Shop <- SaleTransaction: return amount
-GUI <- Shop: return change
+GUI -> EZShop: receiveCashPayment()
+EZShop -> SaleTransactionImpl: saleTransaction.getAmount()
+EZShop <- SaleTransactionImpl: return amount
+EZShop -> EZShop: update balance
+GUI <- EZShop: return change
 U <- GUI: successful message (includes change)
 @enduml
 ```
@@ -511,23 +530,26 @@ U <- GUI: successful message (includes change)
 @startuml
 actor Cashier
 Cashier -> GUI : Insert transactionID
-GUI -> Shop : startReturnTransaction()
-Shop -> ReturnTransaction : new ReturnTransaction()
-ReturnTransaction -> Shop : return returnTransaction
-Shop -> GUI : return ID
+GUI -> EZShop : startReturnTransaction()
+EZShop -> ReturnTransactionImpl : new ReturnTransaction()
+ReturnTransactionImpl -> EZShop : return returnTransaction
+EZShop -> GUI : return returnTransaction.getId()
 GUI -> Cashier : Ask for product bar code
 GUI -> Cashier : Ask for product units
 Cashier -> GUI : Insert product bar code
 Cashier -> GUI : Set N units of product P
-GUI -> Shop : returnProduct()
-Shop -> Shop : products.get(productID)
-Shop -> ReturnTransaction : returnTransaction.setProduct()
-Shop -> GUI : Manage  credit card return
+GUI -> EZShop : returnProduct()
+EZShop -> EZShop : openedReturnTransaction.get(returnId)
+EZShop -> TicketEntryImpl : new TicketEntryImpl()
+TicketEntryImpl -> EZShop : return ticketEntry
+EZShop -> ReturnTransactionImpl : returnTransaction.addEntry(ticketEntry)
+EZShop -> GUI : return true
 GUI -> Cashier : Manage credit card return
 Cashier -> GUI : Close return transaction
-GUI -> Shop : endReturnTransaction()
-Shop -> ProductType : productType.setQuantity()
-Shop -> GUI : return true
+GUI -> EZShop : endReturnTransaction()
+EZShop -> EZShop : openedReturnTransactions.get(returnId)
+EZShop -> ProductTypeImpl : productType.setAmount()
+EZShop -> GUI : return true
 GUI -> Cashier : Successful message
 @enduml
 ```
@@ -538,8 +560,8 @@ GUI -> Cashier : Successful message
 actor Manager
 Manager -> GUI : Select start date
 Manager -> GUI : Select end date
-GUI -> Shop : getCreditsAndDebits()
-Shop -> GUI : return balanceOperationList
+GUI -> EZShop : getCreditsAndDebits()
+EZShop -> GUI : return creditsAndDebits
 GUI -> Manager : List displayed
 @enduml
 ```
@@ -550,9 +572,9 @@ GUI -> Manager : List displayed
 actor Cashier
 GUI -> Cashier: ask for credit card number
 Cashier -> GUI: Insert credit card number
-GUI -> Shop: returnCreditCardPayment()
-Shop -> ReturnTransaction:  returnTransaction.getAmount()
-GUI <- Shop: return money
+GUI -> EZShop: returnCreditCardPayment()
+EZShop -> ReturnTransaction:  returnTransaction.getAmount()
+GUI <- EZShop: return money
 Cashier <- GUI: Successful message
 @enduml
 ```

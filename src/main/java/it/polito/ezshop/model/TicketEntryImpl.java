@@ -1,7 +1,11 @@
 package it.polito.ezshop.model;
 
-public class TicketEntryImpl implements it.polito.ezshop.data.TicketEntry {
+public class TicketEntryImpl implements it.polito.ezshop.data.TicketEntry, java.io.Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 7580487094437296878L;
 	private String barCode;
 	private String productDescription;
 	private Integer amount;

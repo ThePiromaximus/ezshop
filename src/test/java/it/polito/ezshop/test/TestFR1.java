@@ -9,10 +9,10 @@ import it.polito.ezshop.exceptions.*;
 
 
 public class TestFR1 {
-	
 		@Test
 		public void testLogout() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-			EZShopInterface EzShop = new EZShop();
+			EZShopInterface EzShop = new EZShop(0);
+
 			Integer id = 0;
 			User usr;
 			boolean ret;
@@ -27,13 +27,13 @@ public class TestFR1 {
 
 			ret = EzShop.logout();
 			assertTrue(ret);
-			
 			return;
 		}
 		
 		@Test
 		public void testReset() {
 			EZShopInterface EzShop = new EZShop();
+			EzShop = new EZShop(0);
 			
 			EzShop.reset();
 			
@@ -45,7 +45,7 @@ public class TestFR1 {
 		public void testCreateUser() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 			
 			//username=null -> throws InvalidUsernameException
-			EZShop ezshop = new EZShop();
+			EZShop ezshop = new EZShop(0);
 			try
 			{
 				Integer id = ezshop.createUser(null, "admin", "Administrator");
@@ -56,7 +56,7 @@ public class TestFR1 {
 			}
 			
 			//username="" -> throws InvalidUsernameException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			try
 			{
 				Integer id = ezshop.createUser("", "admin", "Administrator");
@@ -67,7 +67,7 @@ public class TestFR1 {
 			}
 			
 			//password=null -> throws InvalidPasswordException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			try
 			{
 				Integer id = ezshop.createUser("admin", null, "Administrator");
@@ -78,7 +78,7 @@ public class TestFR1 {
 			}
 			
 			//password="" -> throws InvalidPasswordException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			try
 			{
 				Integer id = ezshop.createUser("admin", "" , "Administrator");
@@ -89,7 +89,7 @@ public class TestFR1 {
 			}
 			
 			//role=null -> throws InvalidRoleException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			try
 			{
 				Integer id = ezshop.createUser("admin", "admin", null);
@@ -100,7 +100,7 @@ public class TestFR1 {
 			}
 			
 			//role="" -> throws InvalidRoleException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			try
 			{
 				Integer id = ezshop.createUser("admin", "admin", "");
@@ -111,7 +111,7 @@ public class TestFR1 {
 			}
 			
 			//role="Admin" -> throws InvalidRoleException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			try
 			{
 				Integer id = ezshop.createUser("admin", "admin", "Admin");
@@ -122,13 +122,13 @@ public class TestFR1 {
 			}
 			
 			//Username that already exists returns -1  
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("CashierA","MyPW","Cashier");
 			Integer id = ezshop.createUser("CashierA", "MyPW", "Cashier");
 			assertTrue(id < 0);
 			
 			//New User returns id > 0 
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			id = ezshop.createUser("ShopManagerA", "MyPW", "ShopManager");
 			assertTrue(id > 0);
 			
@@ -139,7 +139,7 @@ public class TestFR1 {
 		public void testDeleteUser() throws InvalidUserIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 			
 			//loggedUser = null -> throws UnauthorizedException
-			EZShop ezshop = new EZShop();
+			EZShop ezshop = new EZShop(0);
 			try
 			{
 				boolean res = ezshop.deleteUser(null);
@@ -150,7 +150,7 @@ public class TestFR1 {
 			}
 			
 			//loggedUser = Cashier -> throws UnauthorizedException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("cashier", "cashier", "Cashier");
 			ezshop.login("cashier", "cashier");
 			try
@@ -163,7 +163,7 @@ public class TestFR1 {
 			}
 			
 			//id=null -> throws InvalidUserIdException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			try
@@ -176,7 +176,7 @@ public class TestFR1 {
 			}
 			
 			//id = negative number -> throws InvalidUserIdException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			try
@@ -189,14 +189,14 @@ public class TestFR1 {
 			}
 			
 			//id = "100"  -> id isn't present return false
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			boolean res = ezshop.deleteUser(100);
 			assertFalse(res);
 			
 			//id exists  -> return true 
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			Integer id = ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			res = ezshop.deleteUser(id);
@@ -208,7 +208,7 @@ public class TestFR1 {
 		public void testGetAllUsers() throws UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException{
 			
 			//loggedUser = null -> throws UnauthorizedException
-			EZShop ezshop = new EZShop();
+			EZShop ezshop = new EZShop(0);
 			try
 			{
 				List<User> res = ezshop.getAllUsers();
@@ -219,7 +219,7 @@ public class TestFR1 {
 			}
 			
 			//loggedUser = Cashier -> throws UnauthorizedException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("cashierB", "cashier", "Cashier");
 			ezshop.login("cashierB", "cashier");
 			try
@@ -242,7 +242,7 @@ public class TestFR1 {
 		@Test
 		public void testGetUser() throws UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidUserIdException{
 			//loggedUser = null -> throws UnauthorizedException
-			EZShop ezshop = new EZShop();
+			EZShop ezshop = new EZShop(0);
 			try
 			{
 				User u = ezshop.getUser(null);
@@ -252,7 +252,7 @@ public class TestFR1 {
 				assertNotNull(e);
 			}
 			//loggedUser = Cashier -> throws UnauthorizedException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("cashierB", "cashier", "Cashier");
 			ezshop.login("cashierB", "cashier");
 			try
@@ -265,7 +265,7 @@ public class TestFR1 {
 			}
 			
 			//id=null -> throws InvalidUserIdException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			try
@@ -278,7 +278,7 @@ public class TestFR1 {
 			}
 			
 			//id=negative number -> throws InvalidUserIdException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			try
@@ -291,14 +291,14 @@ public class TestFR1 {
 			}
 			
 			//Id exists  -> return user
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			Integer id = ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			User u = ezshop.getUser(id);
 			assertNotNull(u);
 			
 			//Id = "100"  -> return null, user doesn't exists 
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			u = ezshop.getUser(100);
@@ -311,7 +311,7 @@ public class TestFR1 {
 		public void testUpdateUserRights() throws InvalidUserIdException, InvalidRoleException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException {
 			
 			//loggedUser = null -> throws UnauthorizedException
-			EZShop ezshop = new EZShop();
+			EZShop ezshop = new EZShop(0);
 			try
 			{
 				boolean res = ezshop.updateUserRights(null, null);
@@ -322,7 +322,7 @@ public class TestFR1 {
 			}
 			
 			//loggedUser = Cashier -> throws UnauthorizedException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("cashierB", "cashier", "Cashier");
 			ezshop.login("cashierB", "cashier");
 			try
@@ -335,7 +335,7 @@ public class TestFR1 {
 			}
 			
 			//id=null -> throws InvalidUserIdException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			try
@@ -348,7 +348,7 @@ public class TestFR1 {
 			}
 			
 			//id=negative number -> throws InvalidUserIdException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			try
@@ -361,7 +361,7 @@ public class TestFR1 {
 			}
 
 			//role=null -> throws InvalidRoleException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			try
@@ -374,7 +374,7 @@ public class TestFR1 {
 			}
 			
 			//role="" -> throws InvalidRoleException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			try
@@ -388,7 +388,7 @@ public class TestFR1 {
 			
 			//role="Admin" -> throws InvalidRoleException 
 			//infact should be Administrator or Cashier or ShopManager
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			try
@@ -401,14 +401,14 @@ public class TestFR1 {
 			}
 			
 			//id = "100"  -> id isn't present return false
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			boolean u = ezshop.updateUserRights(100, "Administrator");
 			assertFalse(u);
 			
 			//id exists  -> id  present return true
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			Integer id = ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			u = ezshop.updateUserRights(id, "Administrator");
@@ -421,7 +421,7 @@ public class TestFR1 {
 		public void testLogin() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
 			
 			//username=null -> throws InvalidUsernameException
-			EZShop ezshop = new EZShop();
+			EZShop ezshop = new EZShop(0);
 			try
 			{
 				User u = ezshop.login(null, "psw");
@@ -432,7 +432,7 @@ public class TestFR1 {
 			}
 			
 			//username="" -> throws InvalidUsernameException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			try
 			{
 				User u = ezshop.login("", "psw");
@@ -443,7 +443,7 @@ public class TestFR1 {
 			}
 			
 			//password=null -> throws InvalidPasswordException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			try
 			{
 				User u = ezshop.login("user", null);
@@ -454,7 +454,7 @@ public class TestFR1 {
 			}
 			
 			//password="" -> throws InvalidPasswordException
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			try
 			{
 				User u = ezshop.login("user", "");
@@ -465,13 +465,13 @@ public class TestFR1 {
 			}
 			
 			//Correct login return loggeduser
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			User u = ezshop.login("admin","admin");
 			assertNotNull(u);
 			
 			//wrong login return null
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			u = ezshop.login("cashier","pws");
 			assertNull(u);

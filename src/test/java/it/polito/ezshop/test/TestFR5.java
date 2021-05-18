@@ -16,7 +16,7 @@ public class TestFR5 {
 	@Test
 	public void testDefineCustomer() throws InvalidCustomerNameException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException
 	{
-		EZShopInterface ezshop = new EZShop();
+		EZShopInterface ezshop = new EZShop(0);
 		//loggedUser = null -> throw UnauthorizedException
 		try 
 		{
@@ -28,7 +28,7 @@ public class TestFR5 {
 		}
 		
 		//customerName = null -> throw InvalidCustomerNameException 
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try 
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -41,14 +41,14 @@ public class TestFR5 {
 		}
 		
 		//Insert a customer name which is already present on system -> return -1
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.defineCustomer("Gabriele");
 		assertTrue(ezshop.defineCustomer("Gabriele")==-1);
 		
 		//All is good -> return id of customer
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		assertTrue(ezshop.defineCustomer("Mario")>0);
@@ -57,7 +57,7 @@ public class TestFR5 {
 	@Test
 	public void testModifyCustomer() throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException
 	{
-		EZShopInterface ezshop = new EZShop();
+		EZShopInterface ezshop = new EZShop(0);
 		//loggedUser = null -> throw UnauthorizedException
 		try 
 		{
@@ -69,10 +69,10 @@ public class TestFR5 {
 		}
 		
 		//customerName = null -> throw InvalidCustomerNameException 
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			ezshop.defineCustomer("Mario");
@@ -84,10 +84,10 @@ public class TestFR5 {
 		}
 		
 		//customerCard = 123456789 (9 digits) -> throw InvalidCustomerCardException 
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
-			ezshop = new EZShop();
+			ezshop = new EZShop(0);
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			Integer costumerId = ezshop.defineCustomer("Mario");
@@ -99,21 +99,21 @@ public class TestFR5 {
 		}
 		
 		//customerCard = "" -> return true 
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		Integer costumerId = ezshop.defineCustomer("Mario");
 		assertTrue(ezshop.modifyCustomer(costumerId, "Mario", ""));
 		
 		//customerCard = null -> return true 
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		costumerId = ezshop.defineCustomer("Mario");
 		assertTrue(ezshop.modifyCustomer(costumerId, "Mario", null));
 		
 		//customerCard already assigned to another user -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.defineCustomer("Mario");
@@ -122,18 +122,21 @@ public class TestFR5 {
 		assertFalse(ezshop.modifyCustomer(costumerId, "Salvatore", "0123456789"));
 		
 		//All is good -> return true
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
+		assertFalse(ezshop.modifyCustomer(costumerId, "Giovanni", "7777777777"));
 		costumerId = ezshop.defineCustomer("Mario");
-		assertTrue(ezshop.modifyCustomer(costumerId, "Giovanni", "7777777777"));		
+		assertTrue(ezshop.modifyCustomer(costumerId, "Giovanni", "7777777777"));
+		costumerId = ezshop.defineCustomer("Luigi");
+		assertFalse(ezshop.modifyCustomer(costumerId, "Giovanni", "7777777777"));
 		
 	}
 	
 	@Test
 	public void testDeleteCustomer() throws InvalidCustomerIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidCustomerNameException
 	{
-		EZShopInterface ezshop = new EZShop();
+		EZShopInterface ezshop = new EZShop(0);
 		//loggedUser = null -> throw UnauthorizedException
 		try 
 		{
@@ -145,7 +148,7 @@ public class TestFR5 {
 		}
 		
 		//loggedUser = null -> throw InvalidCustomerIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try 
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -158,13 +161,13 @@ public class TestFR5 {
 		}
 		
 		//customerId does not exist -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		assertFalse(ezshop.deleteCustomer(35171));
 		
 		//All is good -> return true
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		Integer costumerId = ezshop.defineCustomer("Giovanni");
@@ -175,7 +178,7 @@ public class TestFR5 {
 	@SuppressWarnings("unused")
 	@Test
 	public void testGetCustomer() throws InvalidCustomerIdException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidCustomerNameException {
-		EZShopInterface EzShop = new EZShop();
+		EZShopInterface EzShop = new EZShop(0);
 		Customer cus1 = null;
 		Integer id = 0;
 		User usr;
@@ -221,7 +224,7 @@ public class TestFR5 {
 	@SuppressWarnings("unused")
 	@Test
 	public void testGetAllCustomers() throws UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-		EZShopInterface EzShop = new EZShop();
+		EZShopInterface EzShop = new EZShop(0);
 		Integer id = 0;
 		User usr;
 		List<Customer> custList = null;
@@ -250,7 +253,7 @@ public class TestFR5 {
 	@SuppressWarnings("unused")
 	@Test
 	public void testCreateCard() throws UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException {
-		EZShopInterface EzShop = new EZShop();
+		EZShopInterface EzShop = new EZShop(0);
 		Integer id = 0;
 		String card = "";
 		User usr;
@@ -280,7 +283,7 @@ public class TestFR5 {
 	@SuppressWarnings("unused")
 	@Test
 	public void testAttachCardToCustomer() throws InvalidCustomerIdException, InvalidCustomerCardException, UnauthorizedException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidCustomerNameException{
-		EZShopInterface EzShop = new EZShop();
+		EZShopInterface EzShop = new EZShop(0);
 		Integer id = 0;
 		String card = "";
 		User usr;
@@ -349,7 +352,7 @@ public class TestFR5 {
 	@SuppressWarnings("unused")
 	@Test
 	public void testModifyPointsOnCard() throws InvalidCustomerCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidCustomerNameException, InvalidCustomerIdException {
-		EZShopInterface EzShop = new EZShop();
+		EZShopInterface EzShop = new EZShop(0);
 		Integer id = 0, points = 0;
 		String card = "";
 		User usr;

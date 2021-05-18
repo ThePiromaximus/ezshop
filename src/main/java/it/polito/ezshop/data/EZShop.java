@@ -2,13 +2,21 @@ package it.polito.ezshop.data;
 
 import it.polito.ezshop.exceptions.*;
 import it.polito.ezshop.model.*;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class EZShop implements EZShopInterface {
+public class EZShop implements EZShopInterface, java.io.Serializable {
 	
+	private static final long serialVersionUID = 1L;
 	/* Sale Transactions */
 	private HashMap<Integer, SaleTransactionImpl> openedSaleTransactions = new HashMap<Integer, SaleTransactionImpl>();
 	private HashMap<Integer, SaleTransactionImpl> closedSaleTransactions = new HashMap<Integer, SaleTransactionImpl>();
@@ -25,7 +33,8 @@ public class EZShop implements EZShopInterface {
     /* Users and customers */
     private HashMap<Integer, UserImpl> users = new HashMap<Integer, UserImpl>();
 	private HashMap<Integer, CustomerImpl> customers = new HashMap<Integer, CustomerImpl>();
-
+	
+	private HashMap<String, CreditCardImpl> creditCards = new HashMap<String, CreditCardImpl>();
 	
 	/*
      Questa variabile rappresenta il bilancio corrente del sistema (=/= balanceOperation che invece rappresenta una singola operazione)
@@ -33,8 +42,110 @@ public class EZShop implements EZShopInterface {
      */
     private double balance = 0;
     private User loggedUser=null;
+    
+    public EZShop(){
+    	EZShop ezshop = this;
+    	File creditCardsFile = new File("creditCard.txt");
+    	try {
+			Scanner s = new Scanner(creditCardsFile);
+			while(s.hasNext()) {
+				String line = s.nextLine();
+				if(line.startsWith("#"))
+					continue;
+				String code = line.split(";")[0];
+				Double balance = Double.valueOf(line.split(";")[1]);
+				creditCards.put(code, new CreditCardImpl(code, balance));
+			}
+			s.close();
+		} catch (FileNotFoundException e1) {
 
+		}
+    	
+    	Runtime.getRuntime().addShutdownHook(new Thread () {
+    		public void run() {
+    			try {
+    	    		File ezshopFile = new File("ezshop.bin");
+    	    		if(!ezshopFile.exists()) {
+    	    			ezshopFile.createNewFile();
+    	    		}
+    				FileOutputStream ezshopFos = new FileOutputStream(ezshopFile, false);
+    				ObjectOutputStream ezshopOos = new ObjectOutputStream(ezshopFos);
+    				ezshopOos.writeObject(ezshop);
+    				ezshopOos.close();
+    				ezshopFos.close();
+    			} catch (Exception e) {
 
+    			}
+    		}
+    	});
+    	
+    	
+		File ezshopFile = new File("ezshop.bin");
+		if(!ezshopFile.exists()) {
+			return;
+		}
+    	try {
+
+			FileInputStream ezshopFis = new FileInputStream(ezshopFile);
+			ObjectInputStream ezshopOis = new ObjectInputStream(ezshopFis);
+			EZShop ez = (EZShop) ezshopOis.readObject();
+			ezshopOis.close();
+			ezshopFis.close();
+			this.balance = ez.balance;
+			this.loggedUser = ez.loggedUser;
+			this.customers = ez.customers;
+			this.users = ez.users;
+			this.balanceOperations = ez.balanceOperations;
+			this.products = ez.products;
+			this.orders = ez.orders;
+			this.paidReturnTransactions = ez.paidReturnTransactions;
+			this.closedReturnTransactions = ez.closedReturnTransactions;
+			this.paidSaleTransactions = ez.paidSaleTransactions;
+			this.closedSaleTransactions = ez.closedSaleTransactions;
+			
+			if(customers.size() > 0)
+				CustomerImpl.PROGRESSIVE_ID = customers.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(users.size() > 0)
+				UserImpl.PROGRESSIVE_ID = users.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(balanceOperations.size() > 0)
+				BalanceOperationImpl.PROGRESSIVE_ID = balanceOperations.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(products.size() > 0)
+				ProductTypeImpl.PROGRESSIVE_ID = products.values().stream().map((ProductTypeImpl p) -> p.getId()).max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(orders.size() > 0)
+				OrderImpl.PROGRESSIVE_ID = orders.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			if(closedReturnTransactions.size() > 0 || paidReturnTransactions.size() > 0)
+				ReturnTransactionImpl.PROGRESSIVE_ID = Stream.concat(closedReturnTransactions.keySet().stream(),
+						paidReturnTransactions.keySet().stream()).max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			
+			
+		} catch (Exception e) {
+			ezshopFile.delete();
+		}
+    }
+    
+    public EZShop(int test) {
+    	File creditCardsFile = new File("creditCard.txt");
+    	try {
+			Scanner s = new Scanner(creditCardsFile);
+			while(s.hasNext()) {
+				String line = s.nextLine();
+				if(line.startsWith("#"))
+					continue;
+				String code = line.split(";")[0];
+				Double balance = Double.valueOf(line.split(";")[1]);
+				creditCards.put(code, new CreditCardImpl(code, balance));
+			}
+			s.close();
+		} catch (FileNotFoundException e1) {
+
+		}
+    }
+    
     public void reset() {
     	
     	this.balance = 0;
@@ -45,11 +156,11 @@ public class EZShop implements EZShopInterface {
     	closedReturnTransactions.clear();
     	paidReturnTransactions.clear();
     	balanceOperations.clear();
-    	users.clear();
-    	customers.clear();
-    	orders.clear();
     	products.clear();
-
+    	// According to API these maps shouldn't be cleared by reset()
+    	//users.clear();		
+    	//customers.clear();
+    	//orders.clear();
     }
 
 	@Override
@@ -349,17 +460,10 @@ public class EZShop implements EZShopInterface {
         		if(product.getId()==productId)
         		{
         			
-        			if(product.getLocation()==null)
-        				return false;
+        			if(product.getLocation()==null || product.getLocation().isEmpty())
+        				return false;        			
         			
-        			if(product.getLocation().isEmpty())
-        				return false;
-        			
-        			
-        			if(product.getQuantity()!=null)	
-        				newQuantity = product.getQuantity() + toBeAdded;
-        			else
-        				newQuantity = toBeAdded;
+        			newQuantity = product.getQuantity() + toBeAdded;
     				
         			if(newQuantity>=0)
         			{
@@ -593,10 +697,7 @@ public class EZShop implements EZShopInterface {
 	    				String barCode = p.getBarCode();
 	    				int oldQuantity;
 	    				
-	    				if(p.getQuantity()==null)
-	    					oldQuantity = 0;
-	    				else 
-	    					oldQuantity = p.getQuantity();
+	    				oldQuantity = p.getQuantity();
 	    				
 	    				int quantityToAdd = o.getQuantity();
 	    				products.get(barCode).setQuantity(oldQuantity + quantityToAdd);
@@ -796,7 +897,6 @@ public class EZShop implements EZShopInterface {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
     		throw new UnauthorizedException();
     	
-    	List<Customer> customersList = getAllCustomers();
     	// Else loop until you generate a unique CardId and return it
     	return String.format("%010d", CustomerImpl.getProgressiveCard());
     }
@@ -849,25 +949,17 @@ public class EZShop implements EZShopInterface {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
     		throw new UnauthorizedException();
     	
-    	Integer max;
-    	if(openedSaleTransactions.isEmpty()) {
-    		if(closedSaleTransactions.isEmpty()) {
-    			if(paidSaleTransactions.isEmpty()) {
-    				max = 1;
-    			} else {
-    				max = Collections.max(paidSaleTransactions.keySet());
-    			}
-    		} else {
-    			max = Collections.max(closedSaleTransactions.keySet());
-    		}    			
-    	} else {
-    		max = Collections.max(openedSaleTransactions.keySet());
-    	}
+    	Integer max = 1;
+    	Stream<Integer> st = Stream.concat(openedSaleTransactions.keySet().stream(), closedSaleTransactions.keySet().stream());
+    	st = Stream.concat(st, paidSaleTransactions.keySet().stream()).filter(t -> t != null);
+    	List<Integer> stList = st.collect(Collectors.toList());
+    	if(!stList.isEmpty())
+    		max = stList.stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
     	SaleTransactionImpl sale = new SaleTransactionImpl();
-    	sale.setTicketNumber(max+1);
+    	sale.setTicketNumber(max);
     	sale.setEntries(new ArrayList<TicketEntry>());
-    	openedSaleTransactions.put(max+1, sale);
-    	return (max+1);
+    	openedSaleTransactions.put(max, sale);
+    	return max;
     }
 
     @Override
@@ -877,7 +969,7 @@ public class EZShop implements EZShopInterface {
     	
     	if(transactionId == null || transactionId <= 0)
     		throw new InvalidTransactionIdException();
-    	
+    
     	if(productCode == null || productCode.isEmpty() || !barCodeIsValid(productCode))
     		throw new InvalidProductCodeException();
     	
@@ -892,12 +984,18 @@ public class EZShop implements EZShopInterface {
 			return false;
 		
 		List<TicketEntry> entries = sale.getEntries();
-		TicketEntry productToInsert = new TicketEntryImpl(productCode, amount);
-		productToInsert.setProductDescription(refProd.getProductDescription());
-		productToInsert.setPricePerUnit(refProd.getPricePerUnit());
-		
-		entries.add(productToInsert);
-		sale.setPrice(sale.getPrice() + amount * productToInsert.getPricePerUnit());
+		try {
+			TicketEntry tk = entries.stream().filter(e -> e.getBarCode().equals(productCode)).findFirst().get();
+			tk.setAmount(tk.getAmount() + amount);
+			sale.setPrice(tk.getAmount() * tk.getPricePerUnit());
+		}
+		catch (NoSuchElementException e) {
+			TicketEntry productToInsert = new TicketEntryImpl(productCode, amount);
+			productToInsert.setProductDescription(refProd.getProductDescription());
+			productToInsert.setPricePerUnit(refProd.getPricePerUnit());
+			entries.add(productToInsert);
+			sale.setPrice(sale.getPrice() + amount * productToInsert.getPricePerUnit());
+		}
 		
 		return true;
     }
@@ -1021,10 +1119,8 @@ public class EZShop implements EZShopInterface {
 		if(sale == null)
 			return false;
 		
-		if(closedSaleTransactions.putIfAbsent(transactionId, sale) != null)
-			return false;
-		if(openedSaleTransactions.remove(transactionId) == null)
-			return false;
+		closedSaleTransactions.putIfAbsent(transactionId, sale);
+		openedSaleTransactions.remove(transactionId);
     	
         return true;
     }
@@ -1038,18 +1134,30 @@ public class EZShop implements EZShopInterface {
     		throw new InvalidTransactionIdException();
     	
     	SaleTransaction sale = openedSaleTransactions.get(transactionId);
-		if(sale == null) {
-			sale = closedSaleTransactions.get(transactionId);
-			if(sale == null) {
-				return false;
-			} else {
-				closedSaleTransactions.remove(transactionId);
-			}				
-		} else {
-			openedSaleTransactions.remove(transactionId);
-		}
-		
-        return true;
+    	if(sale != null) {
+    		openedSaleTransactions.remove(transactionId);
+			return true;
+    	}
+    	sale = closedSaleTransactions.get(transactionId);
+    	if(sale != null) {
+    		sale.getEntries().stream().forEach(t -> {
+    			ProductType pr = products.get(t.getBarCode());
+    			pr.setQuantity(pr.getQuantity() + t.getAmount());			
+    		});
+    		closedSaleTransactions.remove(transactionId);
+			return true;
+    	}
+    	sale = paidSaleTransactions.get(transactionId);
+    	if(sale != null) {
+    		sale.getEntries().stream().forEach(t -> {
+    			ProductType pr = products.get(t.getBarCode());
+    			pr.setQuantity(pr.getQuantity() + t.getAmount());			
+    		});
+    		this.balance += sale.getPrice();
+    		paidSaleTransactions.remove(transactionId);
+    		return true;
+    	}
+    	return false;
     }
 
     @Override
@@ -1060,7 +1168,10 @@ public class EZShop implements EZShopInterface {
     	if( transactionId == null|| transactionId <= 0 )
     		throw new InvalidTransactionIdException();
 
-    	return closedSaleTransactions.get(transactionId);
+    	SaleTransactionImpl ret = closedSaleTransactions.get(transactionId);
+    	if(ret == null)
+    		ret = paidSaleTransactions.get(transactionId);
+    	return ret;
     }
 
     @Override
@@ -1222,18 +1333,17 @@ public class EZShop implements EZShopInterface {
         if(!creditCardIsValid(creditCard))
         	throw new InvalidCreditCardException();
         
-        /* TODO credit card handling
-         * if(!creditsCard.contains(creditCard)
-         * 		return false;
-         * 
-         * here something to check credit card balance and check if it is registered
-         *
-         */
-        
+        if(!creditCards.containsKey(creditCard))
+      		return false;
+
         if(!closedSaleTransactions.containsKey(ticketNumber))
     		return false;
         
         SaleTransactionImpl st = closedSaleTransactions.get(ticketNumber);
+        
+        if (creditCards.get(creditCard).getBalance() < st.getPrice())
+        	return false;
+        
     	closedSaleTransactions.remove(ticketNumber);
     	paidSaleTransactions.put(ticketNumber, st);
     	this.balance += st.getPrice();
@@ -1269,13 +1379,8 @@ public class EZShop implements EZShopInterface {
         if(!creditCardIsValid(creditCard))
         	throw new InvalidCreditCardException();
         
-        /* TODO credit card handling
-         * if(!creditsCard.contains(creditCard)
-         * 		return false;
-         * 
-         * here something to check credit card balance and check if it is registered
-         *
-         */
+        if(!creditCards.containsKey(creditCard))
+        		return -1;
         
         if(openedReturnTransactions.containsKey(returnId) || !closedReturnTransactions.containsKey(returnId) || paidReturnTransactions.containsKey(returnId))
         	return -1;
@@ -1369,9 +1474,6 @@ public class EZShop implements EZShopInterface {
     	if(barCode.matches("[0-9]{12,14}"))
     	{
     		//Il bar code deve essere una stringa composta da numeri
-    	
-	    	if( (bcSize == 12) || (bcSize == 13) || (bcSize == 14) )
-	    	{
 	    		int sum = 0;
 	    		int mul; //Può essere 1 o 3
 	    		int digit; 
@@ -1425,15 +1527,6 @@ public class EZShop implements EZShopInterface {
 	    		}
 	    		
 	    	}
-	    	else
-	    	{
-	    		r = false;
-	    	}
-    	}
-    	else
-    	{
-    		r = false;
-    	}
     	
     	return r;
     }

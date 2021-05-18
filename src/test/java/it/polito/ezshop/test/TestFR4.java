@@ -13,7 +13,7 @@ public class TestFR4 {
 	public void testUpdateQuantity() throws InvalidProductIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidLocationException
 	{
 		//loggedUser = Cashier -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Cashier");
@@ -26,7 +26,7 @@ public class TestFR4 {
 		}
 		
 		//productId = null -> throws InvalidProductIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -40,15 +40,22 @@ public class TestFR4 {
 		}
 		
 		//final quantity is negative -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.createProductType("product", "6291041500213", 1, "");
-		ezshop.updatePosition(2, "1-a-1");
-		assertFalse(ezshop.updateQuantity(1, -2));
+		int id = ezshop.createProductType("product", "6291041500213", 1, "");
+		ezshop.updatePosition(id, "1-a-1");
+		assertFalse(ezshop.updateQuantity(id, -10));
+		
+		//final quantity is negative -> return false
+		ezshop = new EZShop(0);
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		id = ezshop.createProductType("product", "6291041500213", 1, "");
+		assertFalse(ezshop.updateQuantity(id, 1));
 		
 		//product is not present -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
@@ -56,14 +63,14 @@ public class TestFR4 {
 		assertFalse(ezshop.updateQuantity(1000, -2));
 		
 		//product has not a location -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
 		assertFalse(ezshop.updateQuantity(4, 1));
 		
 		//all is good -> return true
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		Integer productId = ezshop.createProductType("product", "6291041500213", 1, "");
@@ -71,7 +78,7 @@ public class TestFR4 {
 		assertTrue(ezshop.updateQuantity(productId, 1));
 		
 		//location = "notWorkingLocation" -> throws InvalidLocationException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -91,12 +98,9 @@ public class TestFR4 {
 	public void testUpdatePosition() throws InvalidProductIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidLocationException
 	{
 		//loggedUser = Cashier -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
-			ezshop.createUser("admin", "admin", "Cashier");
-			ezshop.login("admin", "admin");
-			ezshop.createProductType("product", "6291041500213", 1, "");
 			ezshop.updatePosition(1, "1-a-1");
 			fail("Expected an UnauthorizedException to be thrown");
 		}catch(UnauthorizedException e)
@@ -105,7 +109,7 @@ public class TestFR4 {
 		}
 		
 		//productId = null -> throws InvalidProductIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -119,7 +123,7 @@ public class TestFR4 {
 		}
 		
 		//location = "notWorkingLocation" -> throws InvalidLocationException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -133,16 +137,16 @@ public class TestFR4 {
 		}
 		
 		//location is already assigned to another product -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.createProductType("product", "6291041500213", 1, "");
-		ezshop.updatePosition(4, "1-a-1");
-		ezshop.createProductType("another product", "0000000000000", 1, "");
-		assertFalse(ezshop.updatePosition(5, "1-a-1"));
+		int id = ezshop.createProductType("product", "6291041500213", 1, "");
+		ezshop.updatePosition(id, "1-a-1");
+		id = ezshop.createProductType("another product", "0000000000000", 1, "");
+		assertFalse(ezshop.updatePosition(id, "1-a-1"));
 		
 		//product does not exist -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
@@ -154,7 +158,7 @@ public class TestFR4 {
 	public void testIssueOrder() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductDescriptionException, UnauthorizedException
 	{
 		//loggedUser = Cashier -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Cashier");
@@ -167,7 +171,7 @@ public class TestFR4 {
 		}
 		
 		//quantity = -3 -> throws InvalidQuantityException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -181,7 +185,7 @@ public class TestFR4 {
 		}
 		
 		//pricePerUnit = -3 -> throws InvalidPricePerUnitException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -195,7 +199,7 @@ public class TestFR4 {
 		}
 		
 		//productCode = "" -> throws InvalidProductCodeException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -209,7 +213,7 @@ public class TestFR4 {
 		}
 		
 		//the product does not exists -> return -1
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
@@ -217,7 +221,7 @@ public class TestFR4 {
 		assertTrue(i==-1);
 		
 		//All is good -> return id of the product
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
@@ -229,7 +233,7 @@ public class TestFR4 {
 	public void testPayOrderFor() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductDescriptionException, UnauthorizedException
 	{
 		//loggedUser = Cashier -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Cashier");
@@ -242,7 +246,7 @@ public class TestFR4 {
 		}
 		
 		//quantity = -3 -> throws InvalidQuantityException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -256,7 +260,7 @@ public class TestFR4 {
 		}
 		
 		//pricePerUnit = -3 -> throws InvalidPricePerUnitException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -270,7 +274,7 @@ public class TestFR4 {
 		}
 		
 		//productCode = "" -> throws InvalidProductCodeException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -284,7 +288,7 @@ public class TestFR4 {
 		}
 		
 		//the product does not exists -> return -1
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
@@ -292,7 +296,7 @@ public class TestFR4 {
 		assertTrue(i==-1);
 		
 		//All is good -> return id of the product
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.recordBalanceUpdate(100);
@@ -301,7 +305,7 @@ public class TestFR4 {
 		assertTrue(j>0);
 		
 		//Balance is not enough to pay the order -> return -1
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
@@ -312,7 +316,7 @@ public class TestFR4 {
 	public void testPayOrder() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductDescriptionException, UnauthorizedException, InvalidOrderIdException
 	{
 		//loggedUser = Cashier -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Cashier");
@@ -325,7 +329,7 @@ public class TestFR4 {
 		}
 		
 		//orderId = null -> throws InvalidOrderIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -338,36 +342,45 @@ public class TestFR4 {
 		}
 		
 		//The order does not exist -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		assertFalse(ezshop.payOrder(1));
 		
 		//The order is not in ISSUED state -> return false
-		ezshop = new EZShop();
-		ezshop.createUser("admin", "admin", "Administrator");
-		ezshop.login("admin", "admin");
-		ezshop.createProductType("product", "6291041500213", 1, "");
-		ezshop.recordBalanceUpdate(10);
-		ezshop.issueOrder("6291041500213", 1, 1);
-		ezshop.payOrder(3);
-		assertFalse(ezshop.payOrder(3));
-		
-		//All is good -> return true
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		ezshop.createProductType("product", "6291041500213", 1, "");
 		ezshop.recordBalanceUpdate(10);
 		Integer orderId = ezshop.issueOrder("6291041500213", 1, 1);
+		ezshop.payOrder(orderId);
+		assertFalse(ezshop.payOrder(3));
+		
+		//Not enough balance to pay for order -> return false
+		ezshop = new EZShop(0);
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		ezshop.createProductType("product", "6291041500213", 1, "");
+		orderId = ezshop.issueOrder("6291041500213", 1, 1);
+		assertFalse(ezshop.payOrder(orderId));
+		
+		//All is good -> return true
+		ezshop = new EZShop(0);
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		ezshop.createProductType("product", "6291041500213", 1, "");
+		ezshop.recordBalanceUpdate(10);
+		orderId = ezshop.issueOrder("6291041500213", 1, 1);
 		assertTrue(ezshop.payOrder(orderId));
+		assertFalse(ezshop.payOrder(orderId));
 	}
 	
 	@Test
 	public void testRecordOrderArrival() throws InvalidOrderIdException, InvalidLocationException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, InvalidQuantityException, InvalidProductIdException 
 	{
 		//loggedUser = Cashier -> throws UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Cashier");
@@ -380,7 +393,7 @@ public class TestFR4 {
 		}
 		
 		//location = null -> throws InvalidLocationException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -396,7 +409,7 @@ public class TestFR4 {
 		}
 		
 		//orderId = 0 -> throws InvalidOrderIdException
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		try
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
@@ -409,20 +422,24 @@ public class TestFR4 {
 		}
 		
 		//order does not exist -> return false
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		assertFalse(ezshop.recordOrderArrival(67000));
 		
 		//All is good -> return true
-		ezshop = new EZShop();
+		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 
 		Integer productId = ezshop.createProductType("product", "000000000000", 1, "");
 		ezshop.updatePosition(productId, "001-abcd-001");
-		ezshop.recordBalanceUpdate(10);
-		Integer orderId = ezshop.payOrderFor("000000000000", 1, 1);
+		ezshop.recordBalanceUpdate(10);	
+		Integer orderId = ezshop.issueOrder("000000000000", 1, 1);
+		assertFalse(ezshop.recordOrderArrival(orderId));
+		assertFalse(ezshop.recordOrderArrival(orderId));
+		assertTrue(ezshop.payOrder(orderId));
+		assertTrue(ezshop.recordOrderArrival(orderId));	
 		assertTrue(ezshop.recordOrderArrival(orderId));	
 
 		
@@ -433,7 +450,7 @@ public class TestFR4 {
 	public void testGetAllOrders() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidProductCodeException, InvalidQuantityException, InvalidPricePerUnitException, InvalidProductDescriptionException
 	{
 		//loggedUser = null -> throw UnauthorizedException
-		EZShop ezshop = new EZShop();
+		EZShop ezshop = new EZShop(0);
 		try 
 		{
 			ezshop.getAllOrders();

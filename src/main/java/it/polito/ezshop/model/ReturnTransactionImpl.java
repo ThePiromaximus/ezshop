@@ -7,8 +7,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class ReturnTransactionImpl{
-	private static Integer PROGRESSIVE_ID = 1;
+public class ReturnTransactionImpl implements java.io.Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -5584725631361573214L;
+
+	public static Integer PROGRESSIVE_ID = 1;
 	
 	private SaleTransaction saleTransaction;
 	private Integer id;

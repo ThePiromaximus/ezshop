@@ -1,10 +1,7 @@
 package it.polito.ezshop.test;
 import static org.junit.Assert.*;
-import static org.junit.Assert.*;
-import java.util.List;
 import org.junit.Test;
 import it.polito.ezshop.data.*;
-import it.polito.ezshop.exceptions.*;
 
 
 public class TestUnit {
@@ -20,6 +17,10 @@ public class TestUnit {
 		assertFalse(EZShop.barCodeIsValid("123"));
 		//barCode = "111111111111" (length==12) -> return false
 		assertFalse(EZShop.barCodeIsValid("111111111111"));
+		//barCode = "111111111111" (length==13) -> return false
+		assertFalse(EZShop.barCodeIsValid("1111111111111"));
+		//barCode = "111111111111" (length==14) -> return false
+		assertFalse(EZShop.barCodeIsValid("11111111111111"));
 		//barCode = "746299013160" -> return true
 		assertTrue(EZShop.barCodeIsValid("746299013160"));
 		//barCode = "6291041500213" -> return true
@@ -40,6 +41,8 @@ public class TestUnit {
 		assertFalse(EZShop.creditCardIsValid("11111111"));
 		//creditCard = "4194343567131588" -> return true
 		assertTrue(EZShop.creditCardIsValid("4194343567131588"));
+		//creditCard = "41943435671315883" -> return false
+		assertFalse(EZShop.creditCardIsValid("41943435671315883"));
 	}
 	
 	@Test

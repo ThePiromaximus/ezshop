@@ -1,10 +1,15 @@
 package it.polito.ezshop.model;
 
-public class ProductTypeImpl implements it.polito.ezshop.data.ProductType {
+public class ProductTypeImpl implements it.polito.ezshop.data.ProductType, java.io.Serializable {
 	
-	private static Integer PROGRESSIVE_ID = 1;
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3421884904005090164L;
+
+	public static Integer PROGRESSIVE_ID = 1;
 	
-	private Integer quantity;
+	private Integer quantity = 0;
 	private String location;
 	private String note;
 	private String productDescription;

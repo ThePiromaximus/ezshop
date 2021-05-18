@@ -433,8 +433,8 @@ GUI -> User : Successful message
 actor Cashier
 Cashier -> GUI: Start a new sale transaction
 GUI  -> EZShop: startSaleTransaction()
-EZShop -> SaleTransaction: new SaleTransaction()
-EZShop <- SaleTransaction: return saleTransaction
+EZShop -> SaleTransactionImpl: new SaleTransaction()
+EZShop <- SaleTransactionImpl: return saleTransaction
 GUI <- EZShop: return ID
 GUI -> Cashier: Ask for product bar code
 GUI -> Cashier: Ask for product units
@@ -442,23 +442,24 @@ Cashier -> GUI: Insert product bar code
 Cashier -> GUI: Set N units of product P
 GUI  -> EZShop: addProductToSale()
 EZShop -> EZShop: products.get(productCode)
-EZShop -> SaleTransaction: saleTransaction.setProductType()
-EZShop -> ProductType : productType.setQuantity()
+EZShop -> SaleTransactionImpl: saleTransaction.setProductType()
+EZShop -> ProductTypeImpl : productType.setQuantity()
 EZShop -> GUI: return true
 GUI -> Cashier : Ask for product discount rate 
 Cashier -> GUI: Apply product discount rate  
 GUI -> EZShop: applyDiscountRateToProduct()
 EZShop -> EZShop : productType.getID()
-EZShop -> SaleTransaction: setDiscountRate()
+EZShop -> SaleTransactionImpl: setDiscountRate()
 EZShop -> GUI: return true
 Cashier -> GUI: End Sale transaction
 GUI  -> EZShop: endSaleTransaction()
-EZShop -> SaleTransaction: saleTransaction.setState()
+EZShop -> SaleTransactionImpl: saleTransaction.setState()
 GUI <- EZShop: return true
 Cashier -> GUI: Manage payment (UC7)
 Cashier <- GUI: Print sale receipt
 @enduml
 ```
+
 
 ### Scenario 6.4
 ```plantuml
@@ -466,8 +467,8 @@ Cashier <- GUI: Print sale receipt
 actor Cashier
 Cashier -> GUI: Start a new sale transaction
 GUI  -> EZShop: startSaleTransaction()
-EZShop -> SaleTransaction: new SaleTransaction()
-EZShop <- SaleTransaction: return saleTransaction
+EZShop -> SaleTransactionImpl: new SaleTransaction()
+EZShop <- SaleTransactionImpl: return saleTransaction
 GUI <- EZShop: return ID
 GUI -> Cashier: Ask for product bar code
 GUI -> Cashier: Ask for product units
@@ -475,12 +476,12 @@ Cashier -> GUI: Insert product bar code
 Cashier -> GUI: Set N units of product P
 GUI  -> EZShop: addProductToSale()
 EZShop -> EZShop: productType.getID()
-EZShop -> SaleTransaction: saleTransaction.setProductType()
+EZShop -> SaleTransactionImpl: saleTransaction.setProductType()
 EZShop -> ProductTypeImpl: productType.setQuantity()
 EZShop -> GUI: return true
 Cashier -> GUI: End Sale transaction
 GUI  -> EZShop: endSaleTransaction()
-EZShop -> SaleTransaction: saleTransaction.setState()
+EZShop -> SaleTransactionImpl: saleTransaction.setState()
 GUI <- EZShop: return true
 Cashier <- GUI: Ask for payment type
 Cashier -> GUI: Insert LoyaltyCard number
@@ -488,12 +489,13 @@ GUI -> EZShop: computePointsForSale()
 EZShop -> GUI: return points 
 Cashier -> GUI: Manage payment(UC7)
 GUI -> EZShop: modifyPointsOnCard()
-EZShop -> LoyaltyCard: loyaltyCard.setPoints()
-EZShop <- LoyaltyCard: return true
+EZShop -> CustomerImpl: customer.setPoints()
+EZShop <- CustomerImpl: return true
 EZShop -> GUI: return true
 Cashier <- GUI: Print ticket
 @enduml
 ```
+
 
 ### Scenario 7.1
 ```plantuml
@@ -573,8 +575,9 @@ actor Cashier
 GUI -> Cashier: ask for credit card number
 Cashier -> GUI: Insert credit card number
 GUI -> EZShop: returnCreditCardPayment()
-EZShop -> ReturnTransaction:  returnTransaction.getAmount()
+EZShop -> ReturnTransactionImpl:  returnTransaction.getAmount()
 GUI <- EZShop: return money
 Cashier <- GUI: Successful message
 @enduml
 ```
+

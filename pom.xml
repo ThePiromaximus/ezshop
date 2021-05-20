@@ -118,7 +118,6 @@
             <version>1.0.0</version>
             <scope>system</scope>
             <systemPath>${pom.basedir}/lib/ezshop-gui.jar</systemPath>
-        </dependency>
-
+        </dependency>		
     </dependencies>
 </project>

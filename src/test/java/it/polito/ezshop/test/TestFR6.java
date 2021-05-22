@@ -238,11 +238,12 @@ public class TestFR6 {
 	}
 	
 	@Test
-	public void testApplyDiscountRateToProduct() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidQuantityException, InvalidDiscountRateException, InvalidLocationException {
+	public void testApplyDiscountRateToProduct() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidQuantityException, InvalidDiscountRateException, InvalidLocationException, InvalidPaymentException {
 		EZShopInterface EzShop = new EZShop(0);
 		Integer id = 0;
 		User usr;
 		boolean ret = false;
+		double cash = 0;
 		
 		try {
 			ret = EzShop.applyDiscountRateToProduct(id, "122474487139", 0.1);
@@ -343,6 +344,15 @@ public class TestFR6 {
 		
 		ret = EzShop.applyDiscountRateToProduct(id, "122474487139", 0.1);
 		assertTrue(ret);
+		
+		ret = EzShop.applyDiscountRateToSale(id, 0.5);
+		assertTrue(ret);
+		
+		ret = EzShop.endSaleTransaction(id);
+		assertTrue(ret);
+		
+		cash = EzShop.receiveCashPayment(id, 10);
+		assertTrue(cash == 5.5);
 		
 		return;
 	}

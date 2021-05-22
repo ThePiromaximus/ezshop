@@ -34,6 +34,7 @@ package it.polito.ezshop.test as Test
 package "ezshop-gui.jar" as GUI
 database ezshop.bin as DB
 
+EzShop <-- GUI
 EzShop <-- EZShopModel
 EZShopData <-- EZShopModel
 EZShopExceptions <-- EZShopModel
@@ -43,7 +44,6 @@ EZShopData <-- Test
 EZShopData <--> DB
 @enduml
 ```
-<-->
 
 # Low level design
 

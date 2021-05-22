@@ -337,6 +337,13 @@ public class TestFR5 {
 			
 		}
 		
+		try {
+			ret = EzShop.attachCardToCustomer("12121", id);
+			fail();
+		} catch(InvalidCustomerCardException e) {
+			
+		}
+		
 		ret = EzShop.attachCardToCustomer(card, 150);
 		assertTrue(!ret);
 		
@@ -351,7 +358,7 @@ public class TestFR5 {
 	
 	@SuppressWarnings("unused")
 	@Test
-	public void testModifyPointsOnCard() throws InvalidCustomerCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidCustomerNameException, InvalidCustomerIdException {
+	public void testModifyPointsOnCard() throws InvalidCustomerCardException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException, InvalidCustomerNameException, InvalidCustomerIdException, InvalidTransactionIdException, InvalidCreditCardException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException {
 		EZShopInterface EzShop = new EZShop(0);
 		Integer id = 0, points = 0;
 		String card = "";
@@ -404,6 +411,22 @@ public class TestFR5 {
 		
 		ret = EzShop.modifyPointsOnCard(card, -5);
 		assertTrue(ret);
+		
+		double oldBalance = EzShop.computeBalance();
+		Integer productId = EzShop.createProductType("Lenovo Yoga Slim 7", "1845678901001", 1000.0, "Notebook");
+		EzShop.updatePosition(productId, "001-abcd-003");		
+		EzShop.updateQuantity(productId, 10);
+		Integer saleId = EzShop.startSaleTransaction();
+		EzShop.addProductToSale(saleId, "1845678901001", 3);
+		EzShop.endSaleTransaction(saleId);
+		
+		assertTrue(EzShop.receiveCreditCardPayment(saleId, "5555555555554444"));
+		assertTrue(EzShop.computeBalance() == (oldBalance + 3000.0));
+		
+		points = EzShop.computePointsForSale(saleId);
+		
+		ret = EzShop.modifyPointsOnCard(card, points);
+		assertTrue(ret);		
 		
 		return;
 	}

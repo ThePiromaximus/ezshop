@@ -137,31 +137,30 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 | 4-4 | FR1, FR5 | testModifyCustomer() |           
 | 5-1 | FR1 | testLogin() |            
 | 5-2 | FR1 | testLogout() |
-| 6-1 | FR1, FR3, FR6, FR8 | testReceiveCashPayment() |            
-| 6-2 | FR1, FR3, FR6, FR8 | testApplyDiscountRateToProduct() |
-| 6-3 | FR1, FR3, FR6, FR8 | testApplyDiscountRateToProduct() |
-| 6-4 | FR1, FR3, FR5, FR6, FR8 | testModifyPointsOnCard() |
-| 6-5 |                                 |  |
-| 6-6 |                                 |             | 
-| 7-1 | FRx                             |             |            
-| 7-2 | FRy                             |             |            
-| 7-3 |                                 |             |           
-| 7-4 |                                 |             | 
-| 8-1 | FRx                             |             |            
-| 8-2 | FRy                             |             | 
-| 9-1 | FRx                             |             |  
-| 10-1 | FRx                             |             |             
-| 10-2 | FRy                             |             |
+| 6-1 | FR1, FR3, FR6, FR7, FR8 | testReceiveCashPayment() |            
+| 6-2 | FR1, FR3, FR6, FR7, FR8| testApplyDiscountRateToProduct() |
+| 6-3 | FR1, FR3, FR6, FR7, FR8 | testApplyDiscountRateToProduct() |
+| 6-4 | FR1, FR3, FR5, FR6, FR7, FR8 | testModifyPointsOnCard() |
+| 6-5 | FR1, FR3, FR6, FR7 | testDeleteSaleTransaction() |
+| 6-6 | FR1, FR3, FR6, FR7, FR8 | testReceiveCashPayment() | 
+| 7-1 | FR1, FR3, FR6, FR7, FR8 | testReceiveCreditCardPayment() |            
+| 7-2 | FR1, FR3, FR6, FR7, FR8 | testReceiveCreditCardPayment() |            
+| 7-3 | FR1, FR3, FR6, FR7, FR8 | testReceiveCreditCardPayment() |         
+| 7-4 | FR1, FR3, FR6, FR7, FR8 | testReceiveCashPayment() | 
+| 8-1 | FR1, FR3, FR6, FR7, FR8 | testReturnCreditCardPayment() |            
+| 8-2 | FR1, FR3, FR6, FR7, FR8 | testReturnCashPayment() | 
+| 9-1 | FR1, FR3, FR4, FR6, FR7, FR8 | testGetCreditsAndDebits() |  
+| 10-1 | FR1, FR3, FR6, FR7, FR8 | testReturnCashPayment() |             
+| 10-2 | FR1, FR3, FR6, FR7, FR8 | testReturnCreditCardPayment() |             
 
 # Coverage of Non Functional Requirements
 
-<Report in the following table the coverage of the Non Functional Requirements of the application - only those that can be tested with automated testing frameworks.>
-
-
-### 
-
 | Non Functional Requirement | Test name |
 | -------------------------- | --------- |
-|                            |           |
+| NFR2 | See image exectutionTime.png |
+| NFR4 | testBarcodeIsValid() |
+| NFR5 | testCreditCardIsValid() |
+| NFR6 | testAttachCardToCustomer() |
 
-
+![image](./IntegrationReport/executionTime.png)
+*executionTime.png: The time required to execute the whole test suite is lower than 0.5 seconds, thus allowing us to infer that the time required to complete each method is lower than 0.5 seconds.*

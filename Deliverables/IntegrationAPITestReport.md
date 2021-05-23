@@ -36,9 +36,6 @@ Once that was done, all the subsequent steps delved deeper in granularity on sig
 
 #  Tests
 
-   <define below a table for each integration step. For each integration step report the group of classes under test, and the names of
-     JUnit test cases applied to them> JUnit test classes should be here src/test/java/it/polito/ezshop
-
 ## Step 1 - Test EZShop setup
 | Classes  | JUnit test cases |
 |--|--|
@@ -113,10 +110,6 @@ Once that was done, all the subsequent steps delved deeper in granularity on sig
 | OrderImpl | class TestFR8 |
 
 # Coverage of Scenarios and FR
-
-<Report in the following table the coverage of  scenarios (from official requirements and from above) vs FR. 
-Report also for each of the scenarios the (one or more) API JUnit tests that cover it. >
-
 
 >The API is not consistent with scenario 4-3, as there is no method to explicitly detach a LoyaltyCard and passing a null customerCard to attachCardToCustomer() results in a InvalidCustomerCardException.
 

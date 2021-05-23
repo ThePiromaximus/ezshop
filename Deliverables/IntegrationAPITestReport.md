@@ -162,5 +162,6 @@ Report also for each of the scenarios the (one or more) API JUnit tests that cov
 | NFR5 | testCreditCardIsValid() |
 | NFR6 | testAttachCardToCustomer() |
 
-![image](./IntegrationReport/executionTime.png)<\br>
+![image](./IntegrationReport/executionTime.png)
+
 *executionTime.png: The time required to execute the whole test suite is lower than 0.5 seconds, thus allowing us to infer that the time required to complete each method is lower than 0.5 seconds.*

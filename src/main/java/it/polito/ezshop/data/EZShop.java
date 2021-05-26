@@ -1107,7 +1107,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			}
 		}
 		
-		Integer retPoints = sale.getEntries().stream().mapToInt(p -> (int)(p.getAmount() * p.getPricePerUnit())).sum()/10;
+		Integer retPoints = (int) sale.getPrice() / 10;
     	
         return retPoints;
     }

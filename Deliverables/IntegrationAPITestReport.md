@@ -2,13 +2,13 @@
 
 Authors: Angela D'Antonio, Gabriele Inzerillo, Ruggero Nocera, Marzio Vallero
 
-Date: 22/05/2021
+Date: 26/05/2021
 
-Version: 1.0
+Version: 1.1
 
 # Contents
 
-- [Dependency graph](#dependency graph)
+- [Dependency graph](#dependency-graph)
 
 - [Integration approach](#integration)
 
@@ -31,12 +31,12 @@ We used a top-down approach, starting directly from API and integrations testing
 We divided all the methods in their respective API functional requirement group and then tested each method by initializing an independent scope in which to test all the possible inputs and exceptions in order to maximize coverage and bug discovery.
 Each member in the group has been tasked with writing the test cases of a subset of the methods in the API.
 Since both class testing and method testing referred to the same object, EZShop, we wrote a test method for each API method that accomplished both functionalities.
-The first step has been writing in parallel all the integration tests of EZShop, then as a second step we checked for bugs and solved them.
-Once that was done, all the subsequent steps delved deeper in granularity on signle classes, but the approach was exactly the same as before.
+The first step has been writing in parallel all the integration tests of EZShop, then checking for bugs and solving them.
+This approach has been repeated, with each subsequent step delving deeper in granularity on single classes, until we obtained an high enough coverage of the code.
 
 #  Tests
 
-## Step 1 - Test EZShop setup
+## Step 1 - Test EZShop setup and persistency
 | Classes  | JUnit test cases |
 |--|--|
 | EZShop | class TestFR1 |
@@ -108,6 +108,20 @@ Once that was done, all the subsequent steps delved deeper in granularity on sig
 | ProductTypeImpl | class TestFR8 |
 | BalanceOperationImpl | class TestFR8 |
 | OrderImpl | class TestFR8 |
+
+## Step 9 - Unit Testing
+| Classes  | JUnit test cases |
+|--|--|
+| EZShop | class TestUnit |
+| UserImpl | class TestClasses |
+| SaleTransacitonImpl | class TestClasses |
+| ReturnTransactionImpl | class TestClasses |
+| OrderImpl | class TestClasses |
+| BalanceOperationImpl | class TestClasses |
+| CreditCardImpl | class TestClasses |
+| CustomerCardImpl | class TestClasses |
+| ProductTypeImpl | class TestClasses |
+| TicketEntryImpl | class TestClasses |
 
 # Coverage of Scenarios and FR
 

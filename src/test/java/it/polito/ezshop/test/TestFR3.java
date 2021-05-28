@@ -247,7 +247,7 @@ public class TestFR3 {
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
 		Integer id = ezshop.createProductType("product", "6291041500213", 1, "");
-		boolean res = ezshop.updateProduct(id,"product A","0123456789012", 2, "note");
+		boolean res = ezshop.updateProduct(ezshop.getProductTypeByBarCode("6291041500213").getId(),"product A","0123456789012", 2, "note");
 		assertTrue(res);
 		
 		//modify product with id=3 and barCode that already exists return false 

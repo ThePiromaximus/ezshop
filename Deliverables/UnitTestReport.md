@@ -160,6 +160,4 @@ Version: 1.1
 |TestUnit|1447-1462|16|testCreditCardIsValid()|
 |TestUnit|1447-1462|[17, maxint]|testCreditCardIsValid()|
 |TestUnit|None|Not applicable|testRoundUp()|
-
-
-
+|TestClasses|None|Not applicable|testClasses()|

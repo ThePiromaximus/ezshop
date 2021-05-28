@@ -129,7 +129,7 @@ public class TestFR4 {
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
 			ezshop.createProductType("product", "6291041500213", 1, "");
-			ezshop.updatePosition(3, "notWorkingLocation");
+			ezshop.updatePosition(ezshop.getProductTypeByBarCode("6291041500213").getId(), "notWorkingLocation");
 			fail("Expected an InvalidLocationException to be thrown");
 		}catch(InvalidLocationException e)
 		{

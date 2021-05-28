@@ -13,7 +13,7 @@ public class SaleTransactionImpl implements it.polito.ezshop.data.SaleTransactio
 	private static final long serialVersionUID = -9109210677396483532L;
 	private Integer ticketNumber;
 	private List<TicketEntry> entries;
-	private double discountRate;
+	private double discountRate = 0;
 	private double price;
 	private LocalDate date = LocalDate.now();
 	private BalanceOperationImpl balanceOperation = new BalanceOperationImpl();

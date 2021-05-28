@@ -910,7 +910,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(customerId == null || customerId <= 0)
     		throw new InvalidCustomerIdException();
     	
-    	if(customerCard == null || customerCard.isEmpty())
+    	if(customerCard == null || customerCard.isEmpty() || customerCard.length() != 10)
     		throw new InvalidCustomerCardException();
     	
     	List<Customer> customersList = getAllCustomers();
@@ -1058,7 +1058,9 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 		List<TicketEntry> entries = sale.getEntries();
 		Optional<TicketEntry> tmp = entries.stream().filter(e -> productCode.equals(e.getBarCode())).findFirst();
     	if(tmp.isPresent()) {
+    		sale.setPrice(sale.getPrice() - tmp.get().getAmount() * tmp.get().getPricePerUnit() * (1 - sale.getDiscountRate()) * (1 - tmp.get().getDiscountRate()));
     		tmp.get().setDiscountRate(discountRate);
+    		sale.setPrice(sale.getPrice() + tmp.get().getAmount() * tmp.get().getPricePerUnit() * (1 - sale.getDiscountRate()) * (1 - tmp.get().getDiscountRate()));
     		return true;
     	}
     	
@@ -1079,7 +1081,10 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 		if(sale == null)
 			return false;
 		
+		if(sale.getDiscountRate() < 1.0)
+			sale.setPrice(sale.getPrice() / (1 - sale.getDiscountRate()));
 		sale.setDiscountRate(discountRate);
+		sale.setPrice(sale.getPrice() * (1 - sale.getDiscountRate()));
     	
     	return true;
     }
@@ -1102,7 +1107,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			}
 		}
 		
-		Integer retPoints = sale.getEntries().stream().mapToInt(p -> (int)(p.getAmount() * p.getPricePerUnit())).sum()/10;
+		Integer retPoints = (int) sale.getPrice() / 10;
     	
         return retPoints;
     }

@@ -1048,7 +1048,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(productCode == null || productCode.isEmpty() || !barCodeIsValid(productCode))
     		throw new InvalidProductCodeException();
     	
-    	if(discountRate < 0.0 || discountRate > 1.0)
+    	if(discountRate < 0.0 || discountRate >= 1.0)
     		throw new InvalidDiscountRateException ();
     	
 		if(products.get(productCode) == null)
@@ -1077,7 +1077,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	
     	if(transactionId == null || transactionId <= 0 )
     		throw new InvalidTransactionIdException();
-    	if(discountRate < 0.0 || discountRate > 1.0)
+    	if(discountRate < 0.0 || discountRate >= 1.0)
     		throw new InvalidDiscountRateException ();
     	
     	SaleTransaction sale = openedSaleTransactions.get(transactionId);

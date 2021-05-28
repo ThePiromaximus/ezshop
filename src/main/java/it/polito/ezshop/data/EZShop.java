@@ -928,7 +928,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
     		throw new UnauthorizedException();
     	
-    	if(customerCard == null || customerCard.isEmpty())
+    	if(customerCard == null || customerCard.isEmpty() || !customerCard.matches("[0-9]{10}"))
     		throw new InvalidCustomerCardException();
     	
     	List<Customer> customersList = getAllCustomers();

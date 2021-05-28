@@ -986,6 +986,8 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 		List<TicketEntry> entries = sale.getEntries();
 		try {
 			TicketEntry tk = entries.stream().filter(e -> e.getBarCode().equals(productCode)).findFirst().get();
+			if(tk.getAmount() + amount > refProd.getQuantity())
+				return false;
 			tk.setAmount(tk.getAmount() + amount);
 			sale.setPrice(tk.getAmount() * tk.getPricePerUnit());
 		}

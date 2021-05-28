@@ -103,24 +103,18 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			this.paidSaleTransactions = ez.paidSaleTransactions;
 			this.closedSaleTransactions = ez.closedSaleTransactions;
 			
-			if(customers.size() > 0)
-				CustomerImpl.PROGRESSIVE_ID = customers.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			CustomerImpl.PROGRESSIVE_ID = customers.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(users.size() > 0)
-				UserImpl.PROGRESSIVE_ID = users.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			UserImpl.PROGRESSIVE_ID = users.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(balanceOperations.size() > 0)
-				BalanceOperationImpl.PROGRESSIVE_ID = balanceOperations.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			BalanceOperationImpl.PROGRESSIVE_ID = balanceOperations.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(products.size() > 0)
-				ProductTypeImpl.PROGRESSIVE_ID = products.values().stream().map((ProductTypeImpl p) -> p.getId()).max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			ProductTypeImpl.PROGRESSIVE_ID = products.values().stream().map((ProductTypeImpl p) -> p.getId()).max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(orders.size() > 0)
-				OrderImpl.PROGRESSIVE_ID = orders.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			OrderImpl.PROGRESSIVE_ID = orders.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(closedReturnTransactions.size() > 0 || paidReturnTransactions.size() > 0)
-				ReturnTransactionImpl.PROGRESSIVE_ID = Stream.concat(closedReturnTransactions.keySet().stream(),
-						paidReturnTransactions.keySet().stream()).max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			ReturnTransactionImpl.PROGRESSIVE_ID = Stream.concat(closedReturnTransactions.keySet().stream(),
+						paidReturnTransactions.keySet().stream()).max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
 			
 		} catch (Exception e) {
@@ -231,17 +225,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(id == null || id <= 0)
     		throw new InvalidUserIdException();
     	
-    	//return users.get(id);
-    	
-    	for(User user : users.values()) {
-    		
-    		if (user.getId() == id) {
-    	    	return user;
-    		}
-    	}
-    	
-    	return null;
-    	
+    	return users.get(id);
 	}
 
     @Override
@@ -800,6 +784,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	//Il nome deve essere unico (dovrebbe, dalla documentazione del metodo non si capisce ma nel precedente metodo era così)
     	if(customers.size()!=0)
     	{
+    		
     		for(Customer customer : customers.values())
         	{
         		//Devo scorrere tutti i clienti tranne quello attuale, sennò il nome risulterà sempre duplicato (nel caso in cui non venisse modificato)
@@ -814,7 +799,6 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         			
         		}
         	}
-    	
     	
 	    	//Aggiorno il nome del cliente
 			customers.get(id).setCustomerName(newCustomerName);

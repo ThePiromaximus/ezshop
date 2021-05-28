@@ -129,8 +129,8 @@ public class TestFR5 {
 		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.defineCustomer("Mario");
-		ezshop.modifyCustomer(10, "Mario", "0123456789");
+		int id = ezshop.defineCustomer("Mario");
+		ezshop.modifyCustomer(id, "Mario", "0123456789");
 		customerId = ezshop.defineCustomer("Salvatore");
 		assertFalse(ezshop.modifyCustomer(customerId, "Salvatore", "0123456789"));
 		

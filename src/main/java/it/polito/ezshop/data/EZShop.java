@@ -784,10 +784,17 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(this.loggedUser==null)
     		throw new UnauthorizedException();
     	
+    	// inconsistency with the API document, but acceptanceTest requires that
+    	if(id == null || id <= 0)
+    		throw new InvalidCustomerIdException();
+    	
     	//Il nome non deve essere nullo o vuoto
     	if((newCustomerName==null) || (newCustomerName.isEmpty()))
     		throw new InvalidCustomerNameException();
-  
+    	
+    	//Se la nuova carta è del formato corretto (10 digits) possiamo procedere all'aggiornamento
+    	if(newCustomerCard==null || newCustomerCard.isEmpty() || !newCustomerCard.matches("[0-9]{10}"))
+    		throw new InvalidCustomerCardException();
     	//Il nome deve essere unico (dovrebbe, dalla documentazione del metodo non si capisce ma nel precedente metodo era così)
     	if(customers.size()!=0)
     	{
@@ -820,28 +827,20 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 	    		customers.get(id).setCustomerCard(null);
 	    		return true;
 	    	}
-	    	//Se la nuova carta è del formato corretto (10 digits) possiamo procedere all'aggiornamento
-	    	if(newCustomerCard.matches("[0-9]{10}")) 
-	    	{
-	    		//controllo che il codice della carta non sia già di qualche utente
-	    		for(Customer customer : customers.values())
-	    		{
-	    			//Se la carta è già in possesso di qualcuno ritorno falso
-	    			if(customer.getCustomerCard()!= null && customer.getCustomerCard().equals(newCustomerCard))
-	    			{
-	    				return false;
-	    			}
-	    		}
-	    		//La carta non è in possesso di nessun cliente
-	    		//Aggiorno il cliente
-	    		customers.get(id).setCustomerCard(newCustomerCard);
-	    		return true;
-	        	
-	    	}
-	    	else
-	    	{
-	    		throw new InvalidCustomerCardException();
-	    	}
+	    	
+    		//controllo che il codice della carta non sia già di qualche utente
+    		for(Customer customer : customers.values())
+    		{
+    			//Se la carta è già in possesso di qualcuno ritorno falso
+    			if(customer.getCustomerCard()!= null && customer.getCustomerCard().equals(newCustomerCard))
+    			{
+    				return false;
+    			}
+    		}
+    		//La carta non è in possesso di nessun cliente
+    		//Aggiorno il cliente
+    		customers.get(id).setCustomerCard(newCustomerCard);
+    		return true;
     	}
     	
     	return false;  	

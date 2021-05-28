@@ -231,6 +231,8 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(id == null || id <= 0)
     		throw new InvalidUserIdException();
     	
+    	//return users.get(id);
+    	
     	for(User user : users.values()) {
     		
     		if (user.getId() == id) {

@@ -351,7 +351,8 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         if ( id == null || id <= 0)
         	throw new InvalidProductIdException();
         
-        if(products.containsKey(newCode))
+        ProductType pr = products.get(newCode);
+        if(pr != null && pr.getId() != id)
         	return false;
         
         if(products.size()!=0) 

@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class testezshop20210528 {
+public class Testezshop20210528 {
     private static EZShopInterface ezshop;
     private int adminId;
     private String adminBaseUsername = "ADMIN";

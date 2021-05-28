@@ -1378,7 +1378,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
     		throw new UnauthorizedException();
 
-    	if(returnId <= 0)
+    	if(returnId == null || returnId <= 0)
         	throw new InvalidTransactionIdException();
     	
         if(!creditCardIsValid(creditCard))

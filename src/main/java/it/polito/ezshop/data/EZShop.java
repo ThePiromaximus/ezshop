@@ -158,9 +158,9 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	balanceOperations.clear();
     	products.clear();
     	// According to API these maps shouldn't be cleared by reset()
-    	//users.clear();		
-    	//customers.clear();
-    	//orders.clear();
+    	users.clear();		
+    	customers.clear();
+    	orders.clear();
     }
 
 	@Override

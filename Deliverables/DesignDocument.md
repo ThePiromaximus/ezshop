@@ -3,9 +3,9 @@
 
 Authors: Angela D'Antonio, Gabriele Inzerillo, Ruggero Nocera, Marzio Vallero
 
-Date: 17/05/2021
+Date: 31/05/2021
 
-Version: 1.1
+Version: 1.2
 
 
 # Contents
@@ -147,7 +147,7 @@ top to bottom direction
 
 ProductType -up[hidden]- EZShop 
 API <|-- EZShop : <<implements>>
-note right of Shop: Permanent class
+note right of EZShop: Permanent class
 @enduml
 ```
 

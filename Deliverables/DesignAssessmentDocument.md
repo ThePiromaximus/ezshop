@@ -1,64 +1,40 @@
 # Design assessment
 
-
-```
-<The goal of this document is to analyse the structure of your project, compare it with the design delivered
-on April 30, discuss whether the design could be improved>
-```
-
 # Levelized structure map
-```
-<Applying Structure 101 to your project, version to be delivered on june 4, produce the Levelized structure map,
-with all elements explosed, all dependencies, NO tangles; and report it here as a picture>
-```
+
+The it.polito.ezshop.exceptions package hasn not been expanded due to graphical and presentation reasons. It nevertheless didn't boast any useful information regarding the levelized structure map analyis.
+
+![image](./DesignAssesment/LSM.png)
 
 # Structural over complexity chart
-```
-<Applying Structure 101 to your project, version to be delivered on june 4, produce the structural over complexity chart; and report it here as a picture>
-```
 
+The project initially presented a tangle percentage of 94%, which has been proposedly reduced to 0% after cutting the backward dependencies between the packages it.polito.ezshop.model and it.polito.ezshop.data.
 
+![image](./DesignAssesment/structuralOverComplexity.png)
 
 # Size metrics
 
-```
-<Report here the metrics about the size of your project, collected using Structure 101>
-```
-
-
-
 | Metric                                    | Measure |
 | ----------------------------------------- | ------- |
-| Packages                                  |         |
-| Classes (outer)                           |         |
-| Classes (all)                             |         |
-| NI (number of bytecode instructions)      |         |
-| LOC (non comment non blank lines of code) |         |
-
-
+| Packages                                  | 6 |
+| Classes (outer)                           | 38 |
+| Classes (all)                             | 39 |
+| NI (number of bytecode instructions)      | 5711 |
+| LOC (non comment non blank lines of code) | ~ 2456 |
 
 # Items with XS
 
-```
-<Report here information about code tangles and fat packages>
-```
-
+The XS before cutting tangles is as follows.
 | Item | Tangled | Fat  | Size | XS   |
 | ---- | ------- | ---- | ---- | ---- |
-|      |         |      |      |      |
-|      |         |      |      |      |
-
-
+| ezshop.it.polito.ezshop.data.EZShop | N/A | 215 | 4591 | 2028 |
+| ezshop.it.polito.ezshop | 5% | 4 | 5711 | 284 |
 
 # Package level tangles
 
-```
-<Report screen captures of the package-level tangles by opening the items in the "composition perspective" 
-(double click on the tangle from the Views->Complexity page)>
-```
+![image](./DesignAssesment/packageLevelTangles.png)
 
 # Summary analysis
-```
-<Discuss here main differences of the current structure of your project vs the design delivered on April 30>
-<Discuss if the current structure shows weaknesses that should be fixed>
-```
+
+The main difference between the two versions lies in a lower usage of the object oriented paradigm. This is due to the fact that the interface posed heavy architectural constraints that forced us to avoid using to its fullest the features of the Java language.
+The current structure presents a weakness in keeping the core logic inside the wrapper class that contains all methods, instead of calling class specific methods from modular ad-hoc classes. This assessment is enforced by the analysis performed through Structure 101, which emphasized the presence of backward dependencies between the it.polito.ezshop.model and it.polito.ezshop.data packages.

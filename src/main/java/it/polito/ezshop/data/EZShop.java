@@ -103,24 +103,18 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			this.paidSaleTransactions = ez.paidSaleTransactions;
 			this.closedSaleTransactions = ez.closedSaleTransactions;
 			
-			if(customers.size() > 0)
-				CustomerImpl.PROGRESSIVE_ID = customers.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			CustomerImpl.PROGRESSIVE_ID = customers.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(users.size() > 0)
-				UserImpl.PROGRESSIVE_ID = users.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			UserImpl.PROGRESSIVE_ID = users.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(balanceOperations.size() > 0)
-				BalanceOperationImpl.PROGRESSIVE_ID = balanceOperations.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			BalanceOperationImpl.PROGRESSIVE_ID = balanceOperations.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(products.size() > 0)
-				ProductTypeImpl.PROGRESSIVE_ID = products.values().stream().map((ProductTypeImpl p) -> p.getId()).max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			ProductTypeImpl.PROGRESSIVE_ID = products.values().stream().map((ProductTypeImpl p) -> p.getId()).max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(orders.size() > 0)
-				OrderImpl.PROGRESSIVE_ID = orders.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			OrderImpl.PROGRESSIVE_ID = orders.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			if(closedReturnTransactions.size() > 0 || paidReturnTransactions.size() > 0)
-				ReturnTransactionImpl.PROGRESSIVE_ID = Stream.concat(closedReturnTransactions.keySet().stream(),
-						paidReturnTransactions.keySet().stream()).max((Integer i1, Integer i2) -> i1 - i2).get() + 1;
+			ReturnTransactionImpl.PROGRESSIVE_ID = Stream.concat(closedReturnTransactions.keySet().stream(),
+						paidReturnTransactions.keySet().stream()).max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
 			
 		} catch (Exception e) {
@@ -158,9 +152,9 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	balanceOperations.clear();
     	products.clear();
     	// According to API these maps shouldn't be cleared by reset()
-    	//users.clear();		
-    	//customers.clear();
-    	//orders.clear();
+    	users.clear();		
+    	customers.clear();
+    	orders.clear();
     }
 
 	@Override
@@ -231,15 +225,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(id == null || id <= 0)
     		throw new InvalidUserIdException();
     	
-    	for(User user : users.values()) {
-    		
-    		if (user.getId() == id) {
-    	    	return user;
-    		}
-    	}
-    	
-    	return null;
-    	
+    	return users.get(id);
 	}
 
     @Override
@@ -351,7 +337,8 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         if ( id == null || id <= 0)
         	throw new InvalidProductIdException();
         
-        if(products.containsKey(newCode))
+        ProductType pr = products.get(newCode);
+        if(pr != null && pr.getId() != id)
         	return false;
         
         if(products.size()!=0) 
@@ -783,13 +770,21 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(this.loggedUser==null)
     		throw new UnauthorizedException();
     	
+    	// inconsistency with the API document, but acceptanceTest requires that
+    	if(id == null || id <= 0)
+    		throw new InvalidCustomerIdException();
+    	
     	//Il nome non deve essere nullo o vuoto
     	if((newCustomerName==null) || (newCustomerName.isEmpty()))
     		throw new InvalidCustomerNameException();
-  
+    	
+    	//Se la nuova carta è del formato corretto (10 digits) possiamo procedere all'aggiornamento
+    	if(newCustomerCard==null || newCustomerCard.isEmpty() || !newCustomerCard.matches("[0-9]{10}"))
+    		throw new InvalidCustomerCardException();
     	//Il nome deve essere unico (dovrebbe, dalla documentazione del metodo non si capisce ma nel precedente metodo era così)
     	if(customers.size()!=0)
     	{
+    		
     		for(Customer customer : customers.values())
         	{
         		//Devo scorrere tutti i clienti tranne quello attuale, sennò il nome risulterà sempre duplicato (nel caso in cui non venisse modificato)
@@ -805,7 +800,6 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         		}
         	}
     	
-    	
 	    	//Aggiorno il nome del cliente
 			customers.get(id).setCustomerName(newCustomerName);
 	    	
@@ -819,28 +813,20 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 	    		customers.get(id).setCustomerCard(null);
 	    		return true;
 	    	}
-	    	//Se la nuova carta è del formato corretto (10 digits) possiamo procedere all'aggiornamento
-	    	if(newCustomerCard.matches("[0-9]{10}")) 
-	    	{
-	    		//controllo che il codice della carta non sia già di qualche utente
-	    		for(Customer customer : customers.values())
-	    		{
-	    			//Se la carta è già in possesso di qualcuno ritorno falso
-	    			if(customer.getCustomerCard()!= null && customer.getCustomerCard().equals(newCustomerCard))
-	    			{
-	    				return false;
-	    			}
-	    		}
-	    		//La carta non è in possesso di nessun cliente
-	    		//Aggiorno il cliente
-	    		customers.get(id).setCustomerCard(newCustomerCard);
-	    		return true;
-	        	
-	    	}
-	    	else
-	    	{
-	    		throw new InvalidCustomerCardException();
-	    	}
+	    	
+    		//controllo che il codice della carta non sia già di qualche utente
+    		for(Customer customer : customers.values())
+    		{
+    			//Se la carta è già in possesso di qualcuno ritorno falso
+    			if(customer.getCustomerCard()!= null && customer.getCustomerCard().equals(newCustomerCard))
+    			{
+    				return false;
+    			}
+    		}
+    		//La carta non è in possesso di nessun cliente
+    		//Aggiorno il cliente
+    		customers.get(id).setCustomerCard(newCustomerCard);
+    		return true;
     	}
     	
     	return false;  	
@@ -928,7 +914,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
     		throw new UnauthorizedException();
     	
-    	if(customerCard == null || customerCard.isEmpty())
+    	if(customerCard == null || customerCard.isEmpty() || !customerCard.matches("[0-9]{10}"))
     		throw new InvalidCustomerCardException();
     	
     	List<Customer> customersList = getAllCustomers();
@@ -986,6 +972,8 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 		List<TicketEntry> entries = sale.getEntries();
 		try {
 			TicketEntry tk = entries.stream().filter(e -> e.getBarCode().equals(productCode)).findFirst().get();
+			if(tk.getAmount() + amount > refProd.getQuantity())
+				return false;
 			tk.setAmount(tk.getAmount() + amount);
 			sale.setPrice(tk.getAmount() * tk.getPricePerUnit());
 		}
@@ -1045,7 +1033,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(productCode == null || productCode.isEmpty() || !barCodeIsValid(productCode))
     		throw new InvalidProductCodeException();
     	
-    	if(discountRate < 0.0 || discountRate > 1.0)
+    	if(discountRate < 0.0 || discountRate >= 1.0)
     		throw new InvalidDiscountRateException ();
     	
 		if(products.get(productCode) == null)
@@ -1074,7 +1062,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	
     	if(transactionId == null || transactionId <= 0 )
     		throw new InvalidTransactionIdException();
-    	if(discountRate < 0.0 || discountRate > 1.0)
+    	if(discountRate < 0.0 || discountRate >= 1.0)
     		throw new InvalidDiscountRateException ();
     	
     	SaleTransaction sale = openedSaleTransactions.get(transactionId);
@@ -1378,7 +1366,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
     		throw new UnauthorizedException();
 
-    	if(returnId <= 0)
+    	if(returnId == null || returnId <= 0)
         	throw new InvalidTransactionIdException();
     	
         if(!creditCardIsValid(creditCard))

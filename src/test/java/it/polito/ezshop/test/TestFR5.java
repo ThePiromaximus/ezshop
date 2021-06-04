@@ -58,6 +58,7 @@ public class TestFR5 {
 	public void testModifyCustomer() throws InvalidCustomerNameException, InvalidCustomerCardException, InvalidCustomerIdException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, UnauthorizedException
 	{
 		EZShopInterface ezshop = new EZShop(0);
+		Integer customerId;
 		//loggedUser = null -> throw UnauthorizedException
 		try 
 		{
@@ -98,38 +99,50 @@ public class TestFR5 {
 			assertNotNull(e);
 		}
 		
-		//customerCard = "" -> return true 
+		//customerCard = "" -> throw InvalidCustomerCardException 
 		ezshop = new EZShop(0);
+		try
+		{
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		Integer costumerId = ezshop.defineCustomer("Mario");
-		assertTrue(ezshop.modifyCustomer(costumerId, "Mario", ""));
+		customerId = ezshop.defineCustomer("Mario");
+		ezshop.modifyCustomer(customerId, "Mario", "");
+		fail("Expected an InvalidCustomerCardException to be thrown");
+
+		}catch(InvalidCustomerCardException e) {
+			assertNotNull(e);
+		}
 		
-		//customerCard = null -> return true 
+		//customerCard = null -> throw InvalidCustomerCardException 
 		ezshop = new EZShop(0);
+		try
+		{
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		costumerId = ezshop.defineCustomer("Mario");
-		assertTrue(ezshop.modifyCustomer(costumerId, "Mario", null));
-		
+		customerId = ezshop.defineCustomer("Mario");
+		ezshop.modifyCustomer(customerId, "Mario", null);
+		fail("Expected an InvalidCustomerCardException to be thrown");
+		}catch(InvalidCustomerCardException e) {
+			assertNotNull(e);
+		}
 		//customerCard already assigned to another user -> return false
 		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		ezshop.defineCustomer("Mario");
-		ezshop.modifyCustomer(10, "Mario", "0123456789");
-		costumerId = ezshop.defineCustomer("Salvatore");
-		assertFalse(ezshop.modifyCustomer(costumerId, "Salvatore", "0123456789"));
+		int id = ezshop.defineCustomer("Mario");
+		ezshop.modifyCustomer(id, "Mario", "0123456789");
+		customerId = ezshop.defineCustomer("Salvatore");
+		assertFalse(ezshop.modifyCustomer(customerId, "Salvatore", "0123456789"));
 		
 		//All is good -> return true
 		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		assertFalse(ezshop.modifyCustomer(costumerId, "Giovanni", "7777777777"));
-		costumerId = ezshop.defineCustomer("Mario");
-		assertTrue(ezshop.modifyCustomer(costumerId, "Giovanni", "7777777777"));
-		costumerId = ezshop.defineCustomer("Luigi");
-		assertFalse(ezshop.modifyCustomer(costumerId, "Giovanni", "7777777777"));
+		assertFalse(ezshop.modifyCustomer(customerId, "Giovanni", "7777777777"));
+		customerId = ezshop.defineCustomer("Mario");
+		assertTrue(ezshop.modifyCustomer(customerId, "Giovanni", "7777777777"));
+		customerId = ezshop.defineCustomer("Luigi");
+		assertFalse(ezshop.modifyCustomer(customerId, "Giovanni", "7777777777"));
 		
 	}
 	
@@ -400,8 +413,12 @@ public class TestFR5 {
 		ret = EzShop.attachCardToCustomer(card, id);
 		assertTrue(ret);
 		
-		ret = EzShop.modifyPointsOnCard(card + "a", 10);
-		assertTrue(!ret);
+		try {
+			EzShop.modifyPointsOnCard(card + "a", 10);
+			fail("Expected an InvalidCustomerCardException to be thrown");
+		} catch (InvalidCustomerCardException e) {
+			assertNotNull(e);
+		}
 		
 		ret = EzShop.modifyPointsOnCard(card, -10);
 		assertTrue(!ret);

@@ -2914,22 +2914,6 @@ public class Testezshop20210528 {
         }
     }
 
-    @Test(expected = InvalidCustomerIdException.class)
-    public void testModifyCustomerZeroId() throws InvalidCustomerIdException {
-        try {
-            ezshop.modifyCustomer(0, customerName1, customerName1);
-            Assert.fail(getErrorMsg("testModifyCustomerZeroId", "The operation should fail"));
-        } catch (InvalidCustomerCardException e) {
-            e.printStackTrace();
-            Assert.fail(getErrorMsg("testModifyCustomerZeroId", "Customer card should not be considered as invalid"));
-        } catch (InvalidCustomerNameException e) {
-            e.printStackTrace();
-            Assert.fail(getErrorMsg("testModifyCustomerZeroId", "Customer name should not be considered as invalid"));
-        } catch (UnauthorizedException e){
-            e.printStackTrace();
-            Assert.fail(getErrorMsg("testModifyCustomerZeroId", "Logged user should be authorized"));
-        }
-    }
 
     @Test(expected = InvalidCustomerNameException.class)
     public void testModifyCustomerEmptyName() throws InvalidCustomerNameException {

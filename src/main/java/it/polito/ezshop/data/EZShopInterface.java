@@ -5,6 +5,12 @@ import it.polito.ezshop.exceptions.*;
 import java.time.LocalDate;
 import java.util.List;
 
+/* version 1.3 5 june 2021 
+changes: added functions to support RFID in each product 
+ recordOrderArrivalRFID(), addProductToSaleRFID(), deleteProductFromSaleRFID(), returnProductRFID() 
+added InvalidRFIDException
+*/ 
+
 /*  version 1.2 29 april 2021
 changes:
 improved description of reset() function
@@ -343,6 +349,27 @@ public interface EZShopInterface {
      */
     public boolean recordOrderArrival(Integer orderId) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException;
 
+ /**
+     * This method records the arrival of an order with given <orderId>. This method changes the quantity of available product.
+     * This method records each product received, with its RFID. RFIDs are recorded starting from RFIDfrom, in increments of 1
+     * ex recordOrderArrivalRFID(10, "000000001000")  where order 10 ordered 10 quantities of an item, this method records
+     * products with RFID 1000, 1001, 1002, 1003 etc until 1009
+     * The product type affected must have a location registered. The order should be either in the PAYED state (in this
+     * case the state will change to the COMPLETED one and the quantity of product type will be updated) or in the
+     * COMPLETED one (in this case this method will have no effect at all).
+     * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
+     *
+     * @param orderId the id of the order that has arrived
+     *
+     * @return  true if the operation was successful
+     *          false if the order does not exist or if it was not in an ORDERED/COMPLETED state
+     *
+     * @throws InvalidOrderIdException if the order id is less than or equal to 0 or if it is null.
+     * @throws InvalidLocationException if the ordered product type has not an assigned location.
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     * @throws InvalidRFIDException if the RFID has invalid format or is not unique 
+     */
+    public boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom) throws InvalidOrderIdException, UnauthorizedException, InvalidLocationException, InvalidRFIDException;
     /**
      * This method return the list of all orders ISSUED, ORDERED and COMLPETED.
      * It can be invoked only after a user with role "Administrator" or "ShopManager" is logged in.
@@ -490,7 +517,7 @@ public interface EZShopInterface {
     public Integer startSaleTransaction() throws UnauthorizedException;
 
     /**
-     * This method adds a product to a sale transaction decreasing the temporary amount of product available on the
+     * This method adds a product to a sale transaction receiving its barcode, decreasing the temporary amount of product available on the
      * shelves for other customers.
      * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
      *
@@ -508,9 +535,24 @@ public interface EZShopInterface {
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     public boolean addProductToSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException;
-
     /**
-     * This method deletes a product from a sale transaction increasing the temporary amount of product available on the
+     * This method adds a product to a sale transaction receiving  its RFID, decreasing the temporary amount of product available on the
+     * shelves for other customers.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param RFID the RFID of the product to be added
+     * @return  true if the operation is successful
+     *          false   if the RFID does not exist,
+     *                  if the transaction id does not identify a started and open transaction.
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidRFIDException if the RFID code is empty, null or invalid
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
+    public boolean addProductToSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException;
+      /**
+     * This method deletes a product from a sale transaction , receiving its barcode, increasing the temporary amount of product available on the
      * shelves for other customers.
      * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
      *
@@ -529,6 +571,23 @@ public interface EZShopInterface {
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     public boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException;
+    /**
+     * This method deletes a product from a sale transaction , receiving its RFID, increasing the temporary amount of product available on the
+     * shelves for other customers.
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param transactionId the id of the Sale transaction
+     * @param RFID the RFID of the product to be deleted
+     *
+     * @return  true if the operation is successful
+     *          false   if the product code does not exist,
+     *                  if the transaction id does not identify a started and open transaction.
+     *
+     * @throws InvalidTransactionIdException if the transaction id less than or equal to 0 or if it is null
+     * @throws InvalidRFIDException if the RFID is empty, null or invalid
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
+    public boolean deleteProductFromSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException;
 
     /**
      * This method applies a discount rate to all units of a product type with given type in a sale transaction. The
@@ -646,7 +705,7 @@ public interface EZShopInterface {
     public Integer startReturnTransaction(Integer transactionId) throws InvalidTransactionIdException, UnauthorizedException;
 
     /**
-     * This method adds a product to the return transaction
+     * This method adds a product to the return transaction, starting from its barcode
      * The amount of units of product to be returned should not exceed the amount originally sold.
      * This method DOES NOT update the product quantity
      * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
@@ -667,7 +726,24 @@ public interface EZShopInterface {
      * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
      */
     public boolean returnProduct(Integer returnId, String productCode, int amount) throws InvalidTransactionIdException, InvalidProductCodeException, InvalidQuantityException, UnauthorizedException;
-
+   /**
+     * This method adds a product to the return transaction, starting from its RFID
+     * This method DOES NOT update the product quantity
+     * It can be invoked only after a user with role "Administrator", "ShopManager" or "Cashier" is logged in.
+     *
+     * @param returnId the id of the return transaction
+     * @param RFID the RFID of the product to be returned
+     *
+     * @return  true if the operation is successful
+     *          false   if the the product to be returned does not exists,
+     *                  if it was not in the transaction,
+     *                  if the transaction does not exist
+     *
+     * @throws InvalidTransactionIdException if the return id is less ther or equal to 0 or if it is null
+     * @throws InvalidRFIDException if the RFID is empty, null or invalid
+     * @throws UnauthorizedException if there is no logged user or if it has not the rights to perform the operation
+     */
+    public boolean returnProductRFID(Integer returnId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, UnauthorizedException;
     /**
      * This method closes a return transaction. A closed return transaction can be committed (i.e. <commit> = true) thus
      * it increases the product quantity available on the shelves or not (i.e. <commit> = false) thus the whole trasaction

@@ -441,9 +441,85 @@ public class TestFR4 {
 		assertTrue(ezshop.payOrder(orderId));
 		assertTrue(ezshop.recordOrderArrival(orderId));	
 		assertTrue(ezshop.recordOrderArrival(orderId));	
+	}
+	
+	@Test
+	public void testRecordOrderArrivalRFID() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidOrderIdException, InvalidLocationException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidQuantityException, InvalidProductIdException, InvalidRFIDException {
+		//loggedUser = Cashier -> throws UnauthorizedException
+		EZShop ezshop = new EZShop(0);
+		try
+		{
+			ezshop.createUser("admin", "admin", "Cashier");
+			ezshop.login("admin", "admin");
+			ezshop.recordOrderArrivalRFID(1, "");
+			fail("Expected an UnauthorizedException to be thrown");
+		}catch(UnauthorizedException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//location = null -> throws InvalidLocationException
+		ezshop = new EZShop(0);
+		try
+		{
+			ezshop.createUser("admin", "admin", "Administrator");
+			ezshop.login("admin", "admin");
+			ezshop.createProductType("product", "000000000000", 1, "");
+			ezshop.recordBalanceUpdate(10);
+			Integer orderId = ezshop.payOrderFor("000000000000", 1, 1);
+			ezshop.recordOrderArrivalRFID(orderId, "0000000000");
+			fail("Expected an InvalidLocationException to be thrown");
+		}catch(InvalidLocationException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//orderId = 0 -> throws InvalidOrderIdException
+		ezshop = new EZShop(0);
+		try
+		{
+			ezshop.createUser("admin", "admin", "Administrator");
+			ezshop.login("admin", "admin");
+			ezshop.recordOrderArrivalRFID(0, "0000000000");
+			fail("Expected an InvalidOrderIdException to be thrown");
+		}catch(InvalidOrderIdException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//RFID invalid -> throws InvalidRFIDException
+		ezshop = new EZShop(0);
+		try
+		{
+			ezshop.createUser("admin", "admin", "Administrator");
+			ezshop.login("admin", "admin");
+			ezshop.recordOrderArrivalRFID(1, "");
+			fail("Expected an InvalidOrderIdException to be thrown");
+		}catch(InvalidRFIDException e)
+		{
+			assertNotNull(e);
+		}
+		
+		//order does not exist -> return false
+		ezshop = new EZShop(0);
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
+		assertFalse(ezshop.recordOrderArrivalRFID(67000, "0000000000"));
+		
+		//All is good -> return true
+		ezshop = new EZShop(0);
+		ezshop.createUser("admin", "admin", "Administrator");
+		ezshop.login("admin", "admin");
 
-		
-		
+		Integer productId = ezshop.createProductType("product", "000000000000", 1, "");
+		ezshop.updatePosition(productId, "001-abcd-001");
+		ezshop.recordBalanceUpdate(10);	
+		Integer orderId = ezshop.issueOrder("000000000000", 1, 1);
+		assertFalse(ezshop.recordOrderArrivalRFID(orderId, "0000000000"));
+		assertFalse(ezshop.recordOrderArrivalRFID(orderId, "0000000000"));
+		assertTrue(ezshop.payOrder(orderId));
+		assertTrue(ezshop.recordOrderArrivalRFID(orderId, "0000000000"));	
+		assertTrue(ezshop.recordOrderArrivalRFID(orderId, "0000000000"));
 	}
 	
 	@Test

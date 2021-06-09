@@ -174,7 +174,7 @@ public class TestFR6 {
 		EzShop.recordBalanceUpdate(10);	
 		Integer orderId = EzShop.issueOrder("122474487139", 1, 1);
 		assertTrue(EzShop.payOrder(orderId));
-		assertTrue(EzShop.recordOrderArrivalRFID(orderId, "0000000000"));
+		assertTrue(EzShop.recordOrderArrivalRFID(orderId, "000000000000"));
 		
 		id = EzShop.startSaleTransaction();
 		assertTrue(id > 0);
@@ -214,13 +214,13 @@ public class TestFR6 {
 			
 		}
 		
-		ret = EzShop.addProductToSaleRFID(id, "1000000000");
+		ret = EzShop.addProductToSaleRFID(id, "100000000000");
 		assertTrue(!ret);
 		
-		ret = EzShop.addProductToSaleRFID(id+1, "0000000000");
+		ret = EzShop.addProductToSaleRFID(id+1, "000000000000");
 		assertTrue(!ret);
 		
-		ret = EzShop.addProductToSaleRFID(id, "0000000000");
+		ret = EzShop.addProductToSaleRFID(id, "000000000000");
 		assertTrue(ret);
 
 	}
@@ -345,12 +345,12 @@ public class TestFR6 {
 		
 		Integer orderId = EzShop.issueOrder("122474487139", 1, 1);
 		assertTrue(EzShop.payOrder(orderId));
-		assertTrue(EzShop.recordOrderArrivalRFID(orderId, "0000000000"));
+		assertTrue(EzShop.recordOrderArrivalRFID(orderId, "000000000000"));
 		
 		id = EzShop.startSaleTransaction();
 		assertTrue(id > 0);
 		
-		ret = EzShop.addProductToSaleRFID(id, "0000000000");
+		ret = EzShop.addProductToSaleRFID(id, "000000000000");
 		assertTrue(ret);
 
 		try {
@@ -388,13 +388,13 @@ public class TestFR6 {
 			
 		}
 		
-		ret = EzShop.deleteProductFromSaleRFID(id, "1000000000");
+		ret = EzShop.deleteProductFromSaleRFID(id, "100000000000");
 		assertTrue(!ret);
 		
-		ret = EzShop.deleteProductFromSaleRFID(id+1, "0000000000");
+		ret = EzShop.deleteProductFromSaleRFID(id+1, "000000000000");
 		assertTrue(!ret);
 		
-		ret = EzShop.deleteProductFromSaleRFID(id, "0000000000");
+		ret = EzShop.deleteProductFromSaleRFID(id, "000000000000");
 		assertTrue(ret);
 		
 		return;
@@ -990,16 +990,16 @@ EZShopInterface ezShop = new EZShop(0);
 		ezShop.recordBalanceUpdate(10000);	
 		Integer orderId = ezShop.issueOrder("1845678901001", 1, 1);
 		assertTrue(ezShop.payOrder(orderId));
-		assertTrue(ezShop.recordOrderArrivalRFID(orderId, "0000000000"));
+		assertTrue(ezShop.recordOrderArrivalRFID(orderId, "000000000000"));
 		
 		Integer productId2 = ezShop.createProductType("Samsung A52", "8806090987977", 400.0, "Smartphone");
 		ezShop.updatePosition(productId2, "002-abcd-003");		
 		orderId = ezShop.issueOrder("8806090987977", 1, 1);
 		assertTrue(ezShop.payOrder(orderId));
-		assertTrue(ezShop.recordOrderArrivalRFID(orderId, "0000000001"));
+		assertTrue(ezShop.recordOrderArrivalRFID(orderId, "000000000001"));
 		
 		Integer saleId = ezShop.startSaleTransaction();
-		ezShop.addProductToSaleRFID(saleId, "0000000000");
+		ezShop.addProductToSaleRFID(saleId, "000000000000");
 		ezShop.endSaleTransaction(saleId);
 		ezShop.receiveCashPayment(saleId, 3000.0);
 		
@@ -1042,19 +1042,19 @@ EZShopInterface ezShop = new EZShop(0);
 		}
 		
 		// product does not exists
-		assertFalse(ezShop.returnProductRFID(returnId, "1000000000"));
+		assertFalse(ezShop.returnProductRFID(returnId, "100000000000"));
 		// product was not in the transiction
-		assertFalse(ezShop.returnProductRFID(returnId, "0000000001"));
+		assertFalse(ezShop.returnProductRFID(returnId, "000000000001"));
 		// transaction does not exist
-		assertFalse(ezShop.returnProductRFID(100, "0000000000"));
+		assertFalse(ezShop.returnProductRFID(100, "000000000000"));
 		
 		// operation successfull
-		assertTrue(ezShop.returnProductRFID(returnId, "0000000000"));
+		assertTrue(ezShop.returnProductRFID(returnId, "000000000000"));
 		// i try to add again the same product with an higher amount
 		// should return true but set the amount to return equals to the amount
 		// in the sale transaction
-		assertTrue(ezShop.returnProductRFID(returnId, "0000000000"));
-		assertTrue(ezShop.returnProductRFID(returnId, "0000000000"));
+		assertTrue(ezShop.returnProductRFID(returnId, "000000000000"));
+		assertTrue(ezShop.returnProductRFID(returnId, "000000000000"));
 	}
 	
 	@Test

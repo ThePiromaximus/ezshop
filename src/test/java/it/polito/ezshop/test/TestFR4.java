@@ -467,7 +467,7 @@ public class TestFR4 {
 			ezshop.createProductType("product", "000000000000", 1, "");
 			ezshop.recordBalanceUpdate(10);
 			Integer orderId = ezshop.payOrderFor("000000000000", 1, 1);
-			ezshop.recordOrderArrivalRFID(orderId, "0000000000");
+			ezshop.recordOrderArrivalRFID(orderId, "000000000000");
 			fail("Expected an InvalidLocationException to be thrown");
 		}catch(InvalidLocationException e)
 		{
@@ -480,7 +480,7 @@ public class TestFR4 {
 		{
 			ezshop.createUser("admin", "admin", "Administrator");
 			ezshop.login("admin", "admin");
-			ezshop.recordOrderArrivalRFID(0, "0000000000");
+			ezshop.recordOrderArrivalRFID(0, "000000000000");
 			fail("Expected an InvalidOrderIdException to be thrown");
 		}catch(InvalidOrderIdException e)
 		{
@@ -504,7 +504,7 @@ public class TestFR4 {
 		ezshop = new EZShop(0);
 		ezshop.createUser("admin", "admin", "Administrator");
 		ezshop.login("admin", "admin");
-		assertFalse(ezshop.recordOrderArrivalRFID(67000, "0000000000"));
+		assertFalse(ezshop.recordOrderArrivalRFID(67000, "000000000000"));
 		
 		//All is good -> return true
 		ezshop = new EZShop(0);
@@ -515,11 +515,11 @@ public class TestFR4 {
 		ezshop.updatePosition(productId, "001-abcd-001");
 		ezshop.recordBalanceUpdate(10);	
 		Integer orderId = ezshop.issueOrder("000000000000", 1, 1);
-		assertFalse(ezshop.recordOrderArrivalRFID(orderId, "0000000000"));
-		assertFalse(ezshop.recordOrderArrivalRFID(orderId, "0000000000"));
+		assertFalse(ezshop.recordOrderArrivalRFID(orderId, "000000000000"));
+		assertFalse(ezshop.recordOrderArrivalRFID(orderId, "000000000000"));
 		assertTrue(ezshop.payOrder(orderId));
-		assertTrue(ezshop.recordOrderArrivalRFID(orderId, "0000000000"));	
-		assertTrue(ezshop.recordOrderArrivalRFID(orderId, "0000000000"));
+		assertTrue(ezshop.recordOrderArrivalRFID(orderId, "000000000000"));	
+		assertTrue(ezshop.recordOrderArrivalRFID(orderId, "000000000000"));
 	}
 	
 	@Test

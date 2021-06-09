@@ -734,7 +734,7 @@ InvalidLocationException, InvalidRFIDException {
     	if(orderId == null || orderId <= 0)
     		throw new InvalidOrderIdException();
     	
-    	if(RFIDfrom == null || RFIDfrom.isEmpty() || !RFIDfrom.matches("[0-9]{10}"))
+    	if(RFIDfrom == null || RFIDfrom.isEmpty() || !RFIDfrom.matches("[0-9]{12}"))
     		throw new InvalidRFIDException();
     	
     	boolean ret = false;
@@ -743,7 +743,7 @@ InvalidLocationException, InvalidRFIDException {
         	ProductTypeImpl pr = productTypes.get(orders.get(orderId).getProductCode());
         	int quantity = orders.get(orderId).getQuantity();
         	for(int i = 0; i<quantity; ++i) {
-        		String rfid = String.format("%010d", Integer.valueOf(RFIDfrom) + i);
+        		String rfid = String.format("%012d", Integer.valueOf(RFIDfrom) + i);
         		products.put(rfid, pr);
         	}
     	}
@@ -1025,7 +1025,7 @@ InvalidLocationException, InvalidRFIDException {
     	if(transactionId == null || transactionId <= 0)
     		throw new InvalidTransactionIdException();
     
-    	if(RFID == null || RFID.isEmpty() || !RFID.matches("[0-9]{10}"))
+    	if(RFID == null || RFID.isEmpty() || !RFID.matches("[0-9]{12}"))
     		throw new InvalidRFIDException();
 
     	boolean ret = false;
@@ -1083,7 +1083,7 @@ InvalidLocationException, InvalidRFIDException {
     	if(transactionId == null || transactionId <= 0)
     		throw new InvalidTransactionIdException();
     	
-    	if(RFID == null || RFID.isEmpty() || !RFID.matches("[0-9]{10}"))
+    	if(RFID == null || RFID.isEmpty() || !RFID.matches("[0-9]{12}"))
     		throw new InvalidRFIDException();
     	
     	boolean ret = false;
@@ -1315,7 +1315,7 @@ InvalidLocationException, InvalidRFIDException {
     	if(returnId == null || returnId <= 0)
     		throw new InvalidTransactionIdException();
     	
-    	if(RFID == null || RFID.isEmpty() || !RFID.matches("[0-9]{10}"))
+    	if(RFID == null || RFID.isEmpty() || !RFID.matches("[0-9]{12}"))
     		throw new InvalidRFIDException();
     	
     	boolean ret = false;

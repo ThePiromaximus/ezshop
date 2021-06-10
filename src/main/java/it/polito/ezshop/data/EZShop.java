@@ -738,10 +738,20 @@ InvalidLocationException, InvalidRFIDException {
     		throw new InvalidRFIDException();
     	
     	boolean ret = false;
+    	
+    	if(!orders.containsKey(orderId))
+    		return ret;
+    	
+    	ProductTypeImpl pr = productTypes.get(orders.get(orderId).getProductCode());
+    	int quantity = orders.get(orderId).getQuantity();
+    	for(int i = 0; i<quantity; ++i) {
+    		String rfid = String.format("%012d", Integer.valueOf(RFIDfrom) + i);
+    		if(products.get(rfid) != null)
+    			throw new InvalidRFIDException();
+    	}
+    	
     	ret = recordOrderArrival(orderId);
     	if(ret) {
-        	ProductTypeImpl pr = productTypes.get(orders.get(orderId).getProductCode());
-        	int quantity = orders.get(orderId).getQuantity();
         	for(int i = 0; i<quantity; ++i) {
         		String rfid = String.format("%012d", Integer.valueOf(RFIDfrom) + i);
         		products.put(rfid, pr);

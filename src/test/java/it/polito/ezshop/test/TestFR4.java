@@ -519,7 +519,12 @@ public class TestFR4 {
 		assertFalse(ezshop.recordOrderArrivalRFID(orderId, "000000000000"));
 		assertTrue(ezshop.payOrder(orderId));
 		assertTrue(ezshop.recordOrderArrivalRFID(orderId, "000000000000"));	
-		assertTrue(ezshop.recordOrderArrivalRFID(orderId, "000000000000"));
+		try{
+			ezshop.recordOrderArrivalRFID(orderId, "000000000000");
+			fail();
+		}catch(InvalidRFIDException e) {
+			//pass
+		}
 	}
 	
 	@Test

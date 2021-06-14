@@ -147,6 +147,85 @@ public class TestFR6 {
 	}
 	
 	@Test
+	public void testAddProductToSaleRFID() throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidOrderIdException {
+		EZShopInterface EzShop = new EZShop(0);
+		Integer id = 0;
+		User usr;
+		boolean ret = false;
+		
+		try {
+			ret = EzShop.addProductToSaleRFID(id, "122474487139");
+			fail();
+		} catch (UnauthorizedException e) {
+			
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "Administrator");
+		assertTrue(id > 0);
+		usr = EzShop.login("Marzio", "password");
+		assertTrue(usr != null);
+		
+		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10, "Music CD");
+		assertTrue(id != -1);
+		
+		ret = EzShop.updatePosition(id, "001-abcd-002");
+		assertTrue(ret);
+		
+		EzShop.recordBalanceUpdate(10);	
+		Integer orderId = EzShop.issueOrder("122474487139", 1, 1);
+		assertTrue(EzShop.payOrder(orderId));
+		assertTrue(EzShop.recordOrderArrivalRFID(orderId, "000000000000"));
+		
+		id = EzShop.startSaleTransaction();
+		assertTrue(id > 0);
+		
+		try {
+			ret = EzShop.addProductToSaleRFID(null, "122474487139");
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.addProductToSaleRFID(-1, "122474487139");
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.addProductToSaleRFID(id, null);
+			fail();
+		} catch (InvalidRFIDException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.addProductToSaleRFID(id, "");
+			fail();
+		} catch (InvalidRFIDException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.addProductToSaleRFID(id, "notValidRFID");
+			fail();
+		} catch (InvalidRFIDException e) {
+			
+		}
+		
+		ret = EzShop.addProductToSaleRFID(id, "100000000000");
+		assertTrue(!ret);
+		
+		ret = EzShop.addProductToSaleRFID(id+1, "000000000000");
+		assertTrue(!ret);
+		
+		ret = EzShop.addProductToSaleRFID(id, "000000000000");
+		assertTrue(ret);
+
+	}
+	
+	@Test
 	public void testDeleteProductFromSale() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidTransactionIdException, InvalidQuantityException, InvalidLocationException {
 		EZShopInterface EzShop = new EZShop(0);
 		Integer id = 0;
@@ -232,6 +311,90 @@ public class TestFR6 {
 		assertTrue(ret);
 		
 		ret = EzShop.deleteProductFromSale(id, "122474487139", 2);
+		assertTrue(ret);
+		
+		return;
+	}
+	
+	@Test
+	public void testDeleteProductFromSaleRFID() throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidOrderIdException {
+		EZShopInterface EzShop = new EZShop(0);
+		Integer id = 0;
+		User usr;
+		boolean ret = false;
+		
+		try {
+			ret = EzShop.deleteProductFromSaleRFID(1, "122474487139");
+			fail();
+		} catch (UnauthorizedException e) {
+			//pass
+		}
+		
+		id = EzShop.createUser("Marzio", "password", "Administrator");
+		assertTrue(id > 0);
+		usr = EzShop.login("Marzio", "password");
+		assertTrue(usr != null);
+		
+		id = EzShop.createProductType("NieR Piano Collections", "122474487139", 10, "Music CD");
+		assertTrue(id != -1);
+		
+		ret = EzShop.updatePosition(id, "001-abcd-002");
+		assertTrue(ret);
+		
+		EzShop.recordBalanceUpdate(100);	
+		
+		Integer orderId = EzShop.issueOrder("122474487139", 1, 1);
+		assertTrue(EzShop.payOrder(orderId));
+		assertTrue(EzShop.recordOrderArrivalRFID(orderId, "000000000000"));
+		
+		id = EzShop.startSaleTransaction();
+		assertTrue(id > 0);
+		
+		ret = EzShop.addProductToSaleRFID(id, "000000000000");
+		assertTrue(ret);
+
+		try {
+			ret = EzShop.deleteProductFromSaleRFID(null, "122474487139");
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.deleteProductFromSaleRFID(0, "122474487139");
+			fail();
+		} catch (InvalidTransactionIdException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.deleteProductFromSaleRFID(id, null);
+			fail();
+		} catch (InvalidRFIDException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.deleteProductFromSaleRFID(id, "");
+			fail();
+		} catch (InvalidRFIDException e) {
+			
+		}
+		
+		try {
+			ret = EzShop.deleteProductFromSaleRFID(id, "notValidRFID");
+			fail();
+		} catch (InvalidRFIDException e) {
+			
+		}
+		
+		ret = EzShop.deleteProductFromSaleRFID(id, "100000000000");
+		assertTrue(!ret);
+		
+		ret = EzShop.deleteProductFromSaleRFID(id+1, "000000000000");
+		assertTrue(!ret);
+		
+		ret = EzShop.deleteProductFromSaleRFID(id, "000000000000");
 		assertTrue(ret);
 		
 		return;
@@ -807,6 +970,91 @@ public class TestFR6 {
 		// in the sale transaction
 		assertTrue(ezShop.returnProduct(returnId, "1845678901001", 1));
 		assertTrue(ezShop.returnProduct(returnId, "1845678901001", 3));
+	}
+	
+	@Test
+	public void testReturnProductRFID() throws InvalidUsernameException, InvalidPasswordException, InvalidRoleException, InvalidTransactionIdException, InvalidRFIDException, InvalidProductDescriptionException, InvalidProductCodeException, InvalidPricePerUnitException, UnauthorizedException, InvalidProductIdException, InvalidLocationException, InvalidQuantityException, InvalidOrderIdException, InvalidPaymentException {
+EZShopInterface ezShop = new EZShop(0);
+		
+		try {
+			ezShop.returnProductRFID(0, null);
+			fail();
+		}catch(UnauthorizedException e) {
+			//pass
+		}
+		
+		ezShop.createUser("ruggero", "password", "Administrator");
+		ezShop.login("ruggero", "password");
+		Integer productId = ezShop.createProductType("Lenovo Yoga Slim 7", "1845678901001", 1000.0, "Notebook");
+		ezShop.updatePosition(productId, "001-abcd-003");		
+		ezShop.recordBalanceUpdate(10000);	
+		Integer orderId = ezShop.issueOrder("1845678901001", 1, 1);
+		assertTrue(ezShop.payOrder(orderId));
+		assertTrue(ezShop.recordOrderArrivalRFID(orderId, "000000000000"));
+		
+		Integer productId2 = ezShop.createProductType("Samsung A52", "8806090987977", 400.0, "Smartphone");
+		ezShop.updatePosition(productId2, "002-abcd-003");		
+		orderId = ezShop.issueOrder("8806090987977", 1, 1);
+		assertTrue(ezShop.payOrder(orderId));
+		assertTrue(ezShop.recordOrderArrivalRFID(orderId, "000000000001"));
+		
+		Integer saleId = ezShop.startSaleTransaction();
+		ezShop.addProductToSaleRFID(saleId, "000000000000");
+		ezShop.endSaleTransaction(saleId);
+		ezShop.receiveCashPayment(saleId, 3000.0);
+		
+		Integer returnId = ezShop.startReturnTransaction(saleId);
+		
+		try {
+			ezShop.returnProductRFID(-1, null);
+		} catch (InvalidTransactionIdException e){
+			//pass
+		}
+		
+		try {
+			ezShop.returnProductRFID(0, null);
+		} catch (InvalidTransactionIdException e){
+			//pass
+		}
+		
+		try {
+			ezShop.returnProductRFID(null, null);
+		} catch (InvalidTransactionIdException e){
+			//pass
+		}
+		
+		try {
+			ezShop.returnProductRFID(returnId, "");
+		} catch (InvalidRFIDException e) {
+			//pass
+		}
+		
+		try {
+			ezShop.returnProductRFID(returnId, null);
+		} catch (InvalidRFIDException e) {
+			//pass
+		}
+		
+		try {
+			ezShop.returnProductRFID(returnId, "123");
+		} catch (InvalidRFIDException e) {
+			//pass
+		}
+		
+		// product does not exists
+		assertFalse(ezShop.returnProductRFID(returnId, "100000000000"));
+		// product was not in the transiction
+		assertFalse(ezShop.returnProductRFID(returnId, "000000000001"));
+		// transaction does not exist
+		assertFalse(ezShop.returnProductRFID(100, "000000000000"));
+		
+		// operation successfull
+		assertTrue(ezShop.returnProductRFID(returnId, "000000000000"));
+		// i try to add again the same product with an higher amount
+		// should return true but set the amount to return equals to the amount
+		// in the sale transaction
+		assertTrue(ezShop.returnProductRFID(returnId, "000000000000"));
+		assertTrue(ezShop.returnProductRFID(returnId, "000000000000"));
 	}
 	
 	@Test

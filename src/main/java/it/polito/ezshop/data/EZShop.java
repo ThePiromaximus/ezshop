@@ -11,6 +11,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,6 +28,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     private HashMap<Integer, ReturnTransactionImpl> paidReturnTransactions = new HashMap<Integer, ReturnTransactionImpl>();
     /* Orders and products */
 	private HashMap<Integer, OrderImpl> orders = new HashMap<Integer, OrderImpl>();
+	private HashMap<String, ProductTypeImpl> productTypes = new HashMap<String, ProductTypeImpl>();
 	private HashMap<String, ProductTypeImpl> products = new HashMap<String, ProductTypeImpl>();
     /* Balance operation */
     private HashMap<Integer, BalanceOperationImpl> balanceOperations = new HashMap<Integer, BalanceOperationImpl>();
@@ -96,6 +98,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			this.customers = ez.customers;
 			this.users = ez.users;
 			this.balanceOperations = ez.balanceOperations;
+			this.productTypes = ez.productTypes;
 			this.products = ez.products;
 			this.orders = ez.orders;
 			this.paidReturnTransactions = ez.paidReturnTransactions;
@@ -109,7 +112,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			
 			BalanceOperationImpl.PROGRESSIVE_ID = balanceOperations.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
-			ProductTypeImpl.PROGRESSIVE_ID = products.values().stream().map((ProductTypeImpl p) -> p.getId()).max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
+			ProductTypeImpl.PROGRESSIVE_ID = productTypes.values().stream().map((ProductTypeImpl p) -> p.getId()).max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
 			OrderImpl.PROGRESSIVE_ID = orders.keySet().stream().max((Integer i1, Integer i2) -> i1 - i2).orElse(0) + 1;
 			
@@ -150,6 +153,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	closedReturnTransactions.clear();
     	paidReturnTransactions.clear();
     	balanceOperations.clear();
+    	productTypes.clear();
     	products.clear();
     	// According to API these maps shouldn't be cleared by reset()
     	users.clear();		
@@ -300,7 +304,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         	throw new InvalidPricePerUnitException();
         
         //BarCode must be unique        
-        if(products.containsKey(productCode))
+        if(productTypes.containsKey(productCode))
         	return -1;
 		
 		ProductTypeImpl pt = new ProductTypeImpl();
@@ -314,7 +318,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 			pt.setNote(note);
 		}
 
-		products.put(pt.getBarCode(),pt);
+		productTypes.put(pt.getBarCode(),pt);
 
         return pt.getId();
     }
@@ -337,14 +341,14 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         if ( id == null || id <= 0)
         	throw new InvalidProductIdException();
         
-        ProductType pr = products.get(newCode);
+        ProductType pr = productTypes.get(newCode);
         if(pr != null && pr.getId() != id)
         	return false;
         
-        if(products.size()!=0) 
+        if(productTypes.size()!=0) 
         {
     	   
-        	for ( ProductType product : products.values())
+        	for ( ProductType product : productTypes.values())
         	{
         		if(product.getId() == id)
         		{
@@ -370,13 +374,13 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(id == null || id <= 0) 
     		throw new InvalidProductIdException();
     	
-		if(products.size()!=0)
+		if(productTypes.size()!=0)
 		{
-			for(ProductType product : products.values())
+			for(ProductType product : productTypes.values())
 			{
 				if(product.getId() == id)
 				{	
-					products.remove(product.getBarCode());
+					productTypes.remove(product.getBarCode());
 					return true;
 				
 				}
@@ -392,7 +396,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if(this.loggedUser==null || this.loggedUser.getRole().equals("Cashier"))
     		throw new UnauthorizedException();
     	
-    	return new ArrayList<ProductType>(products.values());
+    	return new ArrayList<ProductType>(productTypes.values());
     }
 
     @Override
@@ -404,7 +408,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	if((barCode == null) || (barCode.length() == 0) || (!barCodeIsValid(barCode)))
     		throw new InvalidProductCodeException();
     	    	
-		return products.get(barCode);
+		return productTypes.get(barCode);
 
     }
 
@@ -418,9 +422,9 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         if (description == null || description.length()==0) 
         	description = "";
         
-        if(products.size()!=0)
+        if(productTypes.size()!=0)
         {
-        	 for(ProductType product : products.values())
+        	 for(ProductType product : productTypes.values())
              {
              	if(product.getProductDescription().contains(description))
              	{
@@ -442,7 +446,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
         
         if(productId!=null && productId>0)
         {
-        	for(ProductType product : products.values())
+        	for(ProductType product : productTypes.values())
         	{
         		if(product.getId()==productId)
         		{
@@ -454,7 +458,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     				
         			if(newQuantity>=0)
         			{
-        				ProductType p = products.get(product.getBarCode());
+        				ProductType p = productTypes.get(product.getBarCode());
         				p.setQuantity(newQuantity);
         				return true;
         			}
@@ -486,12 +490,12 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	{
     		if(newPos.matches("[0-9]+[-][a-zA-Z]+[-][0-9]+"))
     		{
-    			if(products.size()!=0)
+    			if(productTypes.size()!=0)
     			{
 	    			//La location deve essere univoca
 					//Scorro tutti i prodotti per vedere se esiste già la locazione
 					//Se esiste non è univoca e ritorno false
-	    			for(ProductType product : products.values())
+	    			for(ProductType product : productTypes.values())
 	    			{
 	    				if(product.getLocation()!=null)
 	    				{
@@ -505,11 +509,11 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 	    			
 	    			//La location è univoca
 	    			//Aggiorno il prodotto alla nuova locazione
-	    			for(ProductType product : products.values())
+	    			for(ProductType product : productTypes.values())
 	    			{
 	    				if(product.getId()==productId)
 	    				{
-	    					ProductType p = products.get(product.getBarCode());
+	    					ProductType p = productTypes.get(product.getBarCode());
 	        				p.setLocation(newPos);
 	        				return true;
 	    				}
@@ -543,7 +547,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     			{
     				//Controllo che il prodotto sia in inventario
     				//Altrimenti torno -1
-    				if(!products.containsKey(productCode))
+    				if(!productTypes.containsKey(productCode))
     					return -1;
     				
     				//Creo nuovo ordine e lo aggiungo alla lista
@@ -580,7 +584,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     		{
     			if(pricePerUnit>0)
     			{
-    				if(!products.containsKey(productCode))
+    				if(!productTypes.containsKey(productCode))
     					return -1;
 					
 					if(this.balance >= (quantity*pricePerUnit))
@@ -673,7 +677,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     	{
     		if(orders.containsKey(orderId))
     		{
-	    		ProductType p = products.get(orders.get(orderId).getProductCode());
+	    		ProductType p = productTypes.get(orders.get(orderId).getProductCode());
 	    		Order o = orders.get(orderId);
 	    		if((p.getLocation()!=null) && (!p.getLocation().isEmpty()))
 	    		{
@@ -687,7 +691,7 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
 	    				oldQuantity = p.getQuantity();
 	    				
 	    				int quantityToAdd = o.getQuantity();
-	    				products.get(barCode).setQuantity(oldQuantity + quantityToAdd);
+	    				productTypes.get(barCode).setQuantity(oldQuantity + quantityToAdd);
 	    				orders.get(orderId).setStatus("COMPLETED");
 	    				return true;
 	    			}
@@ -724,7 +728,37 @@ public class EZShop implements EZShopInterface, java.io.Serializable {
     @Override
     public boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom) throws InvalidOrderIdException, UnauthorizedException, 
 InvalidLocationException, InvalidRFIDException {
-        return false;
+    	if(this.loggedUser==null || this.loggedUser.getRole().equals("Cashier"))
+    		throw new UnauthorizedException();
+    	
+    	if(orderId == null || orderId <= 0)
+    		throw new InvalidOrderIdException();
+    	
+    	if(RFIDfrom == null || RFIDfrom.isEmpty() || !RFIDfrom.matches("[0-9]{12}"))
+    		throw new InvalidRFIDException();
+    	
+    	boolean ret = false;
+    	
+    	if(!orders.containsKey(orderId))
+    		return ret;
+    	
+    	ProductTypeImpl pr = productTypes.get(orders.get(orderId).getProductCode());
+    	int quantity = orders.get(orderId).getQuantity();
+    	for(int i = 0; i<quantity; ++i) {
+    		String rfid = String.format("%012d", Integer.valueOf(RFIDfrom) + i);
+    		if(products.get(rfid) != null)
+    			throw new InvalidRFIDException();
+    	}
+    	
+    	ret = recordOrderArrival(orderId);
+    	if(ret) {
+        	for(int i = 0; i<quantity; ++i) {
+        		String rfid = String.format("%012d", Integer.valueOf(RFIDfrom) + i);
+        		products.put(rfid, pr);
+        	}
+    	}
+    	
+        return ret;
     }
     @Override
     public List<Order> getAllOrders() throws UnauthorizedException {
@@ -967,7 +1001,7 @@ InvalidLocationException, InvalidRFIDException {
     	if(amount < 0)
     		throw new InvalidQuantityException();
     	
-		ProductType refProd = products.get(productCode);
+		ProductType refProd = productTypes.get(productCode);
 		if(refProd == null || refProd.getQuantity() < amount)
 			return false;
 		SaleTransaction sale = openedSaleTransactions.get(transactionId);
@@ -995,7 +1029,26 @@ InvalidLocationException, InvalidRFIDException {
 
     @Override
     public boolean addProductToSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
-        return false;
+    	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
+    		throw new UnauthorizedException();
+    	
+    	if(transactionId == null || transactionId <= 0)
+    		throw new InvalidTransactionIdException();
+    
+    	if(RFID == null || RFID.isEmpty() || !RFID.matches("[0-9]{12}"))
+    		throw new InvalidRFIDException();
+
+    	boolean ret = false;
+    	ProductType pr = products.get(RFID);
+    	if(pr == null)
+    		return false;
+    	try {
+			ret = addProductToSale(transactionId, pr.getBarCode(), 1);
+		} catch (InvalidProductCodeException e) {
+			
+		}
+    	
+    	return ret;
     }
     
     @Override
@@ -1012,7 +1065,7 @@ InvalidLocationException, InvalidRFIDException {
     	if(amount < 0)
     		throw new InvalidQuantityException();
 
-    	ProductType refProd = products.get(productCode);
+    	ProductType refProd = productTypes.get(productCode);
 		if(refProd == null)
 			return false;
 		SaleTransaction sale = openedSaleTransactions.get(transactionId);
@@ -1034,7 +1087,26 @@ InvalidLocationException, InvalidRFIDException {
 
     @Override
     public boolean deleteProductFromSaleRFID(Integer transactionId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, InvalidQuantityException, UnauthorizedException{
-        return false;
+    	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
+    		throw new UnauthorizedException();
+    	
+    	if(transactionId == null || transactionId <= 0)
+    		throw new InvalidTransactionIdException();
+    	
+    	if(RFID == null || RFID.isEmpty() || !RFID.matches("[0-9]{12}"))
+    		throw new InvalidRFIDException();
+    	
+    	boolean ret = false;
+    	ProductTypeImpl pr = products.get(RFID);
+    	if(pr != null) {
+    		try {
+				ret = deleteProductFromSale(transactionId, pr.getBarCode(), 1);
+			} catch (InvalidProductCodeException e) {
+
+			}
+    	}
+    	
+    	return ret;
     }
 
     @Override
@@ -1051,7 +1123,7 @@ InvalidLocationException, InvalidRFIDException {
     	if(discountRate < 0.0 || discountRate >= 1.0)
     		throw new InvalidDiscountRateException ();
     	
-		if(products.get(productCode) == null)
+		if(productTypes.get(productCode) == null)
 			return false;
 		
 		SaleTransaction sale = openedSaleTransactions.get(transactionId);
@@ -1149,7 +1221,7 @@ InvalidLocationException, InvalidRFIDException {
     	sale = closedSaleTransactions.get(transactionId);
     	if(sale != null) {
     		sale.getEntries().stream().forEach(t -> {
-    			ProductType pr = products.get(t.getBarCode());
+    			ProductType pr = productTypes.get(t.getBarCode());
     			pr.setQuantity(pr.getQuantity() + t.getAmount());			
     		});
     		closedSaleTransactions.remove(transactionId);
@@ -1158,7 +1230,7 @@ InvalidLocationException, InvalidRFIDException {
     	sale = paidSaleTransactions.get(transactionId);
     	if(sale != null) {
     		sale.getEntries().stream().forEach(t -> {
-    			ProductType pr = products.get(t.getBarCode());
+    			ProductType pr = productTypes.get(t.getBarCode());
     			pr.setQuantity(pr.getQuantity() + t.getAmount());			
     		});
     		this.balance += sale.getPrice();
@@ -1214,7 +1286,7 @@ InvalidLocationException, InvalidRFIDException {
     	if(amount <= 0)
     		throw new InvalidQuantityException();
 
-    	if(!products.containsKey(productCode) || !openedReturnTransactions.containsKey(returnId))
+    	if(!productTypes.containsKey(productCode) || !openedReturnTransactions.containsKey(returnId))
     		return false;
     	
     	ReturnTransactionImpl rt = openedReturnTransactions.get(returnId);
@@ -1245,9 +1317,28 @@ InvalidLocationException, InvalidRFIDException {
     }
 
     @Override
-    public boolean returnProductRFID(Integer returnId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, UnauthorizedException 
-    {
-        return false;
+    public boolean returnProductRFID(Integer returnId, String RFID) throws InvalidTransactionIdException, InvalidRFIDException, UnauthorizedException {
+        //TODO:sas
+    	if(loggedUser == null || (!loggedUser.getRole().equals("Administrator") && !loggedUser.getRole().equals("ShopManager") && !loggedUser.getRole().equals("Cashier")))
+    		throw new UnauthorizedException();
+    	
+    	if(returnId == null || returnId <= 0)
+    		throw new InvalidTransactionIdException();
+    	
+    	if(RFID == null || RFID.isEmpty() || !RFID.matches("[0-9]{12}"))
+    		throw new InvalidRFIDException();
+    	
+    	boolean ret = false;
+    	ProductTypeImpl pr = products.get(RFID);
+    	if(pr != null) {
+				try {
+					ret = returnProduct(returnId, pr.getBarCode(), 1);
+				} catch (InvalidProductCodeException | InvalidQuantityException e) {
+					
+				}
+    	}
+    	
+    	return ret;
     }
 
 
@@ -1270,7 +1361,7 @@ InvalidLocationException, InvalidRFIDException {
     	ReturnTransactionImpl rt = openedReturnTransactions.get(returnId);
     	
     	for(TicketEntry te : rt.getEntries()) {
-    		ProductType p = products.get(te.getBarCode());
+    		ProductType p = productTypes.get(te.getBarCode());
     		p.setQuantity(p.getQuantity() + te.getAmount());
     		
     		SaleTransaction st = rt.getSaleTransaction();
@@ -1301,7 +1392,7 @@ InvalidLocationException, InvalidRFIDException {
         ReturnTransactionImpl rt = closedReturnTransactions.get(returnId);
         
     	for(TicketEntry te : rt.getEntries()) {
-    		ProductType p = products.get(te.getBarCode());
+    		ProductType p = productTypes.get(te.getBarCode());
     		p.setQuantity(p.getQuantity() - te.getAmount());
     		
     		SaleTransaction st = rt.getSaleTransaction();

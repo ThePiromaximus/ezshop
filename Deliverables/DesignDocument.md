@@ -3,9 +3,9 @@
 
 Authors: Angela D'Antonio, Gabriele Inzerillo, Ruggero Nocera, Marzio Vallero
 
-Date: 31/05/2021
+Date: 06/06/2021
 
-Version: 1.2
+Version: 1.3
 
 
 # Contents
@@ -77,6 +77,7 @@ top to bottom direction
     Integer payOrderFor(String productCode, int quantity, double pricePerUnit)
     boolean payOrder(Integer orderId) 
     boolean recordOrderArrival(Integer orderId) 
+    boolean recordOrderArrivalRFID(Integer orderId, String RFIDfrom)
     List<Order> getAllOrders() 
     -- Customer Management --
     Integer defineCustomer(String customerName) 
@@ -89,8 +90,10 @@ top to bottom direction
     boolean modifyPointsOnCard(String customerCard, int pointsToBeAdded) 
     -- Payment Management --
     Integer startSaleTransaction() 
-    boolean addProductToSale(Integer transactionId, String productCode, int amount) 
-    boolean deleteProductFromSale(Integer transactionId, String productCode, int amount) 
+    boolean addProductToSale(Integer transactionId, String productCode, int amount)
+    boolean addProductToSaleRFID(Integer transactionId, String RFID)
+    boolean deleteProductFromSale(Integer transactionId, String productCode, int amount)
+    boolean deleteProductFromSaleRFID(Integer transactionId, String RFID) 
     boolean applyDiscountRateToProduct(Integer transactionId, String productCode, double discountRate) 
     boolean applyDiscountRateToSale(Integer transactionId, double discountRate) 
     int computePointsForSale(Integer transactionId) 
@@ -99,6 +102,7 @@ top to bottom direction
     SaleTransaction getSaleTransaction(Integer transactionId) 
     Integer startReturnTransaction(Integer transactionId) 
     boolean returnProduct(Integer returnId, String productCode, int amount) 
+    boolean returnProductRFID(Integer returnId, String RFID)
     boolean endReturnTransaction(Integer returnId, boolean commit) 
     boolean deleteReturnTransaction(Integer returnId) 
     double receiveCashPayment(Integer transactionId, double cash) 
@@ -120,6 +124,7 @@ top to bottom direction
         HashMap<Integer, ReturnTransactionImpl> closedReturnTransactions
         HashMap<Integer, ReturnTransactionImpl> paidReturnTransactions
         HashMap<Integer, OrderImpl> orders
+        HashMap<String, ProductTypeImpl> productTypes
         HashMap<String, ProductTypeImpl> products
         HashMap<Integer, BalanceOperationImpl> balanceOperations
         HashMap<Integer, UserImpl> users
@@ -279,9 +284,10 @@ package it.polito.ezshop.exceptions {
     InvalidQuantityException -up--|> E
     InvalidRoleException -up-|> E
 
-    InvalidTransactionIdException -down--|> E
-    InvalidUserIdException -down-|> E
-    InvalidUsernameException -down--|> E
+    InvalidTransactionIdException -down-|> E
+    InvalidUserIdException -down--|> E
+    InvalidUsernameException -down-|> E
+    InvalidRFIDException -down--|> E
     UnauthorizedException -down-|> E
 }
 @enduml
